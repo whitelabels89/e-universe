@@ -77,6 +77,8 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     const newPosition = currentPosition.current.clone().add(moveVector);
     newPosition.y = 2.0; // Keep avatar above ground
     
+
+    
     // Update position and rotation
     currentPosition.current.copy(newPosition);
     groupRef.current.position.copy(newPosition);

@@ -27,13 +27,9 @@ export function GridWorld({ size = 50, onGridClick }: GridWorldProps) {
     // Snap to grid
     const gridX = Math.round(point.x);
     const gridZ = Math.round(point.z);
-    const gridY = 0;
+    const gridY = 2; // Place objects above ground
     
-    // Check bounds
-    const maxGrid = Math.floor(size / 2);
-    if (Math.abs(gridX) <= maxGrid && Math.abs(gridZ) <= maxGrid) {
-      onGridClick([gridX, gridY, gridZ]);
-    }
+    onGridClick([gridX, gridY, gridZ]);
   };
   
   return (

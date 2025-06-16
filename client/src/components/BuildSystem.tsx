@@ -115,28 +115,7 @@ export function BuildSystem() {
 
   return (
     <>
-      {/* Invisible plane for click detection */}
-      <mesh
-        position={[0, 0, 0]}
-        rotation={[-Math.PI / 2, 0, 0]}
-        onPointerMove={(e) => {
-          const point = e.point;
-          const gridX = Math.round(point.x);
-          const gridZ = Math.round(point.z);
-          handleGridHover([gridX, 2, gridZ]);
-        }}
-        onClick={(e) => {
-          const point = e.point;
-          const gridX = Math.round(point.x);
-          const gridZ = Math.round(point.z);
-          handleGridClick([gridX, 2, gridZ]);
-        }}
-      >
-        <planeGeometry args={[100, 100]} />
-        <meshBasicMaterial transparent opacity={0} />
-      </mesh>
-
-      {/* Build preview */}
+      {/* Build preview only - no invisible collision plane */}
       {hoverPosition && (
         <BuildPreview 
           position={hoverPosition} 
