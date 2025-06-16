@@ -2,7 +2,9 @@ import { useState, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
 import { useWorldObjects } from "../lib/stores/useWorldObjects";
 import { useEducation } from "../lib/stores/useEducation";
+import { useAudio } from "../lib/stores/useAudio";
 import { PREFAB_TYPES } from "../types/education";
+import { showNotification } from "./UI/NotificationSystem";
 import * as THREE from "three";
 
 interface BuildPreviewProps {
@@ -77,6 +79,7 @@ export function BuildSystem() {
     objects
   } = useWorldObjects();
   const { student } = useEducation();
+  const { playSuccess, playHit } = useAudio();
   const [previewPosition, setPreviewPosition] = useState<[number, number, number] | null>(null);
   const [isValidPosition, setIsValidPosition] = useState(false);
 
@@ -109,12 +112,27 @@ export function BuildSystem() {
         requiredLevel: prefabType.requiredLevel
       });
       
+      // Play success sound and show notification
+      playSuccess();
+      showNotification(`Built ${prefabType.name} successfully!`, 'success');
+      
       // Exit placement mode
       setPlacementMode(false);
       setSelectedPrefab(null);
       setPreviewPosition(null);
       
       console.log(`Built ${prefabType.name} at position:`, position);
+    } else {
+      // Play error sound for invalid placement
+      playHit();
+      
+      if (!inBounds) {
+        showNotification('Cannot build outside the world boundaries!', 'error');
+      } else if (isOccupied) {
+        showNotification('Position is already occupied!', 'error');
+      } else if (!isUnlocked) {
+        showNotification(`Need level ${prefabType.requiredLevel} to build ${prefabType.name}!`, 'error');
+      }
     }
   };
 

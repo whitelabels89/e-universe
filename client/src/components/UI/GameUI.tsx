@@ -1,6 +1,7 @@
 import { LeftPanel } from "./LeftPanel";
 import { RightPanel } from "./RightPanel";
 import { AvatarCustomizationPanel } from "./AvatarCustomizationPanel";
+import { NotificationSystem } from "./NotificationSystem";
 
 export function GameUI() {
   return (
@@ -8,6 +9,7 @@ export function GameUI() {
       <LeftPanel />
       <RightPanel />
       <AvatarCustomizationPanel />
+      <NotificationSystem />
       
       {/* Top Status Bar */}
       <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-black/20 backdrop-blur-md rounded-lg border border-white/10 px-6 py-2 z-50">
@@ -19,7 +21,7 @@ export function GameUI() {
       {/* Bottom Instructions */}
       <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black/20 backdrop-blur-md rounded-lg border border-white/10 px-4 py-2 z-50">
         <div className="text-white/70 text-xs text-center">
-          Use WASD to move Nina • Mouse to look around • Click objects in left panel to place them
+          Use WASD to move Nina • A/D to turn • Click to place buildings
         </div>
       </div>
     </>
