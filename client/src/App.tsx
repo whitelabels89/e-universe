@@ -174,8 +174,8 @@ function App() {
             <BuildSystem />
           </Suspense>
 
-          {/* Camera Controls - Enabled for 3rd person camera drag */}
-          <OrbitControls
+          {/* Camera Controls - Temporarily disabled for debugging */}
+          {/* <OrbitControls
             target={[avatarPosition[0], avatarPosition[1] + 1, avatarPosition[2]]}
             enablePan={false}
             enableZoom={true}
@@ -188,7 +188,7 @@ function App() {
             rotateSpeed={0.5}
             zoomSpeed={1.0}
             autoRotate={false}
-          />
+          /> */}
         </Canvas>
 
         {/* UI Overlay */}
