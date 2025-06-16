@@ -81,11 +81,7 @@ export function GridWorld({ size = 50, onGridClick }: GridWorldProps) {
         );
       })}
       
-      {/* World center marker */}
-      <mesh position={[0, 0.1, 0]}>
-        <cylinderGeometry args={[0.2, 0.2, 0.1]} />
-        <meshBasicMaterial color="#FFC107" />
-      </mesh>
+      {/* World center marker - removed to avoid visual constraint */}
     </group>
   );
 }

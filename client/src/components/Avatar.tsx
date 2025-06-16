@@ -42,50 +42,45 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     }
   }, [position]);
   
-  // Movement system - free movement without bounds
+  // Third-person movement system - tank-style controls
   useFrame((state, delta) => {
     if (!groupRef.current) return;
     
     const controls = getControls();
-    const moveSpeed = 10;
+    const moveSpeed = 8;
+    const turnSpeed = 3;
     
-    // Reset velocity
-    velocity.current.set(0, 0, 0);
-    
-    // Apply movement based on controls with corrected direction math
-    let moved = false;
-    
-    if (controls.forward) {
-      // Move forward in the direction character is facing
-      velocity.current.x += Math.sin(rotation.current) * moveSpeed * delta;
-      velocity.current.z -= Math.cos(rotation.current) * moveSpeed * delta;
-      moved = true;
-    }
-    if (controls.backward) {
-      // Move backward opposite to facing direction  
-      velocity.current.x -= Math.sin(rotation.current) * moveSpeed * delta;
-      velocity.current.z += Math.cos(rotation.current) * moveSpeed * delta;
-      moved = true;
-    }
+    // Handle rotation (turning)
     if (controls.leftward) {
-      rotation.current += 2 * delta; // Turn left
-      moved = true;
+      rotation.current += turnSpeed * delta;
     }
     if (controls.rightward) {
-      rotation.current -= 2 * delta; // Turn right
-      moved = true;
+      rotation.current -= turnSpeed * delta;
     }
     
-    // Apply velocity without any bounds checking
-    const newPosition = currentPosition.current.clone().add(velocity.current);
+    // Handle forward/backward movement
+    const moveVector = new THREE.Vector3(0, 0, 0);
+    
+    if (controls.forward) {
+      // Move forward based on character's facing direction
+      moveVector.z = -moveSpeed * delta;
+    }
+    if (controls.backward) {
+      // Move backward
+      moveVector.z = moveSpeed * delta;
+    }
+    
+    // Apply rotation to movement vector
+    moveVector.applyAxisAngle(new THREE.Vector3(0, 1, 0), rotation.current);
+    
+    // Update position freely without any constraints
+    const newPosition = currentPosition.current.clone().add(moveVector);
     newPosition.y = 2.0; // Keep avatar above ground
     
     // Update position and rotation
     currentPosition.current.copy(newPosition);
     groupRef.current.position.copy(newPosition);
     groupRef.current.rotation.y = rotation.current;
-    
-    // Let OrbitControls handle camera positioning - no manual camera control needed
     
     // Notify parent component of position changes
     if (onPositionChange) {
