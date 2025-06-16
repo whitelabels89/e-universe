@@ -38,7 +38,7 @@ export const PREFAB_TYPES: PrefabType[] = [
     name: 'Coding Lab',
     type: 'coding-lab',
     color: '#2196F3',
-    requiredLevel: 2,
+    requiredLevel: 1,
     description: 'Advanced programming workspace'
   },
   {

@@ -1,6 +1,7 @@
 import { useRef, useEffect } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { useKeyboardControls } from "@react-three/drei";
+import { useAvatarCustomization } from "../lib/stores/useAvatarCustomization";
 import * as THREE from "three";
 
 // Define movement controls
@@ -17,9 +18,10 @@ interface AvatarProps {
 }
 
 export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps) {
-  const meshRef = useRef<THREE.Mesh>(null);
+  const groupRef = useRef<THREE.Group>(null);
   const [subscribe, getControls] = useKeyboardControls<Controls>();
   const { camera } = useThree();
+  const { customization } = useAvatarCustomization();
   
   // Avatar movement state
   const velocity = useRef(new THREE.Vector3());
@@ -27,15 +29,15 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
   
   // Initialize position
   useEffect(() => {
-    if (meshRef.current) {
-      meshRef.current.position.set(...position);
+    if (groupRef.current) {
+      groupRef.current.position.set(...position);
       currentPosition.current.set(...position);
     }
   }, [position]);
   
   // Movement system with bounds checking (10x10 grid)
   useFrame((state, delta) => {
-    if (!meshRef.current) return;
+    if (!groupRef.current) return;
     
     const controls = getControls();
     const moveSpeed = 5;
@@ -72,7 +74,7 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     
     // Update position
     currentPosition.current.copy(newPosition);
-    meshRef.current.position.copy(newPosition);
+    groupRef.current.position.copy(newPosition);
     
     // Update camera to follow avatar (offset behind and above)
     const idealCameraPosition = new THREE.Vector3(
@@ -91,27 +93,59 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
   });
   
   return (
-    <group>
+    <group ref={groupRef}>
       {/* Avatar Body - A simple character representation */}
-      <mesh ref={meshRef} castShadow>
+      <mesh castShadow>
         <boxGeometry args={[0.6, 1.2, 0.3]} />
-        <meshLambertMaterial color="#FFB74D" />
+        <meshLambertMaterial color={customization.bodyColor} />
       </mesh>
       
       {/* Avatar Head */}
       <mesh position={[0, 1, 0]} castShadow>
         <sphereGeometry args={[0.25]} />
-        <meshLambertMaterial color="#FFCC80" />
+        <meshLambertMaterial color={customization.headColor} />
       </mesh>
       
-      {/* Simple face features */}
+      {/* Hair */}
+      <mesh position={[0, 1.15, 0]} castShadow>
+        <sphereGeometry args={[0.28]} />
+        <meshLambertMaterial color={customization.hairColor} />
+      </mesh>
+      
+      {/* Simple face features - Eyes */}
       <mesh position={[0.1, 1.05, 0.22]} castShadow>
         <sphereGeometry args={[0.03]} />
-        <meshLambertMaterial color="#333" />
+        <meshLambertMaterial color={customization.eyeColor} />
       </mesh>
       <mesh position={[-0.1, 1.05, 0.22]} castShadow>
         <sphereGeometry args={[0.03]} />
-        <meshLambertMaterial color="#333" />
+        <meshLambertMaterial color={customization.eyeColor} />
+      </mesh>
+      
+      {/* Mouth */}
+      <mesh position={[0, 0.95, 0.22]} castShadow>
+        <sphereGeometry args={[0.02]} />
+        <meshLambertMaterial color="#FF6B6B" />
+      </mesh>
+      
+      {/* Avatar Legs */}
+      <mesh position={[0.15, -0.8, 0]} castShadow>
+        <boxGeometry args={[0.2, 0.6, 0.2]} />
+        <meshLambertMaterial color={customization.clothingColor} />
+      </mesh>
+      <mesh position={[-0.15, -0.8, 0]} castShadow>
+        <boxGeometry args={[0.2, 0.6, 0.2]} />
+        <meshLambertMaterial color={customization.clothingColor} />
+      </mesh>
+      
+      {/* Avatar Arms */}
+      <mesh position={[0.4, 0.3, 0]} castShadow>
+        <boxGeometry args={[0.15, 0.6, 0.15]} />
+        <meshLambertMaterial color={customization.bodyColor} />
+      </mesh>
+      <mesh position={[-0.4, 0.3, 0]} castShadow>
+        <boxGeometry args={[0.15, 0.6, 0.15]} />
+        <meshLambertMaterial color={customization.bodyColor} />
       </mesh>
       
       {/* Avatar name label */}
