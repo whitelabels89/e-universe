@@ -171,12 +171,7 @@ function App() {
 
           {/* Camera Controls - Enabled for 3rd person camera drag */}
           <OrbitControls
-            ref={(controls) => {
-              if (controls && avatarPosition) {
-                controls.target.set(avatarPosition[0], avatarPosition[1] + 1, avatarPosition[2]);
-                controls.update();
-              }
-            }}
+            target={[avatarPosition[0], avatarPosition[1] + 1, avatarPosition[2]]}
             enablePan={false}
             enableZoom={true}
             enableRotate={true}
