@@ -93,27 +93,15 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
   
   return (
     <group ref={groupRef}>
-      {/* 3D Nina Model with fallback */}
-      {ninaModel ? (
-        <primitive 
-          object={ninaModel.clone()} 
-          scale={[2.5, 2.5, 2.5]} 
-          position={[0, -0.9, 0]}
-          castShadow
-        />
-      ) : (
-        // Fallback simple character while model loads
-        <>
-          <mesh castShadow>
-            <boxGeometry args={[0.6, 1.8, 0.3]} />
-            <meshLambertMaterial color={customization.bodyColor} />
-          </mesh>
-          <mesh position={[0, 1.25, 0]} castShadow>
-            <sphereGeometry args={[0.3]} />
-            <meshLambertMaterial color={customization.headColor} />
-          </mesh>
-        </>
-      )}
+      {/* Visible test character - bright colored box */}
+      <mesh castShadow>
+        <boxGeometry args={[1, 2, 0.5]} />
+        <meshLambertMaterial color="#FF0000" />
+      </mesh>
+      <mesh position={[0, 1.25, 0]} castShadow>
+        <sphereGeometry args={[0.3]} />
+        <meshLambertMaterial color="#00FF00" />
+      </mesh>
       
       {/* Avatar name label */}
       <mesh position={[0, 2, 0]}>

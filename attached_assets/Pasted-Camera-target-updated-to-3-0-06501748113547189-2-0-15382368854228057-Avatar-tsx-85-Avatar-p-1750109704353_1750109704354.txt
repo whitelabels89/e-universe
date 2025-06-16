@@ -1,0 +1,31 @@
+Camera target updated to: (3) [-0.06501748113547189, 2, -0.15382368854228057]
+Avatar.tsx:85 Avatar position after: (3) [-0.06501748113547189, 2, -0.15382368854228057] applied to mesh
+App.tsx:97 Camera target updated to: (3) [-0.06501748113547189, 2, -0.15382368854228057]
+Avatar.tsx:85 Avatar position after: (3) [-0.06501748110646481, 2, -0.15382368847365327] applied to mesh
+App.tsx:97 Camera target updated to: (3) [-0.06501748110646481, 2, -0.15382368847365327]
+Avatar.tsx:85 Avatar position after: (3) [-0.06384950241524365, 2, -0.1510603887074246] applied to mesh
+App.tsx:97 Camera target updated to: (3) [-0.06384950241524365, 2, -0.1510603887074246]
+Avatar.tsx:85 Avatar position after: (3) [0, 2, 0] applied to mesh
+App.tsx:97 Camera target updated to: (3) [0, 2, 0]
+Avatar.tsx:85 Avatar position after: (3) [0, 2, 0] applied to mesh
+App.tsx:97 Camera target updated to: (3) [0, 2, 0]
+Avatar.tsx:85 Avatar position after: (3) [0, 2, 0] applied to mesh
+App.tsx:97 Camera target updated to: (3) [0, 2, 0]
+Avatar.tsx:85 Avatar position after: (3) [0, 2, 0] applied to mesh
+App.tsx:97 Camera target updated to: (3) [0, 2, 0]
+Avatar.tsx:85 Avatar position after: (3) [0, 2, 0] applied to mesh
+App.tsx:97 Camera target updated to: (3) [0, 2, 0]
+Avatar.tsx:85 Avatar position after: (3) [0, 2, 0] applied to mesh
+App.tsx:97 Camera target updated to: (3) [0, 2, 0]
+Avatar.tsx:85 Avatar position after: (3) [0, 2, 0] applied to mesh
+App.tsx:97 Camera target updated to: (3) [0, 2, 0]
+Avatar.tsx:85 Avatar position after: (3) [0, 2, 0] applied to mesh
+App.tsx:97 Camera target updated to: (3) [0, 2, 0]
+Avatar.tsx:85 Avatar position after: (3) [0, 2, 0] applied to mesh
+App.tsx:97 Camera target updated to: (3) [0, 2, 0]
+Avatar.tsx:85 Avatar position after: (3) [-0.057138415327063645, 2, -0.1569210039445995] applied to mesh
+App.tsx:97 Camera target updated to: (3) [-0.057138415327063645, 2, -0.1569210039445995]
+Avatar.tsx:85 Avatar position after: (3) [-0.056454122943049086, 2, -0.15504171052568758] applied to mesh
+App.tsx:97 Camera target updated to: (3) [-0.056454122943049086, 2, -0.15504171052568758]
+Avatar.tsx:85 Avatar position after: (3) [-0.05748056155730873, 2, -0.15786065075906916] applied to mesh
+App.tsx:97 Camera target updated to: (3) [-0.05748056155730873, 2, -0.15786065075906916]
