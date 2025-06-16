@@ -60,19 +60,23 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
       velocity.current.x -= Math.sin(rotation.current) * moveSpeed * delta;
       velocity.current.z -= Math.cos(rotation.current) * moveSpeed * delta;
       moved = true;
+      console.log('Moving forward, rotation:', rotation.current, 'velocity:', velocity.current);
     }
     if (controls.backward) {
       velocity.current.x += Math.sin(rotation.current) * moveSpeed * delta;
       velocity.current.z += Math.cos(rotation.current) * moveSpeed * delta;
       moved = true;
+      console.log('Moving backward, rotation:', rotation.current, 'velocity:', velocity.current);
     }
     if (controls.leftward) {
       rotation.current -= 2 * delta;
       moved = true;
+      console.log('Turning left, new rotation:', rotation.current);
     }
     if (controls.rightward) {
       rotation.current += 2 * delta;
       moved = true;
+      console.log('Turning right, new rotation:', rotation.current);
     }
     
     // Apply velocity with bounds checking
@@ -88,12 +92,7 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     groupRef.current.position.copy(newPosition);
     groupRef.current.rotation.y = rotation.current;
     
-    // Update OrbitControls target to follow character (let OrbitControls handle camera positioning)
-    if (camera && (camera as any).target) {
-      const targetPosition = newPosition.clone();
-      targetPosition.y += 1; // Look at character center
-      (camera as any).target.lerp(targetPosition, 2 * delta);
-    }
+    // Let OrbitControls handle camera positioning - no manual camera control needed
     
     // Notify parent component of position changes
     if (onPositionChange) {

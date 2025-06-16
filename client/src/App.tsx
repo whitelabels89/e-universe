@@ -1,5 +1,5 @@
 import { Canvas } from "@react-three/fiber";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { KeyboardControls, OrbitControls } from "@react-three/drei";
 import { useAudio } from "./lib/stores/useAudio";
 import { useEducation } from "./lib/stores/useEducation";
@@ -88,6 +88,9 @@ function App() {
     loadFromStorage 
   } = useWorldObjects();
   const { loadFromStorage: loadAvatarCustomization } = useAvatarCustomization();
+  
+  // Avatar position state for camera following
+  const [avatarPosition, setAvatarPosition] = useState<[number, number, number]>([0, 2, 0]);
 
   // Load saved data on app start
   useEffect(() => {
@@ -157,7 +160,7 @@ function App() {
             <GridWorld size={50} onGridClick={handleGridClick} />
             
             {/* Player Avatar */}
-            <Avatar position={[0, 1.0, 0]} />
+            <Avatar position={[0, 1.0, 0]} onPositionChange={setAvatarPosition} />
             
             {/* Placed Objects */}
             <PrefabObjects />
@@ -168,6 +171,12 @@ function App() {
 
           {/* Camera Controls - Enabled for 3rd person camera drag */}
           <OrbitControls
+            ref={(controls) => {
+              if (controls && avatarPosition) {
+                controls.target.set(avatarPosition[0], avatarPosition[1] + 1, avatarPosition[2]);
+                controls.update();
+              }
+            }}
             enablePan={false}
             enableZoom={true}
             enableRotate={true}

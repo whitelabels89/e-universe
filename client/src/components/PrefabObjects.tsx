@@ -14,10 +14,14 @@ function PrefabObject({ object, onRemove }: PrefabObjectProps) {
   const groupRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
   
-  // Load 3D models
-  const { scene: schoolModel } = useGLTF('/models/school_building.glb');
-  const { scene: codingLabModel } = useGLTF('/models/coding_lab.glb');
-  const { scene: houseModel } = useGLTF('/models/house.glb');
+  // Load 3D models with error handling
+  const schoolGLTF = useGLTF('/models/school_building.glb');
+  const codingLabGLTF = useGLTF('/models/coding_lab.glb');
+  const houseGLTF = useGLTF('/models/house.glb');
+  
+  const schoolModel = schoolGLTF?.scene;
+  const codingLabModel = codingLabGLTF?.scene;
+  const houseModel = houseGLTF?.scene;
   
   const prefabType = PREFAB_TYPES.find(p => p.type === object.type);
   if (!prefabType) return null;
@@ -58,13 +62,20 @@ function PrefabObject({ object, onRemove }: PrefabObjectProps) {
       onPointerLeave={() => setHovered(false)}
     >
       {/* 3D Building Model */}
-      <primitive 
-        object={model3D.clone()} 
-        scale={[3, 3, 3]} 
-        position={[0, 1, 0]}
-        castShadow
-        receiveShadow
-      />
+      {model3D ? (
+        <primitive 
+          object={model3D.clone()} 
+          scale={[6, 6, 6]} 
+          position={[0, 1, 0]}
+          castShadow
+          receiveShadow
+        />
+      ) : (
+        <mesh position={[0, 3, 0]}>
+          <boxGeometry args={[4, 6, 4]} />
+          <meshStandardMaterial color={prefabType.color} />
+        </mesh>
+      )}
       
       {/* Lock indicator for locked objects */}
       {!object.isUnlocked && (
