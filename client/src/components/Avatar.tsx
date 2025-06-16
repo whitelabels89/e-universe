@@ -42,51 +42,44 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     }
   }, [position]);
   
-  // Third-person movement system - tank-style controls
+  // Simple direct movement system
   useFrame((state, delta) => {
     if (!groupRef.current) return;
     
     const controls = getControls();
-    const moveSpeed = 8;
-    const turnSpeed = 3;
+    const speed = 10;
     
-    // Handle rotation (turning)
-    if (controls.leftward) {
-      rotation.current += turnSpeed * delta;
-    }
-    if (controls.rightward) {
-      rotation.current -= turnSpeed * delta;
-    }
+    // Direct position modification without any intermediate variables
+    let x = groupRef.current.position.x;
+    let z = groupRef.current.position.z;
+    let y = 2.0;
+    let rot = groupRef.current.rotation.y;
     
-    // Handle forward/backward movement
-    const moveVector = new THREE.Vector3(0, 0, 0);
-    
+    // Movement controls
     if (controls.forward) {
-      // Move forward based on character's facing direction
-      moveVector.z = -moveSpeed * delta;
+      x += Math.sin(rot) * speed * delta;
+      z += Math.cos(rot) * speed * delta;
     }
     if (controls.backward) {
-      // Move backward
-      moveVector.z = moveSpeed * delta;
+      x -= Math.sin(rot) * speed * delta;
+      z -= Math.cos(rot) * speed * delta;
+    }
+    if (controls.leftward) {
+      rot += 3 * delta;
+    }
+    if (controls.rightward) {
+      rot -= 3 * delta;
     }
     
-    // Apply rotation to movement vector
-    moveVector.applyAxisAngle(new THREE.Vector3(0, 1, 0), rotation.current);
+    // Force update position directly
+    groupRef.current.position.set(x, y, z);
+    groupRef.current.rotation.y = rot;
+    currentPosition.current.set(x, y, z);
+    rotation.current = rot;
     
-    // Update position freely without any constraints
-    const newPosition = currentPosition.current.clone().add(moveVector);
-    newPosition.y = 2.0; // Keep avatar above ground
-    
-
-    
-    // Update position and rotation
-    currentPosition.current.copy(newPosition);
-    groupRef.current.position.copy(newPosition);
-    groupRef.current.rotation.y = rotation.current;
-    
-    // Notify parent component of position changes
-    if (onPositionChange) {
-      onPositionChange([newPosition.x, newPosition.y, newPosition.z]);
+    // Notify parent
+    if (onPositionChange && (controls.forward || controls.backward || controls.leftward || controls.rightward)) {
+      onPositionChange([x, y, z]);
     }
   });
   
