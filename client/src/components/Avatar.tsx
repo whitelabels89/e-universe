@@ -78,9 +78,7 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     // Apply velocity with bounds checking
     const newPosition = currentPosition.current.clone().add(velocity.current);
     
-    // Clamp position to grid bounds
-    newPosition.x = Math.max(-maxBounds, Math.min(maxBounds, newPosition.x));
-    newPosition.z = Math.max(-maxBounds, Math.min(maxBounds, newPosition.z));
+    // Keep avatar above ground without restrictive bounds
     newPosition.y = 2.0; // Keep avatar properly above ground
     
     // Update position and rotation

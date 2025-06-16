@@ -165,21 +165,25 @@ function Vegetation({ size, heightData }: { size: number; heightData: Float32Arr
 }
 
 function Tree({ position }: { position: [number, number, number] }) {
-  const treeHeight = 3 + Math.random() * 4;
+  // Use stable values based on position to avoid animation
+  const seed = position[0] * 1000 + position[2];
+  const pseudoRandom = Math.abs(Math.sin(seed)) * 1000;
+  const treeHeight = 6 + (pseudoRandom % 4); // Larger trees
   const trunkHeight = treeHeight * 0.3;
   const crownHeight = treeHeight * 0.7;
+  const crownRadius = 3 + (pseudoRandom % 2); // Larger crown
   
   return (
     <group position={[position[0], 0, position[2]]}>
       {/* Tree trunk */}
       <mesh position={[0, trunkHeight / 2, 0]} castShadow>
-        <cylinderGeometry args={[0.2, 0.3, trunkHeight, 8]} />
+        <cylinderGeometry args={[0.4, 0.6, trunkHeight, 8]} />
         <meshLambertMaterial color="#8B4513" />
       </mesh>
       
       {/* Tree crown */}
       <mesh position={[0, trunkHeight + crownHeight / 2, 0]} castShadow>
-        <coneGeometry args={[1.5 + Math.random(), crownHeight, 8]} />
+        <coneGeometry args={[crownRadius, crownHeight, 8]} />
         <meshLambertMaterial color="#228B22" />
       </mesh>
     </group>

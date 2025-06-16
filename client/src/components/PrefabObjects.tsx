@@ -65,14 +65,14 @@ function PrefabObject({ object, onRemove }: PrefabObjectProps) {
       {model3D ? (
         <primitive 
           object={model3D.clone()} 
-          scale={[6, 6, 6]} 
-          position={[0, 1, 0]}
+          scale={[10, 10, 10]} 
+          position={[0, 5, 0]}
           castShadow
           receiveShadow
         />
       ) : (
-        <mesh position={[0, 3, 0]}>
-          <boxGeometry args={[4, 6, 4]} />
+        <mesh position={[0, 6, 0]}>
+          <boxGeometry args={[8, 12, 8]} />
           <meshStandardMaterial color={prefabType.color} />
         </mesh>
       )}

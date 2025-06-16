@@ -42,10 +42,10 @@ function BuildPreview({ position, prefabType, isValid }: BuildPreviewProps) {
         />
       </mesh>
       
-      {/* Build indicator */}
-      <mesh position={[0, -4, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[4, 5, 16]} />
-        <meshBasicMaterial color={isValid ? "#00ff00" : "#ff0000"} transparent opacity={0.8} />
+      {/* Build indicator - subtle ground circle */}
+      <mesh position={[0, -3.9, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+        <ringGeometry args={[3, 3.5, 16]} />
+        <meshBasicMaterial color={isValid ? "#00ff00" : "#ff0000"} transparent opacity={0.3} />
       </mesh>
     </group>
   );
