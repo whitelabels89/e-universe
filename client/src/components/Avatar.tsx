@@ -70,7 +70,7 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     // Clamp position to grid bounds
     newPosition.x = Math.max(-maxBounds, Math.min(maxBounds, newPosition.x));
     newPosition.z = Math.max(-maxBounds, Math.min(maxBounds, newPosition.z));
-    newPosition.y = 0.5; // Keep avatar above ground
+    newPosition.y = 1.0; // Keep avatar above ground
     
     // Update position
     currentPosition.current.copy(newPosition);

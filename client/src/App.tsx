@@ -11,6 +11,7 @@ import "@fontsource/inter";
 import { Avatar } from "./components/Avatar";
 import { GridWorld } from "./components/GridWorld";
 import { PrefabObjects } from "./components/PrefabObjects";
+import { Terrain } from "./components/Terrain";
 import { GameUI } from "./components/UI/GameUI";
 import { PREFAB_TYPES } from "./types/education";
 
@@ -126,7 +127,7 @@ function App() {
         <Canvas
           shadows
           camera={{
-            position: [0, 8, 12],
+            position: [0, 15, 20],
             fov: 60,
             near: 0.1,
             far: 1000
@@ -148,11 +149,14 @@ function App() {
 
           {/* 3D Scene Components */}
           <Suspense fallback={null}>
+            {/* Realistic Terrain */}
+            <Terrain size={50} />
+            
             {/* World Grid */}
             <GridWorld size={50} onGridClick={handleGridClick} />
             
             {/* Player Avatar */}
-            <Avatar position={[0, 0.5, 0]} />
+            <Avatar position={[0, 1.0, 0]} />
             
             {/* Placed Objects */}
             <PrefabObjects />
