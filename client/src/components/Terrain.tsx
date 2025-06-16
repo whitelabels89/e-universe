@@ -80,7 +80,7 @@ export function Terrain({ size = 50 }: TerrainProps) {
 
   return (
     <group>
-      {/* Main terrain */}
+      {/* Main terrain - non-interactive */}
       <mesh geometry={terrainGeometry} receiveShadow>
         <meshLambertMaterial 
           color="#4a5d23" 

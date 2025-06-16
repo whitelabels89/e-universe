@@ -34,11 +34,11 @@ export function GridWorld({ size = 50, onGridClick }: GridWorldProps) {
   
   return (
     <group>
-      {/* Main ground plane */}
+      {/* Main ground plane - disabled collision */}
       <mesh 
         ref={groundRef}
         rotation={[-Math.PI / 2, 0, 0]} 
-        position={[0, 0, 0]}
+        position={[0, -1, 0]}
         receiveShadow
         onClick={handleClick}
       >
