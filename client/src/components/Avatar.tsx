@@ -23,13 +23,16 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
   const { camera } = useThree();
   const { customization } = useAvatarCustomization();
   
-  // Load Nina 3D model
-  const { scene: ninaModel } = useGLTF('/models/nina_avatar.glb');
+  // Load Nina 3D model with error handling
+  const gltf = useGLTF('/models/nina_avatar.glb');
+  const ninaModel = gltf?.scene;
   
   // Avatar movement state
   const velocity = useRef(new THREE.Vector3());
   const currentPosition = useRef(new THREE.Vector3(...position));
   const rotation = useRef(0);
+  const cameraOffset = useRef(new THREE.Vector3(0, 8, 10));
+  const cameraTarget = useRef(new THREE.Vector3());
   
   // Initialize position
   useEffect(() => {
@@ -54,21 +57,21 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     let moved = false;
     
     if (controls.forward) {
-      velocity.current.x += Math.sin(rotation.current) * moveSpeed * delta;
-      velocity.current.z += Math.cos(rotation.current) * moveSpeed * delta;
-      moved = true;
-    }
-    if (controls.backward) {
       velocity.current.x -= Math.sin(rotation.current) * moveSpeed * delta;
       velocity.current.z -= Math.cos(rotation.current) * moveSpeed * delta;
       moved = true;
     }
+    if (controls.backward) {
+      velocity.current.x += Math.sin(rotation.current) * moveSpeed * delta;
+      velocity.current.z += Math.cos(rotation.current) * moveSpeed * delta;
+      moved = true;
+    }
     if (controls.leftward) {
-      rotation.current -= 2 * delta;
+      rotation.current += 2 * delta;
       moved = true;
     }
     if (controls.rightward) {
-      rotation.current += 2 * delta;
+      rotation.current -= 2 * delta;
       moved = true;
     }
     
@@ -83,17 +86,36 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     // Update position and rotation
     currentPosition.current.copy(newPosition);
     groupRef.current.position.copy(newPosition);
-    groupRef.current.rotation.y = -rotation.current;
+    groupRef.current.rotation.y = rotation.current;
     
-    // Update camera to follow avatar (offset behind and above)
-    const idealCameraPosition = new THREE.Vector3(
-      newPosition.x,
-      newPosition.y + 3,
-      newPosition.z + 5
-    );
+    // Calculate camera position relative to character's rotation (3rd person camera)
+    const cameraDistance = cameraOffset.current.length();
+    const rotatedOffset = cameraOffset.current.clone()
+      .applyAxisAngle(new THREE.Vector3(0, 1, 0), rotation.current);
     
-    camera.position.lerp(idealCameraPosition, 2 * delta);
-    camera.lookAt(newPosition);
+    const idealCameraPosition = newPosition.clone().add(rotatedOffset);
+    
+    // Update camera target to be slightly ahead of the character
+    cameraTarget.current.copy(newPosition);
+    cameraTarget.current.y += 2; // Look slightly above character
+    
+    // Always follow character but respect user's zoom and angle adjustments
+    const currentDistance = camera.position.distanceTo(newPosition);
+    
+    // If user has zoomed, maintain their preferred distance
+    if (currentDistance > 3 && currentDistance < 80) {
+      cameraOffset.current.setLength(currentDistance);
+    }
+    
+    // Calculate new camera position behind character based on rotation
+    const finalOffset = cameraOffset.current.clone()
+      .applyAxisAngle(new THREE.Vector3(0, 1, 0), rotation.current);
+    
+    const targetCameraPosition = newPosition.clone().add(finalOffset);
+    
+    // Smooth camera following
+    camera.position.lerp(targetCameraPosition, 4 * delta);
+    camera.lookAt(cameraTarget.current);
     
     // Notify parent component of position changes
     if (onPositionChange) {
@@ -103,13 +125,27 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
   
   return (
     <group ref={groupRef}>
-      {/* 3D Nina Model */}
-      <primitive 
-        object={ninaModel.clone()} 
-        scale={[2.5, 2.5, 2.5]} 
-        position={[0, -0.9, 0]}
-        castShadow
-      />
+      {/* 3D Nina Model with fallback */}
+      {ninaModel ? (
+        <primitive 
+          object={ninaModel.clone()} 
+          scale={[2.5, 2.5, 2.5]} 
+          position={[0, -0.9, 0]}
+          castShadow
+        />
+      ) : (
+        // Fallback simple character while model loads
+        <>
+          <mesh castShadow>
+            <boxGeometry args={[0.6, 1.8, 0.3]} />
+            <meshLambertMaterial color={customization.bodyColor} />
+          </mesh>
+          <mesh position={[0, 1.25, 0]} castShadow>
+            <sphereGeometry args={[0.3]} />
+            <meshLambertMaterial color={customization.headColor} />
+          </mesh>
+        </>
+      )}
       
       {/* Avatar name label */}
       <mesh position={[0, 2, 0]}>

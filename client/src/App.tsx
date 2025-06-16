@@ -166,20 +166,20 @@ function App() {
             <BuildSystem />
           </Suspense>
 
-          {/* Camera Controls */}
+          {/* Camera Controls - Manual control only */}
           <OrbitControls
-            enablePan={true}
+            enablePan={false}
             enableZoom={true}
             enableRotate={true}
-            maxDistance={80}
-            minDistance={3}
-            maxPolarAngle={Math.PI / 2.2}
-            target={[0, 0, 0]}
-            enableDamping={false}
+            maxDistance={50}
+            minDistance={5}
+            maxPolarAngle={Math.PI / 2.1}
+            enableDamping={true}
+            dampingFactor={0.1}
             rotateSpeed={0.5}
-            zoomSpeed={0.8}
+            zoomSpeed={1.0}
             autoRotate={false}
-            makeDefault
+            makeDefault={true}
           />
         </Canvas>
 
