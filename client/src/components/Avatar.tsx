@@ -42,44 +42,43 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     }
   }, [position]);
   
-  // Movement system with bounds checking (10x10 grid)
+  // Movement system - free movement without bounds
   useFrame((state, delta) => {
     if (!groupRef.current) return;
     
     const controls = getControls();
-    const moveSpeed = 5;
-    const maxBounds = 24.5; // Keep within -24.5 to 24.5 for 50x50 grid
+    const moveSpeed = 10;
     
     // Reset velocity
     velocity.current.set(0, 0, 0);
     
-    // Apply movement based on controls with rotation
+    // Apply movement based on controls with corrected direction math
     let moved = false;
     
     if (controls.forward) {
-      velocity.current.x -= Math.sin(rotation.current) * moveSpeed * delta;
+      // Move forward in the direction character is facing
+      velocity.current.x += Math.sin(rotation.current) * moveSpeed * delta;
       velocity.current.z -= Math.cos(rotation.current) * moveSpeed * delta;
       moved = true;
     }
     if (controls.backward) {
-      velocity.current.x += Math.sin(rotation.current) * moveSpeed * delta;
+      // Move backward opposite to facing direction  
+      velocity.current.x -= Math.sin(rotation.current) * moveSpeed * delta;
       velocity.current.z += Math.cos(rotation.current) * moveSpeed * delta;
       moved = true;
     }
     if (controls.leftward) {
-      rotation.current -= 2 * delta;
+      rotation.current += 2 * delta; // Turn left
       moved = true;
     }
     if (controls.rightward) {
-      rotation.current += 2 * delta;
+      rotation.current -= 2 * delta; // Turn right
       moved = true;
     }
     
-    // Apply velocity with bounds checking
+    // Apply velocity without any bounds checking
     const newPosition = currentPosition.current.clone().add(velocity.current);
-    
-    // Keep avatar above ground without restrictive bounds
-    newPosition.y = 2.0; // Keep avatar properly above ground
+    newPosition.y = 2.0; // Keep avatar above ground
     
     // Update position and rotation
     currentPosition.current.copy(newPosition);

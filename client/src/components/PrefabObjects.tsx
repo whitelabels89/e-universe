@@ -55,7 +55,7 @@ function PrefabObject({ object, onRemove }: PrefabObjectProps) {
   return (
     <group 
       ref={groupRef}
-      position={object.position}
+      position={[object.position[0], 0, object.position[2]]}
       scale={[scale, scale, scale]}
       onClick={handleClick}
       onPointerEnter={() => setHovered(true)}
