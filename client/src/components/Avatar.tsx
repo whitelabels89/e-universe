@@ -50,6 +50,11 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     const speed = 10;
     const turnSpeed = 3;
     
+    // Debug logging
+    if (controls.forward || controls.backward || controls.leftward || controls.rightward) {
+      console.log("Avatar controls:", controls);
+    }
+    
     // Get current position
     let [x, y, z] = [groupRef.current.position.x, 2, groupRef.current.position.z];
     let rot = groupRef.current.rotation.y;
