@@ -57,13 +57,13 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     let moved = false;
     
     if (controls.forward) {
-      velocity.current.x += Math.sin(rotation.current) * moveSpeed * delta;
-      velocity.current.z += Math.cos(rotation.current) * moveSpeed * delta;
+      velocity.current.x -= Math.sin(rotation.current) * moveSpeed * delta;
+      velocity.current.z -= Math.cos(rotation.current) * moveSpeed * delta;
       moved = true;
     }
     if (controls.backward) {
-      velocity.current.x -= Math.sin(rotation.current) * moveSpeed * delta;
-      velocity.current.z -= Math.cos(rotation.current) * moveSpeed * delta;
+      velocity.current.x += Math.sin(rotation.current) * moveSpeed * delta;
+      velocity.current.z += Math.cos(rotation.current) * moveSpeed * delta;
       moved = true;
     }
     if (controls.leftward) {
@@ -88,25 +88,12 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     groupRef.current.position.copy(newPosition);
     groupRef.current.rotation.y = rotation.current;
     
-    // Simplified 3rd Person Camera that follows character
-    const currentDistance = camera.position.distanceTo(newPosition);
-    
-    // Always keep camera behind character at appropriate distance
-    const targetDistance = Math.max(8, Math.min(currentDistance, 25));
-    
-    // Position camera behind character based on rotation
-    const behindOffset = new THREE.Vector3(0, 5, targetDistance);
-    behindOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), rotation.current);
-    
-    const targetCameraPosition = newPosition.clone().add(behindOffset);
-    
-    // Smooth camera following
-    camera.position.lerp(targetCameraPosition, 3 * delta);
-    
-    // Always look at character
-    const lookTarget = newPosition.clone();
-    lookTarget.y += 1;
-    camera.lookAt(lookTarget);
+    // Update OrbitControls target to follow character (let OrbitControls handle camera positioning)
+    if (camera && (camera as any).target) {
+      const targetPosition = newPosition.clone();
+      targetPosition.y += 1; // Look at character center
+      (camera as any).target.lerp(targetPosition, 2 * delta);
+    }
     
     // Notify parent component of position changes
     if (onPositionChange) {

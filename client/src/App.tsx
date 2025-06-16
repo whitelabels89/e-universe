@@ -166,9 +166,19 @@ function App() {
             <BuildSystem />
           </Suspense>
 
-          {/* Camera Controls - Disabled for character following */}
+          {/* Camera Controls - Enabled for 3rd person camera drag */}
           <OrbitControls
-            enabled={false}
+            enablePan={false}
+            enableZoom={true}
+            enableRotate={true}
+            maxDistance={30}
+            minDistance={8}
+            maxPolarAngle={Math.PI / 2.1}
+            enableDamping={true}
+            dampingFactor={0.05}
+            rotateSpeed={0.5}
+            zoomSpeed={1.0}
+            autoRotate={false}
           />
         </Canvas>
 
