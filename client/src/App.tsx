@@ -12,6 +12,7 @@ import { Avatar } from "./components/Avatar";
 import { GridWorld } from "./components/GridWorld";
 import { PrefabObjects } from "./components/PrefabObjects";
 import { Terrain } from "./components/Terrain";
+import { BuildSystem } from "./components/BuildSystem";
 import { GameUI } from "./components/UI/GameUI";
 import { PREFAB_TYPES } from "./types/education";
 
@@ -160,6 +161,9 @@ function App() {
             
             {/* Placed Objects */}
             <PrefabObjects />
+            
+            {/* Build System */}
+            <BuildSystem />
           </Suspense>
 
           {/* Camera Controls */}

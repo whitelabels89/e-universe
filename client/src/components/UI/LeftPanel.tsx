@@ -16,8 +16,14 @@ export function LeftPanel() {
       return;
     }
     
-    setSelectedPrefab(prefabId);
-    setPlacementMode(true);
+    // Toggle placement mode
+    if (selectedPrefab === prefabId && isPlacementMode) {
+      setSelectedPrefab(null);
+      setPlacementMode(false);
+    } else {
+      setSelectedPrefab(prefabId);
+      setPlacementMode(true);
+    }
   };
   
   const cancelPlacement = () => {
@@ -87,8 +93,9 @@ export function LeftPanel() {
       <div className="mt-6 pt-4 border-t border-white/10">
         <div className="text-white/70 text-sm mb-2">Instructions:</div>
         <ul className="text-white/60 text-xs space-y-1">
-          <li>• WASD to move Nina</li>
-          <li>• Click objects to place them</li>
+          <li>• WASD + mouse to move Nina</li>
+          <li>• A/D keys to turn left/right</li>
+          <li>• Click to place buildings</li>
           <li>• Click placed objects to remove</li>
           <li>• Complete tasks to level up</li>
         </ul>
