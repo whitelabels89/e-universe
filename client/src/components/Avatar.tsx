@@ -42,27 +42,27 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     }
   }, [position]);
   
-  // Working movement system
+  // Fixed movement system based on working SimpleAvatar
   useFrame((state, delta) => {
     if (!groupRef.current) return;
     
     const controls = getControls();
-    const speed = 15;
+    const speed = 10;
+    const turnSpeed = 3;
     
-    // Get current position from mesh
-    let x = groupRef.current.position.x;
-    let z = groupRef.current.position.z;
+    // Get current position
+    let [x, y, z] = [groupRef.current.position.x, 2, groupRef.current.position.z];
     let rot = groupRef.current.rotation.y;
     
-    // Handle rotation
+    // Rotation
     if (controls.leftward) {
-      rot += 4 * delta;
+      rot += turnSpeed * delta;
     }
     if (controls.rightward) {
-      rot -= 4 * delta;
+      rot -= turnSpeed * delta;
     }
     
-    // Handle movement in facing direction
+    // Movement
     if (controls.forward) {
       x += Math.sin(rot) * speed * delta;
       z += Math.cos(rot) * speed * delta;
@@ -72,15 +72,15 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
       z -= Math.cos(rot) * speed * delta;
     }
     
-    // Update position with higher Y to clear terrain obstacles
-    groupRef.current.position.set(x, 10, z);
+    // Apply position directly
+    groupRef.current.position.set(x, y, z);
     groupRef.current.rotation.y = rot;
-    currentPosition.current.set(x, 10, z);
+    currentPosition.current.set(x, y, z);
     rotation.current = rot;
     
-    // Update camera target
-    if (onPositionChange) {
-      onPositionChange([x, 2, z]);
+    // Notify parent
+    if (onPositionChange && (controls.forward || controls.backward || controls.leftward || controls.rightward)) {
+      onPositionChange([x, y, z]);
     }
   });
   
