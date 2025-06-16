@@ -42,20 +42,27 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     }
   }, [position]);
   
-  // Simple direct movement system
+  // Working movement system
   useFrame((state, delta) => {
     if (!groupRef.current) return;
     
     const controls = getControls();
-    const speed = 10;
+    const speed = 15;
     
-    // Direct position modification without any intermediate variables
+    // Get current position from mesh
     let x = groupRef.current.position.x;
     let z = groupRef.current.position.z;
-    let y = 2.0;
     let rot = groupRef.current.rotation.y;
     
-    // Movement controls
+    // Handle rotation
+    if (controls.leftward) {
+      rot += 4 * delta;
+    }
+    if (controls.rightward) {
+      rot -= 4 * delta;
+    }
+    
+    // Handle movement in facing direction
     if (controls.forward) {
       x += Math.sin(rot) * speed * delta;
       z += Math.cos(rot) * speed * delta;
@@ -64,22 +71,16 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
       x -= Math.sin(rot) * speed * delta;
       z -= Math.cos(rot) * speed * delta;
     }
-    if (controls.leftward) {
-      rot += 3 * delta;
-    }
-    if (controls.rightward) {
-      rot -= 3 * delta;
-    }
     
-    // Force update position directly
-    groupRef.current.position.set(x, y, z);
+    // Update position
+    groupRef.current.position.set(x, 2, z);
     groupRef.current.rotation.y = rot;
-    currentPosition.current.set(x, y, z);
+    currentPosition.current.set(x, 2, z);
     rotation.current = rot;
     
-    // Notify parent
-    if (onPositionChange && (controls.forward || controls.backward || controls.leftward || controls.rightward)) {
-      onPositionChange([x, y, z]);
+    // Update camera target
+    if (onPositionChange) {
+      onPositionChange([x, 2, z]);
     }
   });
   
