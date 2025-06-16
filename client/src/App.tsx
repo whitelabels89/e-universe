@@ -91,11 +91,6 @@ function App() {
   
   // Avatar position state for camera following
   const [avatarPosition, setAvatarPosition] = useState<[number, number, number]>([0, 2, 0]);
-  
-  // Debug camera target updates
-  useEffect(() => {
-    console.log("Camera target updated to:", avatarPosition);
-  }, [avatarPosition]);
 
   // Load saved data on app start
   useEffect(() => {
@@ -174,8 +169,8 @@ function App() {
             <BuildSystem />
           </Suspense>
 
-          {/* Camera Controls - Temporarily disabled for debugging */}
-          {/* <OrbitControls
+          {/* Camera Controls - Enabled for 3rd person camera drag */}
+          <OrbitControls
             target={[avatarPosition[0], avatarPosition[1] + 1, avatarPosition[2]]}
             enablePan={false}
             enableZoom={true}
@@ -188,7 +183,7 @@ function App() {
             rotateSpeed={0.5}
             zoomSpeed={1.0}
             autoRotate={false}
-          /> */}
+          />
         </Canvas>
 
         {/* UI Overlay */}

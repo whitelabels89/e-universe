@@ -51,9 +51,7 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     const turnSpeed = 3;
     
     // Get current position
-    let x = groupRef.current.position.x;
-    let y = 2;
-    let z = groupRef.current.position.z;
+    let [x, y, z] = [groupRef.current.position.x, 2, groupRef.current.position.z];
     let rot = groupRef.current.rotation.y;
     
     // Rotation
@@ -80,11 +78,6 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     currentPosition.current.set(x, y, z);
     rotation.current = rot;
     
-    // Debug logging after movement
-    if (controls.forward || controls.backward || controls.leftward || controls.rightward) {
-      console.log("Avatar position after:", [x, y, z], "applied to mesh");
-    }
-    
     // Notify parent
     if (onPositionChange && (controls.forward || controls.backward || controls.leftward || controls.rightward)) {
       onPositionChange([x, y, z]);
@@ -93,15 +86,27 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
   
   return (
     <group ref={groupRef}>
-      {/* Visible test character - bright colored box */}
-      <mesh castShadow>
-        <boxGeometry args={[1, 2, 0.5]} />
-        <meshLambertMaterial color="#FF0000" />
-      </mesh>
-      <mesh position={[0, 1.25, 0]} castShadow>
-        <sphereGeometry args={[0.3]} />
-        <meshLambertMaterial color="#00FF00" />
-      </mesh>
+      {/* 3D Nina Model with fallback */}
+      {ninaModel ? (
+        <primitive 
+          object={ninaModel.clone()} 
+          scale={[2.5, 2.5, 2.5]} 
+          position={[0, -0.9, 0]}
+          castShadow
+        />
+      ) : (
+        // Fallback simple character while model loads
+        <>
+          <mesh castShadow>
+            <boxGeometry args={[0.6, 1.8, 0.3]} />
+            <meshLambertMaterial color={customization.bodyColor} />
+          </mesh>
+          <mesh position={[0, 1.25, 0]} castShadow>
+            <sphereGeometry args={[0.3]} />
+            <meshLambertMaterial color={customization.headColor} />
+          </mesh>
+        </>
+      )}
       
       {/* Avatar name label */}
       <mesh position={[0, 2, 0]}>
