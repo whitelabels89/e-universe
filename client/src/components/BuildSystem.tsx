@@ -173,7 +173,7 @@ export function BuildSystem() {
           const point = e.point;
           const gridX = Math.round(point.x);
           const gridZ = Math.round(point.z);
-          handleGridHover([gridX, 1, gridZ]);
+          handleGridHover([gridX, 2, gridZ]);
         }}
         onClick={(e) => {
           const point = e.point;
