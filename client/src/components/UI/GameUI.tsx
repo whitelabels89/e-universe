@@ -21,7 +21,7 @@ export function GameUI() {
       {/* Bottom Instructions */}
       <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 bg-black/20 backdrop-blur-md rounded-lg border border-white/10 px-4 py-2 z-50">
         <div className="text-white/70 text-xs text-center">
-          Use WASD to move Nina • A/D to turn • Click to place buildings
+          WASD to move • A/D to turn • Mouse wheel to zoom • Right-click drag to rotate camera • Click to place buildings
         </div>
       </div>
     </>

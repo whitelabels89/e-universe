@@ -93,11 +93,11 @@ export function LeftPanel() {
       <div className="mt-6 pt-4 border-t border-white/10">
         <div className="text-white/70 text-sm mb-2">Instructions:</div>
         <ul className="text-white/60 text-xs space-y-1">
-          <li>• WASD + mouse to move Nina</li>
-          <li>• A/D keys to turn left/right</li>
-          <li>• Click to place buildings</li>
+          <li>• WASD to move Nina</li>
+          <li>• A/D to turn left/right</li>
+          <li>• Mouse wheel to zoom camera</li>
+          <li>• Right-click drag to rotate view</li>
           <li>• Click placed objects to remove</li>
-          <li>• Complete tasks to level up</li>
         </ul>
       </div>
     </div>

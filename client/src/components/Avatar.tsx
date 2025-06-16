@@ -99,23 +99,35 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     cameraTarget.current.copy(newPosition);
     cameraTarget.current.y += 2; // Look slightly above character
     
-    // Always follow character but respect user's zoom and angle adjustments
+    // 3rd Person Camera System
     const currentDistance = camera.position.distanceTo(newPosition);
     
-    // If user has zoomed, maintain their preferred distance
-    if (currentDistance > 3 && currentDistance < 80) {
-      cameraOffset.current.setLength(currentDistance);
+    // Only update camera if character is moving to avoid interference with manual control
+    if (moved) {
+      // Update camera offset length based on current zoom level
+      const targetDistance = Math.max(5, Math.min(currentDistance, 30));
+      cameraOffset.current.setLength(targetDistance);
+      
+      // Calculate camera position behind character
+      const cameraDirection = new THREE.Vector3(0, 0, 1); // Behind character
+      cameraDirection.applyAxisAngle(new THREE.Vector3(0, 1, 0), rotation.current);
+      cameraDirection.multiplyScalar(targetDistance);
+      cameraDirection.y = targetDistance * 0.6; // Elevated view
+      
+      const targetCameraPosition = newPosition.clone().add(cameraDirection);
+      
+      // Smooth camera movement only when character moves
+      camera.position.lerp(targetCameraPosition, 2 * delta);
+      
+      // Look at character with slight forward offset
+      const lookTarget = newPosition.clone();
+      lookTarget.y += 1.5;
+      const forwardOffset = new THREE.Vector3(0, 0, -2);
+      forwardOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), rotation.current);
+      lookTarget.add(forwardOffset);
+      
+      camera.lookAt(lookTarget);
     }
-    
-    // Calculate new camera position behind character based on rotation
-    const finalOffset = cameraOffset.current.clone()
-      .applyAxisAngle(new THREE.Vector3(0, 1, 0), rotation.current);
-    
-    const targetCameraPosition = newPosition.clone().add(finalOffset);
-    
-    // Smooth camera following
-    camera.position.lerp(targetCameraPosition, 4 * delta);
-    camera.lookAt(cameraTarget.current);
     
     // Notify parent component of position changes
     if (onPositionChange) {
