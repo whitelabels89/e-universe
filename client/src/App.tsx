@@ -4,6 +4,7 @@ import { KeyboardControls, OrbitControls } from "@react-three/drei";
 import { useAudio } from "./lib/stores/useAudio";
 import { useEducation } from "./lib/stores/useEducation";
 import { useWorldObjects } from "./lib/stores/useWorldObjects";
+import { useAvatarCustomization } from "./lib/stores/useAvatarCustomization";
 import "@fontsource/inter";
 
 // Import our game components
@@ -84,12 +85,14 @@ function App() {
     setSelectedPrefab,
     loadFromStorage 
   } = useWorldObjects();
+  const { loadFromStorage: loadAvatarCustomization } = useAvatarCustomization();
 
-  // Load saved objects on app start
+  // Load saved data on app start
   useEffect(() => {
     loadFromStorage();
+    loadAvatarCustomization();
     console.log("Educational World App initialized");
-  }, [loadFromStorage]);
+  }, [loadFromStorage, loadAvatarCustomization]);
 
   // Handle grid clicks for object placement
   const handleGridClick = (position: [number, number, number]) => {

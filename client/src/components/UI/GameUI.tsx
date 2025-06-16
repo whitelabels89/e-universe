@@ -7,6 +7,7 @@ export function GameUI() {
     <>
       <LeftPanel />
       <RightPanel />
+      <AvatarCustomizationPanel />
       
       {/* Top Status Bar */}
       <div className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-black/20 backdrop-blur-md rounded-lg border border-white/10 px-6 py-2 z-50">
