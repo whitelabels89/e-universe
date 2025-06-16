@@ -163,8 +163,8 @@ function App() {
             enablePan={true}
             enableZoom={true}
             enableRotate={true}
-            maxDistance={20}
-            minDistance={3}
+            maxDistance={30}
+            minDistance={5}
             maxPolarAngle={Math.PI / 2.2}
             target={[0, 0, 0]}
           />
