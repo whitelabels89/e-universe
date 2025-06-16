@@ -1,9 +1,11 @@
 import { useEducation } from "../../lib/stores/useEducation";
 import { useWorldObjects } from "../../lib/stores/useWorldObjects";
+import { useAvatarCustomization } from "../../lib/stores/useAvatarCustomization";
 
 export function RightPanel() {
   const { student, addScore, setActiveModule } = useEducation();
   const { objects, clearAll } = useWorldObjects();
+  const { customization, toggleCustomizationPanel } = useAvatarCustomization();
   
   const modules = [
     "Digital Literacy",
@@ -33,7 +35,7 @@ export function RightPanel() {
         <div className="w-16 h-16 mx-auto mb-3 bg-gradient-to-b from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
           <span className="text-2xl">👧</span>
         </div>
-        <h2 className="text-white text-xl font-bold">{student.name}</h2>
+        <h2 className="text-white text-xl font-bold">{customization.name}</h2>
         <div className="text-blue-300 text-sm">Educational Explorer</div>
       </div>
       
@@ -106,6 +108,13 @@ export function RightPanel() {
       
       {/* Action Buttons */}
       <div className="space-y-2">
+        <button
+          onClick={toggleCustomizationPanel}
+          className="w-full px-4 py-2 bg-purple-500/80 hover:bg-purple-500 text-white rounded text-sm transition-colors"
+        >
+          🎨 Customize Avatar
+        </button>
+        
         <button
           onClick={handleAddScore}
           className="w-full px-4 py-2 bg-green-500/80 hover:bg-green-500 text-white rounded text-sm transition-colors"

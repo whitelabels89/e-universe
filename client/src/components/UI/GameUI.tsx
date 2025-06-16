@@ -1,5 +1,6 @@
 import { LeftPanel } from "./LeftPanel";
 import { RightPanel } from "./RightPanel";
+import { AvatarCustomizationPanel } from "./AvatarCustomizationPanel";
 
 export function GameUI() {
   return (
