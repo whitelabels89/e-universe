@@ -41,7 +41,7 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     
     const controls = getControls();
     const moveSpeed = 5;
-    const maxBounds = 9.5; // Keep within -9.5 to 9.5 for 20x20 grid
+    const maxBounds = 24.5; // Keep within -24.5 to 24.5 for 50x50 grid
     
     // Reset velocity
     velocity.current.set(0, 0, 0);
@@ -96,35 +96,35 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     <group ref={groupRef}>
       {/* Avatar Body - A simple character representation */}
       <mesh castShadow>
-        <boxGeometry args={[0.6, 1.2, 0.3]} />
+        <boxGeometry args={[0.6, 1.8, 0.3]} />
         <meshLambertMaterial color={customization.bodyColor} />
       </mesh>
       
       {/* Avatar Head */}
-      <mesh position={[0, 1, 0]} castShadow>
-        <sphereGeometry args={[0.25]} />
+      <mesh position={[0, 1.25, 0]} castShadow>
+        <sphereGeometry args={[0.3]} />
         <meshLambertMaterial color={customization.headColor} />
       </mesh>
       
       {/* Hair */}
-      <mesh position={[0, 1.15, 0]} castShadow>
-        <sphereGeometry args={[0.28]} />
+      <mesh position={[0, 1.4, 0]} castShadow>
+        <sphereGeometry args={[0.33]} />
         <meshLambertMaterial color={customization.hairColor} />
       </mesh>
       
       {/* Simple face features - Eyes */}
-      <mesh position={[0.1, 1.05, 0.22]} castShadow>
-        <sphereGeometry args={[0.03]} />
+      <mesh position={[0.1, 1.3, 0.25]} castShadow>
+        <sphereGeometry args={[0.04]} />
         <meshLambertMaterial color={customization.eyeColor} />
       </mesh>
-      <mesh position={[-0.1, 1.05, 0.22]} castShadow>
-        <sphereGeometry args={[0.03]} />
+      <mesh position={[-0.1, 1.3, 0.25]} castShadow>
+        <sphereGeometry args={[0.04]} />
         <meshLambertMaterial color={customization.eyeColor} />
       </mesh>
       
       {/* Mouth */}
-      <mesh position={[0, 0.95, 0.22]} castShadow>
-        <sphereGeometry args={[0.02]} />
+      <mesh position={[0, 1.15, 0.25]} castShadow>
+        <sphereGeometry args={[0.03]} />
         <meshLambertMaterial color="#FF6B6B" />
       </mesh>
       

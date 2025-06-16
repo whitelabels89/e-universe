@@ -149,7 +149,7 @@ function App() {
           {/* 3D Scene Components */}
           <Suspense fallback={null}>
             {/* World Grid */}
-            <GridWorld size={20} onGridClick={handleGridClick} />
+            <GridWorld size={50} onGridClick={handleGridClick} />
             
             {/* Player Avatar */}
             <Avatar position={[0, 0.5, 0]} />
@@ -163,10 +163,14 @@ function App() {
             enablePan={true}
             enableZoom={true}
             enableRotate={true}
-            maxDistance={30}
-            minDistance={5}
+            maxDistance={50}
+            minDistance={3}
             maxPolarAngle={Math.PI / 2.2}
             target={[0, 0, 0]}
+            enableDamping={true}
+            dampingFactor={0.1}
+            rotateSpeed={0.5}
+            zoomSpeed={0.8}
           />
         </Canvas>
 
