@@ -39,21 +39,21 @@ function PrefabObject({ object, onRemove }: PrefabObjectProps) {
       >
         {object.type === 'school' && (
           <>
-            <boxGeometry args={[8, 5, 6]} />
+            <boxGeometry args={[15, 8, 12]} />
             <meshLambertMaterial color={prefabType.color} transparent opacity={opacity} />
           </>
         )}
         
         {object.type === 'coding-lab' && (
           <>
-            <boxGeometry args={[6, 4, 5]} />
+            <boxGeometry args={[12, 6, 10]} />
             <meshLambertMaterial color={prefabType.color} transparent opacity={opacity} />
           </>
         )}
         
         {object.type === 'house' && (
           <>
-            <boxGeometry args={[4, 3, 4]} />
+            <boxGeometry args={[8, 5, 8]} />
             <meshLambertMaterial color={prefabType.color} transparent opacity={opacity} />
           </>
         )}
@@ -61,15 +61,15 @@ function PrefabObject({ object, onRemove }: PrefabObjectProps) {
       
       {/* Roof for house */}
       {object.type === 'house' && (
-        <mesh position={[0, 3.8, 0]} castShadow scale={[scale, scale, scale]}>
-          <coneGeometry args={[3, 2, 4]} />
+        <mesh position={[0, 6, 0]} castShadow scale={[scale, scale, scale]}>
+          <coneGeometry args={[6, 3, 4]} />
           <meshLambertMaterial color="#8D6E63" transparent opacity={opacity} />
         </mesh>
       )}
       
       {/* Door/entrance - Human sized */}
-      <mesh position={[0, -0.3, 2.01]} castShadow scale={[scale, scale, scale]}>
-        <boxGeometry args={[0.8, 2.1, 0.15]} />
+      <mesh position={[0, -0.3, 4.1]} castShadow scale={[scale, scale, scale]}>
+        <boxGeometry args={[1.2, 2.1, 0.2]} />
         <meshLambertMaterial color="#5D4037" transparent opacity={opacity} />
       </mesh>
       

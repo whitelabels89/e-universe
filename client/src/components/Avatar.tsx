@@ -26,6 +26,7 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
   // Avatar movement state
   const velocity = useRef(new THREE.Vector3());
   const currentPosition = useRef(new THREE.Vector3(...position));
+  const rotation = useRef(0);
   
   // Initialize position
   useEffect(() => {
@@ -46,22 +47,26 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     // Reset velocity
     velocity.current.set(0, 0, 0);
     
-    // Apply movement based on controls
+    // Apply movement based on controls with rotation
+    let moved = false;
+    
     if (controls.forward) {
-      velocity.current.z -= moveSpeed * delta;
-      console.log("Moving forward");
+      velocity.current.x += Math.sin(rotation.current) * moveSpeed * delta;
+      velocity.current.z += Math.cos(rotation.current) * moveSpeed * delta;
+      moved = true;
     }
     if (controls.backward) {
-      velocity.current.z += moveSpeed * delta;
-      console.log("Moving backward");
+      velocity.current.x -= Math.sin(rotation.current) * moveSpeed * delta;
+      velocity.current.z -= Math.cos(rotation.current) * moveSpeed * delta;
+      moved = true;
     }
     if (controls.leftward) {
-      velocity.current.x -= moveSpeed * delta;
-      console.log("Moving left");
+      rotation.current -= 2 * delta;
+      moved = true;
     }
     if (controls.rightward) {
-      velocity.current.x += moveSpeed * delta;
-      console.log("Moving right");
+      rotation.current += 2 * delta;
+      moved = true;
     }
     
     // Apply velocity with bounds checking
@@ -72,9 +77,10 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     newPosition.z = Math.max(-maxBounds, Math.min(maxBounds, newPosition.z));
     newPosition.y = 1.0; // Keep avatar above ground
     
-    // Update position
+    // Update position and rotation
     currentPosition.current.copy(newPosition);
     groupRef.current.position.copy(newPosition);
+    groupRef.current.rotation.y = -rotation.current;
     
     // Update camera to follow avatar (offset behind and above)
     const idealCameraPosition = new THREE.Vector3(

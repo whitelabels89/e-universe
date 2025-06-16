@@ -28,11 +28,15 @@ export function Terrain({ size = 50 }: TerrainProps) {
         const mountainDistance2 = Math.sqrt((x - 18) ** 2 + (z + 15) ** 2);
         
         if (mountainDistance1 < 8) {
-          elevation += (8 - mountainDistance1) * 3;
+          elevation += (8 - mountainDistance1) * 6;
         }
         if (mountainDistance2 < 6) {
-          elevation += (6 - mountainDistance2) * 4;
+          elevation += (6 - mountainDistance2) * 8;
         }
+        
+        // Add hills
+        elevation += Math.sin(x * 0.8) * Math.cos(z * 0.6) * 3;
+        elevation += Math.sin(x * 1.2) * Math.cos(z * 0.9) * 2;
         
         // Create valleys for rivers
         const riverPath1 = Math.abs(Math.sin(x * 0.3) * 5 - z);
@@ -96,31 +100,31 @@ export function Terrain({ size = 50 }: TerrainProps) {
 function WaterBodies({ size }: { size: number }) {
   return (
     <group>
-      {/* River 1 */}
-      <mesh position={[0, 0.1, 0]} receiveShadow>
+      {/* River 1 - Lower than terrain */}
+      <mesh position={[0, -0.5, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[60, 4]} />
         <meshLambertMaterial color="#1e6091" transparent opacity={0.8} />
       </mesh>
       
-      {/* River 2 */}
-      <mesh position={[10, 0.1, 0]} rotation={[0, 0, Math.PI / 6]} receiveShadow>
+      {/* River 2 - Lower than terrain */}
+      <mesh position={[10, -0.5, 0]} rotation={[-Math.PI / 2, 0, Math.PI / 6]} receiveShadow>
         <planeGeometry args={[50, 3]} />
         <meshLambertMaterial color="#1e6091" transparent opacity={0.8} />
       </mesh>
       
-      {/* Lake */}
-      <mesh position={[15, 0.1, 15]} receiveShadow>
+      {/* Lake - Lower than terrain */}
+      <mesh position={[15, -0.3, 15]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <circleGeometry args={[8, 32]} />
         <meshLambertMaterial color="#0066cc" transparent opacity={0.9} />
       </mesh>
       
-      {/* Ocean */}
-      <mesh position={[-30, -1, 0]} receiveShadow>
+      {/* Ocean - Much lower */}
+      <mesh position={[-30, -2, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[20, size]} />
         <meshLambertMaterial color="#003d6b" transparent opacity={0.9} />
       </mesh>
       
-      <mesh position={[0, -1, 30]} receiveShadow>
+      <mesh position={[0, -2, 30]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
         <planeGeometry args={[size, 20]} />
         <meshLambertMaterial color="#003d6b" transparent opacity={0.9} />
       </mesh>
@@ -166,7 +170,7 @@ function Tree({ position }: { position: [number, number, number] }) {
   const crownHeight = treeHeight * 0.7;
   
   return (
-    <group position={position}>
+    <group position={[position[0], position[1] + 0.1, position[2]]}>
       {/* Tree trunk */}
       <mesh position={[0, trunkHeight / 2, 0]} castShadow>
         <cylinderGeometry args={[0.2, 0.3, trunkHeight, 8]} />

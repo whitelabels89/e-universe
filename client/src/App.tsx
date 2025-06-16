@@ -167,14 +167,15 @@ function App() {
             enablePan={true}
             enableZoom={true}
             enableRotate={true}
-            maxDistance={50}
+            maxDistance={80}
             minDistance={3}
             maxPolarAngle={Math.PI / 2.2}
             target={[0, 0, 0]}
-            enableDamping={true}
-            dampingFactor={0.1}
+            enableDamping={false}
             rotateSpeed={0.5}
             zoomSpeed={0.8}
+            autoRotate={false}
+            makeDefault
           />
         </Canvas>
 
