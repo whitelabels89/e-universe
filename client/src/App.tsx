@@ -8,7 +8,7 @@ import { useAvatarCustomization } from "./lib/stores/useAvatarCustomization";
 import "@fontsource/inter";
 
 // Import our game components
-import { Avatar } from "./components/Avatar";
+import { SimpleAvatar } from "./components/SimpleAvatar";
 import { GridWorld } from "./components/GridWorld";
 import { PrefabObjects } from "./components/PrefabObjects";
 import { Terrain } from "./components/Terrain";
@@ -160,7 +160,7 @@ function App() {
             <GridWorld size={50} onGridClick={handleGridClick} />
             
             {/* Player Avatar */}
-            <Avatar position={[0, 1.0, 0]} onPositionChange={setAvatarPosition} />
+            <SimpleAvatar onPositionChange={setAvatarPosition} />
             
             {/* Placed Objects */}
             <PrefabObjects />
