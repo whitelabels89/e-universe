@@ -166,20 +166,9 @@ function App() {
             <BuildSystem />
           </Suspense>
 
-          {/* Camera Controls - Manual control only */}
+          {/* Camera Controls - Disabled for character following */}
           <OrbitControls
-            enablePan={false}
-            enableZoom={true}
-            enableRotate={true}
-            maxDistance={50}
-            minDistance={5}
-            maxPolarAngle={Math.PI / 2.1}
-            enableDamping={true}
-            dampingFactor={0.1}
-            rotateSpeed={0.5}
-            zoomSpeed={1.0}
-            autoRotate={false}
-            makeDefault={true}
+            enabled={false}
           />
         </Canvas>
 

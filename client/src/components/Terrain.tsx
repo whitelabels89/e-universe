@@ -170,7 +170,7 @@ function Tree({ position }: { position: [number, number, number] }) {
   const crownHeight = treeHeight * 0.7;
   
   return (
-    <group position={[position[0], position[1] + 0.1, position[2]]}>
+    <group position={[position[0], 0, position[2]]}>
       {/* Tree trunk */}
       <mesh position={[0, trunkHeight / 2, 0]} castShadow>
         <cylinderGeometry args={[0.2, 0.3, trunkHeight, 8]} />

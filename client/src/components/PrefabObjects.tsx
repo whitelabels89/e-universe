@@ -61,7 +61,7 @@ function PrefabObject({ object, onRemove }: PrefabObjectProps) {
       <primitive 
         object={model3D.clone()} 
         scale={[3, 3, 3]} 
-        position={[0, 0, 0]}
+        position={[0, 1, 0]}
         castShadow
         receiveShadow
       />

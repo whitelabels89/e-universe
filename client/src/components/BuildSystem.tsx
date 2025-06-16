@@ -179,7 +179,7 @@ export function BuildSystem() {
           const point = e.point;
           const gridX = Math.round(point.x);
           const gridZ = Math.round(point.z);
-          handleGridClick([gridX, 1, gridZ]);
+          handleGridClick([gridX, 2, gridZ]);
         }}
       >
         <planeGeometry args={[100, 100]} />

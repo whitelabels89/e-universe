@@ -57,21 +57,21 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     let moved = false;
     
     if (controls.forward) {
-      velocity.current.x -= Math.sin(rotation.current) * moveSpeed * delta;
-      velocity.current.z -= Math.cos(rotation.current) * moveSpeed * delta;
-      moved = true;
-    }
-    if (controls.backward) {
       velocity.current.x += Math.sin(rotation.current) * moveSpeed * delta;
       velocity.current.z += Math.cos(rotation.current) * moveSpeed * delta;
       moved = true;
     }
+    if (controls.backward) {
+      velocity.current.x -= Math.sin(rotation.current) * moveSpeed * delta;
+      velocity.current.z -= Math.cos(rotation.current) * moveSpeed * delta;
+      moved = true;
+    }
     if (controls.leftward) {
-      rotation.current += 2 * delta;
+      rotation.current -= 2 * delta;
       moved = true;
     }
     if (controls.rightward) {
-      rotation.current -= 2 * delta;
+      rotation.current += 2 * delta;
       moved = true;
     }
     
@@ -81,53 +81,32 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     // Clamp position to grid bounds
     newPosition.x = Math.max(-maxBounds, Math.min(maxBounds, newPosition.x));
     newPosition.z = Math.max(-maxBounds, Math.min(maxBounds, newPosition.z));
-    newPosition.y = 1.0; // Keep avatar above ground
+    newPosition.y = 2.0; // Keep avatar properly above ground
     
     // Update position and rotation
     currentPosition.current.copy(newPosition);
     groupRef.current.position.copy(newPosition);
     groupRef.current.rotation.y = rotation.current;
     
-    // Calculate camera position relative to character's rotation (3rd person camera)
-    const cameraDistance = cameraOffset.current.length();
-    const rotatedOffset = cameraOffset.current.clone()
-      .applyAxisAngle(new THREE.Vector3(0, 1, 0), rotation.current);
-    
-    const idealCameraPosition = newPosition.clone().add(rotatedOffset);
-    
-    // Update camera target to be slightly ahead of the character
-    cameraTarget.current.copy(newPosition);
-    cameraTarget.current.y += 2; // Look slightly above character
-    
-    // 3rd Person Camera System
+    // Simplified 3rd Person Camera that follows character
     const currentDistance = camera.position.distanceTo(newPosition);
     
-    // Only update camera if character is moving to avoid interference with manual control
-    if (moved) {
-      // Update camera offset length based on current zoom level
-      const targetDistance = Math.max(5, Math.min(currentDistance, 30));
-      cameraOffset.current.setLength(targetDistance);
-      
-      // Calculate camera position behind character
-      const cameraDirection = new THREE.Vector3(0, 0, 1); // Behind character
-      cameraDirection.applyAxisAngle(new THREE.Vector3(0, 1, 0), rotation.current);
-      cameraDirection.multiplyScalar(targetDistance);
-      cameraDirection.y = targetDistance * 0.6; // Elevated view
-      
-      const targetCameraPosition = newPosition.clone().add(cameraDirection);
-      
-      // Smooth camera movement only when character moves
-      camera.position.lerp(targetCameraPosition, 2 * delta);
-      
-      // Look at character with slight forward offset
-      const lookTarget = newPosition.clone();
-      lookTarget.y += 1.5;
-      const forwardOffset = new THREE.Vector3(0, 0, -2);
-      forwardOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), rotation.current);
-      lookTarget.add(forwardOffset);
-      
-      camera.lookAt(lookTarget);
-    }
+    // Always keep camera behind character at appropriate distance
+    const targetDistance = Math.max(8, Math.min(currentDistance, 25));
+    
+    // Position camera behind character based on rotation
+    const behindOffset = new THREE.Vector3(0, 5, targetDistance);
+    behindOffset.applyAxisAngle(new THREE.Vector3(0, 1, 0), rotation.current);
+    
+    const targetCameraPosition = newPosition.clone().add(behindOffset);
+    
+    // Smooth camera following
+    camera.position.lerp(targetCameraPosition, 3 * delta);
+    
+    // Always look at character
+    const lookTarget = newPosition.clone();
+    lookTarget.y += 1;
+    camera.lookAt(lookTarget);
     
     // Notify parent component of position changes
     if (onPositionChange) {
