@@ -1,6 +1,6 @@
 import { useRef, useEffect } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
-import { useKeyboardControls } from "@react-three/drei";
+import { useKeyboardControls, useGLTF } from "@react-three/drei";
 import { useAvatarCustomization } from "../lib/stores/useAvatarCustomization";
 import * as THREE from "three";
 
@@ -22,6 +22,9 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
   const [subscribe, getControls] = useKeyboardControls<Controls>();
   const { camera } = useThree();
   const { customization } = useAvatarCustomization();
+  
+  // Load Nina 3D model
+  const { scene: ninaModel } = useGLTF('/models/nina_avatar.glb');
   
   // Avatar movement state
   const velocity = useRef(new THREE.Vector3());
@@ -100,59 +103,13 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
   
   return (
     <group ref={groupRef}>
-      {/* Avatar Body - A simple character representation */}
-      <mesh castShadow>
-        <boxGeometry args={[0.6, 1.8, 0.3]} />
-        <meshLambertMaterial color={customization.bodyColor} />
-      </mesh>
-      
-      {/* Avatar Head */}
-      <mesh position={[0, 1.25, 0]} castShadow>
-        <sphereGeometry args={[0.3]} />
-        <meshLambertMaterial color={customization.headColor} />
-      </mesh>
-      
-      {/* Hair */}
-      <mesh position={[0, 1.4, 0]} castShadow>
-        <sphereGeometry args={[0.33]} />
-        <meshLambertMaterial color={customization.hairColor} />
-      </mesh>
-      
-      {/* Simple face features - Eyes */}
-      <mesh position={[0.1, 1.3, 0.25]} castShadow>
-        <sphereGeometry args={[0.04]} />
-        <meshLambertMaterial color={customization.eyeColor} />
-      </mesh>
-      <mesh position={[-0.1, 1.3, 0.25]} castShadow>
-        <sphereGeometry args={[0.04]} />
-        <meshLambertMaterial color={customization.eyeColor} />
-      </mesh>
-      
-      {/* Mouth */}
-      <mesh position={[0, 1.15, 0.25]} castShadow>
-        <sphereGeometry args={[0.03]} />
-        <meshLambertMaterial color="#FF6B6B" />
-      </mesh>
-      
-      {/* Avatar Legs */}
-      <mesh position={[0.15, -0.8, 0]} castShadow>
-        <boxGeometry args={[0.2, 0.6, 0.2]} />
-        <meshLambertMaterial color={customization.clothingColor} />
-      </mesh>
-      <mesh position={[-0.15, -0.8, 0]} castShadow>
-        <boxGeometry args={[0.2, 0.6, 0.2]} />
-        <meshLambertMaterial color={customization.clothingColor} />
-      </mesh>
-      
-      {/* Avatar Arms */}
-      <mesh position={[0.4, 0.3, 0]} castShadow>
-        <boxGeometry args={[0.15, 0.6, 0.15]} />
-        <meshLambertMaterial color={customization.bodyColor} />
-      </mesh>
-      <mesh position={[-0.4, 0.3, 0]} castShadow>
-        <boxGeometry args={[0.15, 0.6, 0.15]} />
-        <meshLambertMaterial color={customization.bodyColor} />
-      </mesh>
+      {/* 3D Nina Model */}
+      <primitive 
+        object={ninaModel.clone()} 
+        scale={[2.5, 2.5, 2.5]} 
+        position={[0, -0.9, 0]}
+        castShadow
+      />
       
       {/* Avatar name label */}
       <mesh position={[0, 2, 0]}>
@@ -162,3 +119,6 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     </group>
   );
 }
+
+// Preload the Nina model for better performance
+useGLTF.preload('/models/nina_avatar.glb');

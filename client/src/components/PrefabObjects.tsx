@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useWorldObjects } from "../lib/stores/useWorldObjects";
 import { useEducation } from "../lib/stores/useEducation";
+import { useGLTF } from "@react-three/drei";
 import { PREFAB_TYPES, WorldObject } from "../types/education";
 import * as THREE from "three";
 
