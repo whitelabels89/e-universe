@@ -91,6 +91,11 @@ function App() {
   
   // Avatar position state for camera following
   const [avatarPosition, setAvatarPosition] = useState<[number, number, number]>([0, 2, 0]);
+  
+  // Debug camera target updates
+  useEffect(() => {
+    console.log("Camera target updated to:", avatarPosition);
+  }, [avatarPosition]);
 
   // Load saved data on app start
   useEffect(() => {
