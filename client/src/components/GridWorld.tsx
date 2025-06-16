@@ -7,7 +7,7 @@ interface GridWorldProps {
   onGridClick?: (position: [number, number, number]) => void;
 }
 
-export function GridWorld({ size = 10, onGridClick }: GridWorldProps) {
+export function GridWorld({ size = 20, onGridClick }: GridWorldProps) {
   const groundRef = useRef<THREE.Mesh>(null);
   
   // Load grass texture
@@ -18,7 +18,7 @@ export function GridWorld({ size = 10, onGridClick }: GridWorldProps) {
   grassTexture.repeat.set(size, size);
   
   // Handle ground clicks for object placement
-  const handleClick = (event: THREE.Event) => {
+  const handleClick = (event: any) => {
     if (!onGridClick) return;
     
     event.stopPropagation();

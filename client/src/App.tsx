@@ -126,7 +126,7 @@ function App() {
         <Canvas
           shadows
           camera={{
-            position: [0, 5, 8],
+            position: [0, 8, 12],
             fov: 60,
             near: 0.1,
             far: 1000
@@ -149,7 +149,7 @@ function App() {
           {/* 3D Scene Components */}
           <Suspense fallback={null}>
             {/* World Grid */}
-            <GridWorld size={10} onGridClick={handleGridClick} />
+            <GridWorld size={20} onGridClick={handleGridClick} />
             
             {/* Player Avatar */}
             <Avatar position={[0, 0.5, 0]} />

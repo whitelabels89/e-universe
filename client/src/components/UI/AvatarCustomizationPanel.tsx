@@ -23,11 +23,11 @@ export function AvatarCustomizationPanel() {
     loadFromStorage
   } = useAvatarCustomization();
 
-  if (!showCustomizationPanel) return null;
-
   useEffect(() => {
     loadFromStorage();
   }, [loadFromStorage]);
+
+  if (!showCustomizationPanel) return null;
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">

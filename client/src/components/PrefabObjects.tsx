@@ -16,7 +16,7 @@ function PrefabObject({ object, onRemove }: PrefabObjectProps) {
   const prefabType = PREFAB_TYPES.find(p => p.type === object.type);
   if (!prefabType) return null;
   
-  const handleClick = (event: THREE.Event) => {
+  const handleClick = (event: any) => {
     event.stopPropagation();
     if (onRemove) {
       onRemove(object.id);
@@ -39,21 +39,21 @@ function PrefabObject({ object, onRemove }: PrefabObjectProps) {
       >
         {object.type === 'school' && (
           <>
-            <boxGeometry args={[1.5, 1, 1.5]} />
+            <boxGeometry args={[3, 2.5, 3]} />
             <meshLambertMaterial color={prefabType.color} transparent opacity={opacity} />
           </>
         )}
         
         {object.type === 'coding-lab' && (
           <>
-            <boxGeometry args={[1.2, 1.5, 1.2]} />
+            <boxGeometry args={[2.5, 3, 2.5]} />
             <meshLambertMaterial color={prefabType.color} transparent opacity={opacity} />
           </>
         )}
         
         {object.type === 'house' && (
           <>
-            <boxGeometry args={[1, 0.8, 1]} />
+            <boxGeometry args={[2, 2, 2]} />
             <meshLambertMaterial color={prefabType.color} transparent opacity={opacity} />
           </>
         )}
@@ -61,29 +61,29 @@ function PrefabObject({ object, onRemove }: PrefabObjectProps) {
       
       {/* Roof for house */}
       {object.type === 'house' && (
-        <mesh position={[0, 0.9, 0]} castShadow scale={[scale, scale, scale]}>
-          <coneGeometry args={[0.8, 0.6, 4]} />
+        <mesh position={[0, 2.3, 0]} castShadow scale={[scale, scale, scale]}>
+          <coneGeometry args={[1.6, 1.2, 4]} />
           <meshLambertMaterial color="#8D6E63" transparent opacity={opacity} />
         </mesh>
       )}
       
       {/* Door/entrance */}
-      <mesh position={[0, -0.2, 0.76]} castShadow scale={[scale, scale, scale]}>
-        <boxGeometry args={[0.3, 0.6, 0.1]} />
+      <mesh position={[0, -0.5, 1.01]} castShadow scale={[scale, scale, scale]}>
+        <boxGeometry args={[0.6, 1.2, 0.1]} />
         <meshLambertMaterial color="#5D4037" transparent opacity={opacity} />
       </mesh>
       
       {/* Lock indicator for locked objects */}
       {!object.isUnlocked && (
-        <mesh position={[0, 1.5, 0]}>
-          <sphereGeometry args={[0.2]} />
+        <mesh position={[0, 3, 0]}>
+          <sphereGeometry args={[0.3]} />
           <meshBasicMaterial color="#F44336" />
         </mesh>
       )}
       
       {/* Object label */}
-      <mesh position={[0, 2, 0]} scale={[scale, scale, scale]}>
-        <planeGeometry args={[2, 0.4]} />
+      <mesh position={[0, 4, 0]} scale={[scale, scale, scale]}>
+        <planeGeometry args={[3, 0.6]} />
         <meshBasicMaterial 
           color="white" 
           transparent 
@@ -93,8 +93,8 @@ function PrefabObject({ object, onRemove }: PrefabObjectProps) {
       
       {/* Interaction hint when hovered */}
       {hovered && (
-        <mesh position={[0, -1, 0]}>
-          <planeGeometry args={[1.5, 0.3]} />
+        <mesh position={[0, -2, 0]}>
+          <planeGeometry args={[2.5, 0.5]} />
           <meshBasicMaterial color="#FF5722" transparent opacity={0.8} />
         </mesh>
       )}

@@ -41,7 +41,7 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     
     const controls = getControls();
     const moveSpeed = 5;
-    const maxBounds = 4.5; // Keep within -4.5 to 4.5 for 10x10 grid
+    const maxBounds = 9.5; // Keep within -9.5 to 9.5 for 20x20 grid
     
     // Reset velocity
     velocity.current.set(0, 0, 0);
