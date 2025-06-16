@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import { useFrame } from "@react-three/fiber";
+import { useGLTF } from "@react-three/drei";
 import { useWorldObjects } from "../lib/stores/useWorldObjects";
 import { useEducation } from "../lib/stores/useEducation";
 import { useAudio } from "../lib/stores/useAudio";
@@ -17,6 +18,11 @@ function BuildPreview({ position, prefabType, isValid }: BuildPreviewProps) {
   const meshRef = useRef<THREE.Group>(null);
   const prefab = PREFAB_TYPES.find(p => p.id === prefabType);
   
+  // Load 3D models for preview
+  const { scene: schoolModel } = useGLTF('/models/school_building.glb');
+  const { scene: codingLabModel } = useGLTF('/models/coding_lab.glb');
+  const { scene: houseModel } = useGLTF('/models/house.glb');
+  
   useFrame((state) => {
     if (meshRef.current) {
       // Gentle floating animation
@@ -28,41 +34,39 @@ function BuildPreview({ position, prefabType, isValid }: BuildPreviewProps) {
   if (!prefab) return null;
 
   const opacity = isValid ? 0.7 : 0.3;
-  const color = isValid ? prefab.color : "#ff4444";
+  
+  // Select appropriate 3D model for preview
+  let model3D;
+  switch (prefab.type) {
+    case 'school':
+      model3D = schoolModel;
+      break;
+    case 'coding-lab':
+      model3D = codingLabModel;
+      break;
+    case 'house':
+      model3D = houseModel;
+      break;
+    default:
+      return null;
+  }
 
   return (
     <group ref={meshRef} position={[position[0], position[1], position[2]]}>
-      {/* Preview building based on type */}
-      {prefab.type === 'school' && (
-        <mesh>
-          <boxGeometry args={[15, 8, 12]} />
-          <meshLambertMaterial color={color} transparent opacity={opacity} wireframe />
-        </mesh>
-      )}
-      
-      {prefab.type === 'coding-lab' && (
-        <mesh>
-          <boxGeometry args={[12, 6, 10]} />
-          <meshLambertMaterial color={color} transparent opacity={opacity} wireframe />
-        </mesh>
-      )}
-      
-      {prefab.type === 'house' && (
-        <>
-          <mesh>
-            <boxGeometry args={[8, 5, 8]} />
-            <meshLambertMaterial color={color} transparent opacity={opacity} wireframe />
-          </mesh>
-          <mesh position={[0, 6, 0]}>
-            <coneGeometry args={[6, 3, 4]} />
-            <meshLambertMaterial color="#8D6E63" transparent opacity={opacity} wireframe />
-          </mesh>
-        </>
-      )}
+      {/* 3D Model Preview - Wireframe Style */}
+      <primitive 
+        object={model3D.clone()} 
+        scale={[3, 3, 3]} 
+        position={[0, 0, 0]}
+        material-transparent={true}
+        material-opacity={opacity}
+        material-color={isValid ? "#00ff00" : "#ff4444"}
+        material-wireframe={true}
+      />
       
       {/* Build indicator */}
       <mesh position={[0, -2, 0]} rotation={[-Math.PI / 2, 0, 0]}>
-        <ringGeometry args={[3, 4, 16]} />
+        <ringGeometry args={[4, 5, 16]} />
         <meshBasicMaterial color={isValid ? "#00ff00" : "#ff0000"} transparent opacity={0.8} />
       </mesh>
     </group>

@@ -11,8 +11,13 @@ interface PrefabObjectProps {
 }
 
 function PrefabObject({ object, onRemove }: PrefabObjectProps) {
-  const meshRef = useRef<THREE.Mesh>(null);
+  const groupRef = useRef<THREE.Group>(null);
   const [hovered, setHovered] = useState(false);
+  
+  // Load 3D models
+  const { scene: schoolModel } = useGLTF('/models/school_building.glb');
+  const { scene: codingLabModel } = useGLTF('/models/coding_lab.glb');
+  const { scene: houseModel } = useGLTF('/models/house.glb');
   
   const prefabType = PREFAB_TYPES.find(p => p.type === object.type);
   if (!prefabType) return null;
@@ -24,81 +29,56 @@ function PrefabObject({ object, onRemove }: PrefabObjectProps) {
     }
   };
   
-  const scale = hovered ? 1.1 : 1;
-  const opacity = object.isUnlocked ? 1 : 0.5;
+  const scale = hovered ? 1.05 : 1;
+  const opacity = object.isUnlocked ? 1 : 0.6;
   
+  // Select appropriate 3D model
+  let model3D;
+  switch (object.type) {
+    case 'school':
+      model3D = schoolModel;
+      break;
+    case 'coding-lab':
+      model3D = codingLabModel;
+      break;
+    case 'house':
+      model3D = houseModel;
+      break;
+    default:
+      return null;
+  }
+
   return (
-    <group position={object.position}>
-      {/* Main building structure */}
-      <mesh 
-        ref={meshRef}
+    <group 
+      ref={groupRef}
+      position={object.position}
+      scale={[scale, scale, scale]}
+      onClick={handleClick}
+      onPointerEnter={() => setHovered(true)}
+      onPointerLeave={() => setHovered(false)}
+    >
+      {/* 3D Building Model */}
+      <primitive 
+        object={model3D.clone()} 
+        scale={[3, 3, 3]} 
+        position={[0, 0, 0]}
         castShadow
-        onClick={handleClick}
-        onPointerEnter={() => setHovered(true)}
-        onPointerLeave={() => setHovered(false)}
-        scale={[scale, scale, scale]}
-      >
-        {object.type === 'school' && (
-          <>
-            <boxGeometry args={[15, 8, 12]} />
-            <meshLambertMaterial color={prefabType.color} transparent opacity={opacity} />
-          </>
-        )}
-        
-        {object.type === 'coding-lab' && (
-          <>
-            <boxGeometry args={[12, 6, 10]} />
-            <meshLambertMaterial color={prefabType.color} transparent opacity={opacity} />
-          </>
-        )}
-        
-        {object.type === 'house' && (
-          <>
-            <boxGeometry args={[8, 5, 8]} />
-            <meshLambertMaterial color={prefabType.color} transparent opacity={opacity} />
-          </>
-        )}
-      </mesh>
-      
-      {/* Roof for house */}
-      {object.type === 'house' && (
-        <mesh position={[0, 6, 0]} castShadow scale={[scale, scale, scale]}>
-          <coneGeometry args={[6, 3, 4]} />
-          <meshLambertMaterial color="#8D6E63" transparent opacity={opacity} />
-        </mesh>
-      )}
-      
-      {/* Door/entrance - Human sized */}
-      <mesh position={[0, -0.3, 4.1]} castShadow scale={[scale, scale, scale]}>
-        <boxGeometry args={[1.2, 2.1, 0.2]} />
-        <meshLambertMaterial color="#5D4037" transparent opacity={opacity} />
-      </mesh>
+        receiveShadow
+      />
       
       {/* Lock indicator for locked objects */}
       {!object.isUnlocked && (
-        <mesh position={[0, 3, 0]}>
-          <sphereGeometry args={[0.3]} />
-          <meshBasicMaterial color="#F44336" />
+        <mesh position={[0, 8, 0]}>
+          <sphereGeometry args={[0.8]} />
+          <meshBasicMaterial color="#FFD700" />
         </mesh>
       )}
       
-      {/* Object label */}
-      <mesh position={[0, 4, 0]} scale={[scale, scale, scale]}>
-        <planeGeometry args={[3, 0.6]} />
-        <meshBasicMaterial 
-          color="white" 
-          transparent 
-          opacity={hovered ? 0.9 : 0.7} 
-        />
+      {/* Building type label */}
+      <mesh position={[0, 12, 0]}>
+        <planeGeometry args={[8, 1.5]} />
+        <meshBasicMaterial color="white" transparent opacity={0.9} />
       </mesh>
-      
-      {/* Interaction hint when hovered */}
-      {hovered && (
-        <mesh position={[0, -2, 0]}>
-          <planeGeometry args={[2.5, 0.5]} />
-          <meshBasicMaterial color="#FF5722" transparent opacity={0.8} />
-        </mesh>
-      )}
     </group>
   );
 }
@@ -106,16 +86,30 @@ function PrefabObject({ object, onRemove }: PrefabObjectProps) {
 export function PrefabObjects() {
   const { objects, removeObject } = useWorldObjects();
   const { student } = useEducation();
-  
+
+  const handleRemoveObject = (id: string) => {
+    removeObject(id);
+    console.log(`Removed object with ID: ${id}`);
+  };
+
+  if (objects.length === 0) {
+    return null;
+  }
+
   return (
     <group>
       {objects.map((object) => (
-        <PrefabObject 
-          key={object.id} 
-          object={object} 
-          onRemove={removeObject}
+        <PrefabObject
+          key={object.id}
+          object={object}
+          onRemove={handleRemoveObject}
         />
       ))}
     </group>
   );
 }
+
+// Preload all building models for better performance
+useGLTF.preload('/models/school_building.glb');
+useGLTF.preload('/models/coding_lab.glb');
+useGLTF.preload('/models/house.glb');
