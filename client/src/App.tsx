@@ -1,6 +1,7 @@
 import { Canvas } from "@react-three/fiber";
 import { Suspense, useEffect, useState, useRef } from "react";
 import { KeyboardControls, OrbitControls } from "@react-three/drei";
+import * as THREE from "three";
 import { useAudio } from "./lib/stores/useAudio";
 import { useEducation } from "./lib/stores/useEducation";
 import { useWorldObjects } from "./lib/stores/useWorldObjects";
@@ -94,6 +95,7 @@ function App() {
   // Avatar transform state for camera following
   const [avatarPosition, setAvatarPosition] = useState<[number, number, number]>([0, 2, 0]);
   const [avatarRotation, setAvatarRotation] = useState(0);
+  const [avatarMoving, setAvatarMoving] = useState(false);
   const controlsRef = useRef<OrbitControls | null>(null);
 
   // Load saved data on app start
@@ -128,9 +130,14 @@ function App() {
     console.log(`Placed ${prefabType.name} at position:`, position);
   };
 
-  const handleAvatarMove = (pos: [number, number, number], rot: number) => {
+  const handleAvatarMove = (
+    pos: [number, number, number],
+    rot: number,
+    moving: boolean,
+  ) => {
     setAvatarPosition(pos);
     setAvatarRotation(rot);
+    setAvatarMoving(moving);
   };
 
   return (
@@ -182,6 +189,7 @@ function App() {
           <FollowCamera
             position={avatarPosition}
             rotation={avatarRotation}
+            moving={avatarMoving}
             controls={controlsRef}
           />
 
@@ -191,6 +199,7 @@ function App() {
             enablePan={false}
             enableZoom={true}
             enableRotate={true}
+            mouseButtons={{ RIGHT: THREE.MOUSE.ROTATE }}
             maxDistance={30}
             minDistance={8}
             maxPolarAngle={Math.PI / 2.1}

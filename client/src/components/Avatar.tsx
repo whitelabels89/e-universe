@@ -15,7 +15,11 @@ enum Controls {
 interface AvatarProps {
   position?: [number, number, number];
   onPositionChange?: (position: [number, number, number]) => void;
-  onMove?: (position: [number, number, number], rotation: number) => void;
+  onMove?: (
+    position: [number, number, number],
+    rotation: number,
+    moving: boolean,
+  ) => void;
 }
 
 export function Avatar({
@@ -84,24 +88,18 @@ export function Avatar({
     groupRef.current.position.set(x, y + bounce, z);
     groupRef.current.rotation.y = rot + MODEL_ROT_OFFSET;
 
-    if (
-      onPositionChange &&
-      (controls.forward ||
-        controls.backward ||
-        controls.leftward ||
-        controls.rightward)
-    ) {
+    const moving =
+      controls.forward ||
+      controls.backward ||
+      controls.leftward ||
+      controls.rightward;
+
+    if (onPositionChange && moving) {
       onPositionChange([x, y, z]);
     }
 
-    if (
-      onMove &&
-      (controls.forward ||
-        controls.backward ||
-        controls.leftward ||
-        controls.rightward)
-    ) {
-      onMove([x, y, z], rot);
+    if (onMove) {
+      onMove([x, y, z], rot, moving);
     }
   });
 
