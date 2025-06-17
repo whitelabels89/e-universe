@@ -18,11 +18,14 @@ interface AvatarProps {
   onMove?: (position: [number, number, number], rotation: number) => void;
 }
 
-
 export function Avatar({ position = [0, 2, 0], onPositionChange, onMove }: AvatarProps) {
   const groupRef = useRef<THREE.Group>(null);
   const [, getControls] = useKeyboardControls<Controls>();
   const { customization } = useAvatarCustomization();
+
+  // Models often face the -Z axis in three.js, so apply an offset so that
+  // rotation 0 means facing +Z like our simple avatar.
+  const MODEL_ROT_OFFSET = Math.PI;
 
   // Load Nina 3D model with error handling
   const gltf = useGLTF('/models/nina_avatar.glb');
@@ -30,7 +33,7 @@ export function Avatar({ position = [0, 2, 0], onPositionChange, onMove }: Avata
 
   // Simple position/rotation state (similar to SimpleAvatar)
   const positionRef = useRef<[number, number, number]>(position);
-  // Current rotation in radians, 0 facing positive Z
+  // Current rotation in radians, 0 means avatar faces world +Z
   const rotationRef = useRef(0);
 
   useFrame((state, delta) => {
@@ -65,7 +68,7 @@ export function Avatar({ position = [0, 2, 0], onPositionChange, onMove }: Avata
     rotationRef.current = rot;
 
     groupRef.current.position.set(x, y + bounce, z);
-    groupRef.current.rotation.y = rot;
+    groupRef.current.rotation.y = rot + MODEL_ROT_OFFSET;
 
     if (
       onPositionChange &&
