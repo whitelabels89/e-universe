@@ -18,6 +18,7 @@ interface AvatarProps {
   onMove?: (position: [number, number, number], rotation: number) => void;
 }
 
+
 export function Avatar({ position = [0, 2, 0], onPositionChange, onMove }: AvatarProps) {
   const groupRef = useRef<THREE.Group>(null);
   const [, getControls] = useKeyboardControls<Controls>();
@@ -89,6 +90,7 @@ export function Avatar({ position = [0, 2, 0], onPositionChange, onMove }: Avata
           object={ninaModel.clone()}
           scale={[2.5, 2.5, 2.5]}
           position={[0, -0.9, 0]}
+          rotation={[0, -Math.PI / 2, 0]}
           castShadow
         />
       ) : (
