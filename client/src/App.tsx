@@ -8,7 +8,7 @@ import { useAvatarCustomization } from "./lib/stores/useAvatarCustomization";
 import "@fontsource/inter";
 
 // Import our game components
-import { SimpleAvatar } from "./components/SimpleAvatar";
+import { Avatar } from "./components/Avatar";
 import { GridWorld } from "./components/GridWorld";
 import { PrefabObjects } from "./components/PrefabObjects";
 import { Terrain } from "./components/Terrain";
@@ -88,7 +88,7 @@ function App() {
     loadFromStorage 
   } = useWorldObjects();
   const { loadFromStorage: loadAvatarCustomization } = useAvatarCustomization();
-  
+
   // Avatar position state for camera following
   const [avatarPosition, setAvatarPosition] = useState<[number, number, number]>([0, 2, 0]);
 
@@ -123,6 +123,7 @@ function App() {
     
     console.log(`Placed ${prefabType.name} at position:`, position);
   };
+
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
@@ -160,7 +161,7 @@ function App() {
             <GridWorld size={50} onGridClick={handleGridClick} />
             
             {/* Player Avatar */}
-            <SimpleAvatar onPositionChange={setAvatarPosition} />
+            <Avatar onPositionChange={setAvatarPosition} />
             
             {/* Placed Objects */}
             <PrefabObjects />
@@ -168,6 +169,7 @@ function App() {
             {/* Build System */}
             <BuildSystem />
           </Suspense>
+
 
           {/* Camera Controls - Enabled for 3rd person camera drag */}
           <OrbitControls
