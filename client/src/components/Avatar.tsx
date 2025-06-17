@@ -47,10 +47,14 @@ export function Avatar({ position = [0, 2, 0], onPositionChange }: AvatarProps) 
       rot -= turnSpeed * delta;
     }
 
-    if (controls.forward) {
+    const movingForward =
+      controls.forward || (!controls.backward && (controls.leftward || controls.rightward));
+
+    if (movingForward) {
       x += Math.sin(rot) * speed * delta;
       z += Math.cos(rot) * speed * delta;
     }
+
     if (controls.backward) {
       x -= Math.sin(rot) * speed * delta;
       z -= Math.cos(rot) * speed * delta;
@@ -74,10 +78,11 @@ export function Avatar({ position = [0, 2, 0], onPositionChange }: AvatarProps) 
     <group ref={groupRef}>
       {/* 3D Nina Model with fallback */}
       {ninaModel ? (
-        <primitive 
-          object={ninaModel.clone()} 
-          scale={[2.5, 2.5, 2.5]} 
+        <primitive
+          object={ninaModel.clone()}
+          scale={[2.5, 2.5, 2.5]}
           position={[0, -0.9, 0]}
+          rotation={[0, -Math.PI / 2, 0]}
           castShadow
         />
       ) : (
