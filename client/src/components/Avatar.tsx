@@ -6,10 +6,10 @@ import * as THREE from "three";
 
 // Define movement controls
 enum Controls {
-  forward = 'forward',
-  backward = 'backward',
-  leftward = 'leftward',
-  rightward = 'rightward'
+  forward = "forward",
+  backward = "backward",
+  leftward = "leftward",
+  rightward = "rightward",
 }
 
 interface AvatarProps {
@@ -18,17 +18,22 @@ interface AvatarProps {
   onMove?: (position: [number, number, number], rotation: number) => void;
 }
 
-export function Avatar({ position = [0, 2, 0], onPositionChange, onMove }: AvatarProps) {
+export function Avatar({
+  position = [0, 2, 0],
+  onPositionChange,
+  onMove,
+}: AvatarProps) {
   const groupRef = useRef<THREE.Group>(null);
   const [, getControls] = useKeyboardControls<Controls>();
   const { customization } = useAvatarCustomization();
 
-  // Models often face the -Z axis in three.js, so apply an offset so that
-  // rotation 0 means facing +Z like our simple avatar.
-  const MODEL_ROT_OFFSET = Math.PI;
+  // Apply rotation offset for the imported model so its forward direction
+  // matches the movement logic. The Nina model faces +Z already, so no
+  // adjustment is required.
+  const MODEL_ROT_OFFSET = 0;
 
   // Load Nina 3D model with error handling
-  const gltf = useGLTF('/models/nina_avatar.glb');
+  const gltf = useGLTF("/models/nina_avatar.glb");
   const ninaModel = gltf?.scene;
 
   // Simple position/rotation state (similar to SimpleAvatar)
@@ -72,19 +77,25 @@ export function Avatar({ position = [0, 2, 0], onPositionChange, onMove }: Avata
 
     if (
       onPositionChange &&
-      (controls.forward || controls.backward || controls.leftward || controls.rightward)
+      (controls.forward ||
+        controls.backward ||
+        controls.leftward ||
+        controls.rightward)
     ) {
       onPositionChange([x, y, z]);
     }
 
     if (
       onMove &&
-      (controls.forward || controls.backward || controls.leftward || controls.rightward)
+      (controls.forward ||
+        controls.backward ||
+        controls.leftward ||
+        controls.rightward)
     ) {
       onMove([x, y, z], rot);
     }
   });
-  
+
   return (
     <group ref={groupRef}>
       {/* 3D Nina Model with fallback */}
@@ -109,7 +120,7 @@ export function Avatar({ position = [0, 2, 0], onPositionChange, onMove }: Avata
           </mesh>
         </>
       )}
-      
+
       {/* Avatar name label */}
       <mesh position={[0, 2, 0]}>
         <planeGeometry args={[1, 0.3]} />
@@ -120,4 +131,4 @@ export function Avatar({ position = [0, 2, 0], onPositionChange, onMove }: Avata
 }
 
 // Preload the Nina model for better performance
-useGLTF.preload('/models/nina_avatar.glb');
+useGLTF.preload("/models/nina_avatar.glb");

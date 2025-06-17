@@ -9,7 +9,11 @@ interface FollowCameraProps {
   controls: MutableRefObject<OrbitControls | null>;
 }
 
-export function FollowCamera({ position, rotation, controls }: FollowCameraProps) {
+export function FollowCamera({
+  position,
+  rotation,
+  controls,
+}: FollowCameraProps) {
   const { camera } = useThree();
   const offset = new THREE.Vector3(0, 8, 12);
   const camPos = useRef(camera.position.clone());
@@ -17,17 +21,21 @@ export function FollowCamera({ position, rotation, controls }: FollowCameraProps
 
   useFrame(() => {
     const [x, y, z] = position;
-    const rotOffset = offset.clone().applyAxisAngle(new THREE.Vector3(0, 1, 0), rotation);
+    const rotOffset = offset
+      .clone()
+      .applyAxisAngle(new THREE.Vector3(0, 1, 0), rotation);
     const desiredPos = new THREE.Vector3(
       x - rotOffset.x,
       y + rotOffset.y,
-      z - rotOffset.z
+      z - rotOffset.z,
     );
-    camPos.current.lerp(desiredPos, 0.1);
+    // Smoothly interpolate toward the desired camera position
+    camPos.current.lerp(desiredPos, 0.05);
     camera.position.copy(camPos.current);
 
     const desiredTarget = new THREE.Vector3(x, y + 1, z);
-    targetPos.current.lerp(desiredTarget, 0.1);
+    // Smoothly interpolate the camera target as well
+    targetPos.current.lerp(desiredTarget, 0.05);
     if (controls.current) {
       controls.current.target.copy(targetPos.current);
       controls.current.update();
@@ -38,5 +46,3 @@ export function FollowCamera({ position, rotation, controls }: FollowCameraProps
 
   return null;
 }
-
-
