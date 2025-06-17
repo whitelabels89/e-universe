@@ -15,9 +15,10 @@ enum Controls {
 interface AvatarProps {
   position?: [number, number, number];
   onPositionChange?: (position: [number, number, number]) => void;
+  onMove?: (position: [number, number, number], rotation: number) => void;
 }
 
-export function Avatar({ position = [0, 2, 0], onPositionChange }: AvatarProps) {
+export function Avatar({ position = [0, 2, 0], onPositionChange, onMove }: AvatarProps) {
   const groupRef = useRef<THREE.Group>(null);
   const [, getControls] = useKeyboardControls<Controls>();
   const { customization } = useAvatarCustomization();
@@ -71,6 +72,13 @@ export function Avatar({ position = [0, 2, 0], onPositionChange }: AvatarProps) 
     ) {
       onPositionChange([x, y, z]);
     }
+
+    if (
+      onMove &&
+      (controls.forward || controls.backward || controls.leftward || controls.rightward)
+    ) {
+      onMove([x, y, z], rot);
+    }
   });
   
   return (
@@ -81,7 +89,6 @@ export function Avatar({ position = [0, 2, 0], onPositionChange }: AvatarProps) 
           object={ninaModel.clone()}
           scale={[2.5, 2.5, 2.5]}
           position={[0, -0.9, 0]}
-          rotation={[0, -Math.PI / 2, 0]}
           castShadow
         />
       ) : (
