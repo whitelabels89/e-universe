@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { useTexture } from "@react-three/drei";
+import { useBuildMode } from "../lib/stores/useBuildMode";
 import * as THREE from "three";
 
 interface GridWorldProps {
@@ -9,6 +10,7 @@ interface GridWorldProps {
 
 export function GridWorld({ size = 50, onGridClick }: GridWorldProps) {
   const groundRef = useRef<THREE.Mesh>(null);
+  const { isBuildMode, setPreviewPosition, selectedBuildingType } = useBuildMode();
   
   // Load grass texture
   const grassTexture = useTexture("/textures/grass.png");
@@ -19,8 +21,6 @@ export function GridWorld({ size = 50, onGridClick }: GridWorldProps) {
   
   // Handle ground clicks for object placement
   const handleClick = (event: any) => {
-    if (!onGridClick) return;
-    
     event.stopPropagation();
     const point = event.point;
     
@@ -29,7 +29,34 @@ export function GridWorld({ size = 50, onGridClick }: GridWorldProps) {
     const gridZ = Math.round(point.z);
     const gridY = 2; // Place objects above ground
     
-    onGridClick([gridX, gridY, gridZ]);
+    if (isBuildMode && selectedBuildingType) {
+      // In build mode, place building
+      if (onGridClick) {
+        onGridClick([gridX, 0, gridZ]); // Use ground level for buildings
+      }
+      setPreviewPosition(null); // Clear preview after placement
+    } else if (!isBuildMode && onGridClick) {
+      // Normal mode
+      onGridClick([gridX, gridY, gridZ]);
+    }
+  };
+
+  const handlePointerMove = (event: any) => {
+    if (!isBuildMode || !selectedBuildingType) return;
+    
+    const point = event.point;
+    
+    // Snap to grid for preview
+    const gridX = Math.round(point.x);
+    const gridZ = Math.round(point.z);
+    
+    setPreviewPosition([gridX, 0, gridZ]);
+  };
+
+  const handlePointerLeave = () => {
+    if (isBuildMode) {
+      setPreviewPosition(null);
+    }
   };
   
   return (
@@ -41,6 +68,8 @@ export function GridWorld({ size = 50, onGridClick }: GridWorldProps) {
         position={[0, -1, 0]}
         receiveShadow
         onClick={handleClick}
+        onPointerMove={handlePointerMove}
+        onPointerLeave={handlePointerLeave}
       >
         <planeGeometry args={[size, size]} />
         <meshLambertMaterial map={grassTexture} />

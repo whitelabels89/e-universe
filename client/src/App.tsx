@@ -1,21 +1,30 @@
 import { Canvas } from "@react-three/fiber";
 import { Suspense, useEffect, useState, useRef } from "react";
 import { KeyboardControls, OrbitControls } from "@react-three/drei";
+import * as THREE from "three";
 import { useAudio } from "./lib/stores/useAudio";
 import { useEducation } from "./lib/stores/useEducation";
 import { useWorldObjects } from "./lib/stores/useWorldObjects";
 import { useAvatarCustomization } from "./lib/stores/useAvatarCustomization";
+import { useCampus } from "./lib/stores/useCampus";
 import "@fontsource/inter";
 
 // Import our game components
 import { Avatar } from "./components/Avatar";
+import { AnimatedAvatar } from "./components/AnimatedAvatar";
 import { FollowCamera } from "./components/FollowCamera";
 import { GridWorld } from "./components/GridWorld";
 import { PrefabObjects } from "./components/PrefabObjects";
 import { Terrain } from "./components/Terrain";
 import { BuildSystem } from "./components/BuildSystem";
 import { GameUI } from "./components/UI/GameUI";
-import { FollowCamera } from "./components/FollowCamera";
+import { CampusUI } from "./components/UI/CampusUI";
+import { BuildModeUI } from "./components/UI/BuildModeUI";
+import { CameraControlsInfo } from "./components/UI/CameraControlsInfo";
+import { CampusBuildings } from "./components/CampusBuildings";
+import { InteriorEnvironment } from "./components/InteriorEnvironment";
+import { BuildModeCamera } from "./components/BuildModeCamera";
+import { BuildPreviewGhost } from "./components/BuildPreviewGhost";
 import { PREFAB_TYPES } from "./types/education";
 
 // Define control keys for the game
@@ -90,11 +99,13 @@ function App() {
     loadFromStorage 
   } = useWorldObjects();
   const { loadFromStorage: loadAvatarCustomization } = useAvatarCustomization();
+  const { isInsideBuilding } = useCampus();
 
   // Avatar transform state for camera following
   const [avatarPosition, setAvatarPosition] = useState<[number, number, number]>([0, 2, 0]);
   const [avatarRotation, setAvatarRotation] = useState(0);
-  const controlsRef = useRef<OrbitControls | null>(null);
+  const [avatarMoving, setAvatarMoving] = useState(false);
+  const controlsRef = useRef<any>(null);
 
   // Load saved data on app start
   useEffect(() => {
@@ -128,9 +139,14 @@ function App() {
     console.log(`Placed ${prefabType.name} at position:`, position);
   };
 
-  const handleAvatarMove = (pos: [number, number, number], rot: number) => {
+  const handleAvatarMove = (
+    pos: [number, number, number],
+    rot: number,
+    moving: boolean,
+  ) => {
     setAvatarPosition(pos);
     setAvatarRotation(rot);
+    setAvatarMoving(moving);
   };
 
   return (
@@ -162,48 +178,82 @@ function App() {
 
           {/* 3D Scene Components */}
           <Suspense fallback={null}>
-            {/* Realistic Terrain */}
-            <Terrain size={50} />
-            
-            {/* World Grid */}
-            <GridWorld size={50} onGridClick={handleGridClick} />
-            
-            {/* Player Avatar */}
-            <Avatar onMove={handleAvatarMove} />
-            
-            {/* Placed Objects */}
-            <PrefabObjects />
-            
-            {/* Build System */}
-            <BuildSystem />
+            {isInsideBuilding ? (
+              /* Interior Environment */
+              <>
+                <InteriorEnvironment />
+                <AnimatedAvatar onMove={handleAvatarMove} />
+              </>
+            ) : (
+              /* Outdoor Campus */
+              <>
+                {/* Realistic Terrain */}
+                <Terrain size={50} />
+                
+                {/* World Grid */}
+                <GridWorld size={50} onGridClick={handleGridClick} />
+                
+                {/* Campus Buildings */}
+                <CampusBuildings />
+                
+                {/* Build Preview Ghost */}
+                <BuildPreviewGhost />
+                
+                {/* Player Avatar */}
+                <AnimatedAvatar onMove={handleAvatarMove} />
+                
+                {/* Placed Objects */}
+                <PrefabObjects />
+                
+                {/* Build System */}
+                <BuildSystem />
+              </>
+            )}
           </Suspense>
+
+          {/* Build Mode Camera Controller */}
+          <BuildModeCamera />
 
           {/* Camera follow component */}
           <FollowCamera
             position={avatarPosition}
             rotation={avatarRotation}
+            moving={avatarMoving}
             controls={controlsRef}
           />
 
-          {/* Camera Controls - Enabled for 3rd person camera drag */}
+          {/* Camera Controls - Enhanced for better drag control */}
           <OrbitControls
             ref={controlsRef}
             enablePan={false}
             enableZoom={true}
             enableRotate={true}
-            maxDistance={30}
-            minDistance={8}
+            mouseButtons={{ 
+              LEFT: THREE.MOUSE.ROTATE,
+              RIGHT: THREE.MOUSE.ROTATE 
+            }}
+            screenSpacePanning={false}
+            touches={{ 
+              ONE: THREE.TOUCH.ROTATE,
+              TWO: THREE.TOUCH.DOLLY_ROTATE 
+            }}
+            maxDistance={isInsideBuilding ? 12 : 40}
+            minDistance={isInsideBuilding ? 2 : 5}
             maxPolarAngle={Math.PI / 2.1}
+            minPolarAngle={Math.PI / 8}
             enableDamping={true}
             dampingFactor={0.05}
-            rotateSpeed={0.5}
-            zoomSpeed={1.0}
+            rotateSpeed={isInsideBuilding ? 1.0 : 0.8}
+            zoomSpeed={1.2}
             autoRotate={false}
           />
         </Canvas>
 
         {/* UI Overlay */}
         <GameUI />
+        <CampusUI />
+        <BuildModeUI />
+        <CameraControlsInfo />
       </KeyboardControls>
     </div>
   );
