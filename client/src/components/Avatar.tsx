@@ -15,9 +15,11 @@ enum Controls {
 interface AvatarProps {
   position?: [number, number, number];
   onPositionChange?: (position: [number, number, number]) => void;
+  onMove?: (position: [number, number, number], rotation: number) => void;
 }
 
-export function Avatar({ position = [0, 2, 0], onPositionChange }: AvatarProps) {
+
+export function Avatar({ position = [0, 2, 0], onPositionChange, onMove }: AvatarProps) {
   const groupRef = useRef<THREE.Group>(null);
   const [, getControls] = useKeyboardControls<Controls>();
   const { customization } = useAvatarCustomization();
@@ -70,6 +72,13 @@ export function Avatar({ position = [0, 2, 0], onPositionChange }: AvatarProps) 
       (controls.forward || controls.backward || controls.leftward || controls.rightward)
     ) {
       onPositionChange([x, y, z]);
+    }
+
+    if (
+      onMove &&
+      (controls.forward || controls.backward || controls.leftward || controls.rightward)
+    ) {
+      onMove([x, y, z], rot);
     }
   });
   
