@@ -15,6 +15,7 @@ import { PrefabObjects } from "./components/PrefabObjects";
 import { Terrain } from "./components/Terrain";
 import { BuildSystem } from "./components/BuildSystem";
 import { GameUI } from "./components/UI/GameUI";
+import { FollowCamera } from "./components/FollowCamera";
 import { PREFAB_TYPES } from "./types/education";
 
 // Define control keys for the game
@@ -132,7 +133,6 @@ function App() {
     setAvatarRotation(rot);
   };
 
-
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
       <KeyboardControls map={keyMap}>
@@ -177,7 +177,6 @@ function App() {
             {/* Build System */}
             <BuildSystem />
           </Suspense>
-
 
           {/* Camera follow component */}
           <FollowCamera

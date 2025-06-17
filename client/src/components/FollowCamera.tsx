@@ -29,6 +29,7 @@ export function FollowCamera({
       y + rotOffset.y,
       z - rotOffset.z,
     );
+
     camPos.current.lerp(desiredPos, 0.03);
     camera.position.copy(camPos.current);
 
