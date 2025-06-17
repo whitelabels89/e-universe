@@ -184,7 +184,7 @@ function App() {
             rotation={avatarRotation}
             controls={controlsRef}
           />
-        
+
           {/* Camera Controls - Enabled for 3rd person camera drag */}
           <OrbitControls
             ref={controlsRef}

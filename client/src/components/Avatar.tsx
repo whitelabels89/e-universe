@@ -59,7 +59,8 @@ export function Avatar({
     state.camera.getWorldDirection(camDir);
     camDir.y = 0;
     camDir.normalize();
-    rightDir.set(camDir.z, 0, -camDir.x);
+    // Right vector relative to camera direction
+    rightDir.set(-camDir.z, 0, camDir.x);
 
     moveDir.set(0, 0, 0);
     if (controls.forward) moveDir.add(camDir);

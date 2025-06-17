@@ -29,11 +29,12 @@ export function FollowCamera({
       y + rotOffset.y,
       z - rotOffset.z,
     );
-    camPos.current.lerp(desiredPos, 0.05);
+
+    camPos.current.lerp(desiredPos, 0.03);
     camera.position.copy(camPos.current);
 
     const desiredTarget = new THREE.Vector3(x, y + 1, z);
-    targetPos.current.lerp(desiredTarget, 0.05);
+    targetPos.current.lerp(desiredTarget, 0.03);
     if (controls.current) {
       controls.current.target.copy(targetPos.current);
       controls.current.update();
