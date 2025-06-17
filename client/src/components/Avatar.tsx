@@ -28,9 +28,9 @@ export function Avatar({
   const { customization } = useAvatarCustomization();
 
   // Apply rotation offset for the imported model so its forward direction
-  // matches the movement logic. The Nina model faces -Z by default, so
-  // rotate it 180 degrees to align with +Z forward.
-  const MODEL_ROT_OFFSET = Math.PI;
+  // matches the movement logic. The Nina model already faces the +Z axis,
+  // so no additional adjustment is required.
+  const MODEL_ROT_OFFSET = 0;
 
   // Load Nina 3D model with error handling
   const gltf = useGLTF("/models/nina_avatar.glb");

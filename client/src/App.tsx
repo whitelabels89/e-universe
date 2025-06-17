@@ -9,6 +9,7 @@ import "@fontsource/inter";
 
 // Import our game components
 import { Avatar } from "./components/Avatar";
+import { FollowCamera } from "./components/FollowCamera";
 import { GridWorld } from "./components/GridWorld";
 import { PrefabObjects } from "./components/PrefabObjects";
 import { Terrain } from "./components/Terrain";
@@ -90,7 +91,7 @@ function App() {
   } = useWorldObjects();
   const { loadFromStorage: loadAvatarCustomization } = useAvatarCustomization();
 
-  // Avatar position state for camera following
+  // Avatar transform state for camera following
   const [avatarPosition, setAvatarPosition] = useState<[number, number, number]>([0, 2, 0]);
   const [avatarRotation, setAvatarRotation] = useState(0);
   const controlsRef = useRef<OrbitControls | null>(null);
@@ -127,6 +128,10 @@ function App() {
     console.log(`Placed ${prefabType.name} at position:`, position);
   };
 
+  const handleAvatarMove = (pos: [number, number, number], rot: number) => {
+    setAvatarPosition(pos);
+    setAvatarRotation(rot);
+  };
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
@@ -164,7 +169,7 @@ function App() {
             <GridWorld size={50} onGridClick={handleGridClick} />
             
             {/* Player Avatar */}
-            <Avatar onPositionChange={setAvatarPosition} />
+            <Avatar onMove={handleAvatarMove} />
             
             {/* Placed Objects */}
             <PrefabObjects />
@@ -173,7 +178,13 @@ function App() {
             <BuildSystem />
           </Suspense>
 
-
+          {/* Camera follow component */}
+          <FollowCamera
+            position={avatarPosition}
+            rotation={avatarRotation}
+            controls={controlsRef}
+          />
+        
           {/* Camera Controls - Enabled for 3rd person camera drag */}
           <OrbitControls
             ref={controlsRef}

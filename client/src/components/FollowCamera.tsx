@@ -29,12 +29,10 @@ export function FollowCamera({
       y + rotOffset.y,
       z - rotOffset.z,
     );
-    // Smoothly interpolate toward the desired camera position
     camPos.current.lerp(desiredPos, 0.05);
     camera.position.copy(camPos.current);
 
     const desiredTarget = new THREE.Vector3(x, y + 1, z);
-    // Smoothly interpolate the camera target as well
     targetPos.current.lerp(desiredTarget, 0.05);
     if (controls.current) {
       controls.current.target.copy(targetPos.current);
