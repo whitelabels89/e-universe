@@ -127,11 +127,6 @@ function App() {
     console.log(`Placed ${prefabType.name} at position:`, position);
   };
 
-  const handleAvatarMove = (pos: [number, number, number], rot: number) => {
-    setAvatarPosition(pos);
-    setAvatarRotation(rot);
-  };
-
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
       <KeyboardControls map={keyMap}>
@@ -168,7 +163,7 @@ function App() {
             <GridWorld size={50} onGridClick={handleGridClick} />
             
             {/* Player Avatar */}
-            <Avatar onMove={handleAvatarMove} />
+            <Avatar onPositionChange={setAvatarPosition} />
             
             {/* Placed Objects */}
             <PrefabObjects />
@@ -176,9 +171,6 @@ function App() {
             {/* Build System */}
             <BuildSystem />
           </Suspense>
-
-          {/* Camera follow logic */}
-          <FollowCamera position={avatarPosition} rotation={avatarRotation} controls={controlsRef} />
 
           {/* Camera Controls - Enabled for 3rd person camera drag */}
           <OrbitControls
