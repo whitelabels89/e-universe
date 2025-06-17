@@ -1,6 +1,7 @@
 import { Canvas } from "@react-three/fiber";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useRef } from "react";
 import { KeyboardControls, OrbitControls } from "@react-three/drei";
+import * as THREE from "three";
 import { useAudio } from "./lib/stores/useAudio";
 import { useEducation } from "./lib/stores/useEducation";
 import { useWorldObjects } from "./lib/stores/useWorldObjects";
@@ -8,7 +9,8 @@ import { useAvatarCustomization } from "./lib/stores/useAvatarCustomization";
 import "@fontsource/inter";
 
 // Import our game components
-import { SimpleAvatar } from "./components/SimpleAvatar";
+import { Avatar } from "./components/Avatar";
+import { FollowCamera } from "./components/FollowCamera";
 import { GridWorld } from "./components/GridWorld";
 import { PrefabObjects } from "./components/PrefabObjects";
 import { Terrain } from "./components/Terrain";
@@ -88,9 +90,12 @@ function App() {
     loadFromStorage 
   } = useWorldObjects();
   const { loadFromStorage: loadAvatarCustomization } = useAvatarCustomization();
-  
-  // Avatar position state for camera following
+
+  // Avatar transform state for camera following
   const [avatarPosition, setAvatarPosition] = useState<[number, number, number]>([0, 2, 0]);
+  const [avatarRotation, setAvatarRotation] = useState(0);
+  const [avatarMoving, setAvatarMoving] = useState(false);
+  const controlsRef = useRef<OrbitControls | null>(null);
 
   // Load saved data on app start
   useEffect(() => {
@@ -123,6 +128,17 @@ function App() {
     
     console.log(`Placed ${prefabType.name} at position:`, position);
   };
+
+  const handleAvatarMove = (
+    pos: [number, number, number],
+    rot: number,
+    moving: boolean,
+  ) => {
+    setAvatarPosition(pos);
+    setAvatarRotation(rot);
+    setAvatarMoving(moving);
+  };
+
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
@@ -160,7 +176,7 @@ function App() {
             <GridWorld size={50} onGridClick={handleGridClick} />
             
             {/* Player Avatar */}
-            <SimpleAvatar onPositionChange={setAvatarPosition} />
+            <Avatar onMove={handleAvatarMove} />
             
             {/* Placed Objects */}
             <PrefabObjects />
@@ -169,12 +185,22 @@ function App() {
             <BuildSystem />
           </Suspense>
 
+
+          {/* Camera follow component */}
+          <FollowCamera
+            position={avatarPosition}
+            rotation={avatarRotation}
+            moving={avatarMoving}
+            controls={controlsRef}
+          />
+
           {/* Camera Controls - Enabled for 3rd person camera drag */}
           <OrbitControls
-            target={[avatarPosition[0], avatarPosition[1] + 1, avatarPosition[2]]}
+            ref={controlsRef}
             enablePan={false}
             enableZoom={true}
             enableRotate={true}
+            mouseButtons={{ RIGHT: THREE.MOUSE.ROTATE }}
             maxDistance={30}
             minDistance={8}
             maxPolarAngle={Math.PI / 2.1}
