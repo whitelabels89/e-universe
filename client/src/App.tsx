@@ -1,5 +1,5 @@
 import { Canvas } from "@react-three/fiber";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useRef } from "react";
 import { KeyboardControls, OrbitControls } from "@react-three/drei";
 import { useAudio } from "./lib/stores/useAudio";
 import { useEducation } from "./lib/stores/useEducation";
@@ -14,6 +14,7 @@ import { PrefabObjects } from "./components/PrefabObjects";
 import { Terrain } from "./components/Terrain";
 import { BuildSystem } from "./components/BuildSystem";
 import { GameUI } from "./components/UI/GameUI";
+import { FollowCamera } from "./components/FollowCamera";
 import { PREFAB_TYPES } from "./types/education";
 
 // Define control keys for the game
@@ -91,6 +92,8 @@ function App() {
 
   // Avatar position state for camera following
   const [avatarPosition, setAvatarPosition] = useState<[number, number, number]>([0, 2, 0]);
+  const [avatarRotation, setAvatarRotation] = useState(0);
+  const controlsRef = useRef<OrbitControls | null>(null);
 
   // Load saved data on app start
   useEffect(() => {
@@ -123,7 +126,6 @@ function App() {
     
     console.log(`Placed ${prefabType.name} at position:`, position);
   };
-
 
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
@@ -170,10 +172,9 @@ function App() {
             <BuildSystem />
           </Suspense>
 
-
           {/* Camera Controls - Enabled for 3rd person camera drag */}
           <OrbitControls
-            target={[avatarPosition[0], avatarPosition[1] + 1, avatarPosition[2]]}
+            ref={controlsRef}
             enablePan={false}
             enableZoom={true}
             enableRotate={true}
