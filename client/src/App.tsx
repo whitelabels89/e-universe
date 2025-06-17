@@ -127,6 +127,7 @@ function App() {
     console.log(`Placed ${prefabType.name} at position:`, position);
   };
 
+
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
       <KeyboardControls map={keyMap}>
@@ -171,6 +172,7 @@ function App() {
             {/* Build System */}
             <BuildSystem />
           </Suspense>
+
 
           {/* Camera Controls - Enabled for 3rd person camera drag */}
           <OrbitControls

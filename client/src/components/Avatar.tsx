@@ -28,9 +28,9 @@ export function Avatar({
   const { customization } = useAvatarCustomization();
 
   // Apply rotation offset for the imported model so its forward direction
-  // matches the movement logic. The Nina model faces +Z already, so no
-  // adjustment is required.
-  const MODEL_ROT_OFFSET = 0;
+  // matches the movement logic. The Nina model faces -Z by default, so
+  // rotate it 180 degrees to align with +Z forward.
+  const MODEL_ROT_OFFSET = Math.PI;
 
   // Load Nina 3D model with error handling
   const gltf = useGLTF("/models/nina_avatar.glb");
@@ -41,6 +41,11 @@ export function Avatar({
   // Current rotation in radians, 0 means avatar faces world +Z
   const rotationRef = useRef(0);
 
+  // Temporary vectors for camera-relative movement calculations
+  const camDir = new THREE.Vector3();
+  const rightDir = new THREE.Vector3();
+  const moveDir = new THREE.Vector3();
+
   useFrame((state, delta) => {
     if (!groupRef.current) return;
 
@@ -50,22 +55,25 @@ export function Avatar({
     let [x, y, z] = positionRef.current;
     let rot = rotationRef.current;
 
-    // Determine intended direction based on pressed keys
-    let dirX = 0;
-    let dirZ = 0;
-    if (controls.forward) dirZ += 1;
-    if (controls.backward) dirZ -= 1;
-    if (controls.leftward) dirX -= 1;
-    if (controls.rightward) dirX += 1;
+    // Determine camera forward and right vectors on the XZ plane
+    state.camera.getWorldDirection(camDir);
+    camDir.y = 0;
+    camDir.normalize();
+    rightDir.set(camDir.z, 0, -camDir.x);
 
-    // If any movement key pressed, face that direction instantly
+    moveDir.set(0, 0, 0);
+    if (controls.forward) moveDir.add(camDir);
+    if (controls.backward) moveDir.sub(camDir);
+    if (controls.leftward) moveDir.sub(rightDir);
+    if (controls.rightward) moveDir.add(rightDir);
+
+    // If any movement key pressed, face and move in that direction
     let bounce = 0;
-    if (dirX !== 0 || dirZ !== 0) {
-      const targetRot = Math.atan2(dirX, dirZ);
-      rot = targetRot;
-      x += Math.sin(rot) * speed * delta;
-      z += Math.cos(rot) * speed * delta;
-      // simple walking bounce effect
+    if (moveDir.lengthSq() > 0) {
+      moveDir.normalize();
+      rot = Math.atan2(moveDir.x, moveDir.z);
+      x += moveDir.x * speed * delta;
+      z += moveDir.z * speed * delta;
       bounce = Math.sin(state.clock.elapsedTime * 8) * 0.1;
     }
 
