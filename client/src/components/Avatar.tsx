@@ -28,6 +28,7 @@ export function Avatar({ position = [0, 2, 0], onPositionChange }: AvatarProps) 
 
   // Simple position/rotation state (similar to SimpleAvatar)
   const positionRef = useRef<[number, number, number]>(position);
+  // Current rotation in radians, 0 facing positive Z
   const rotationRef = useRef(0);
 
   useFrame((state, delta) => {
@@ -35,35 +36,33 @@ export function Avatar({ position = [0, 2, 0], onPositionChange }: AvatarProps) 
 
     const controls = getControls();
     const speed = 10;
-    const turnSpeed = 3;
 
     let [x, y, z] = positionRef.current;
     let rot = rotationRef.current;
 
-    if (controls.leftward) {
-      rot += turnSpeed * delta;
-    }
-    if (controls.rightward) {
-      rot -= turnSpeed * delta;
-    }
+    // Determine intended direction based on pressed keys
+    let dirX = 0;
+    let dirZ = 0;
+    if (controls.forward) dirZ += 1;
+    if (controls.backward) dirZ -= 1;
+    if (controls.leftward) dirX -= 1;
+    if (controls.rightward) dirX += 1;
 
-    const movingForward =
-      controls.forward || (!controls.backward && (controls.leftward || controls.rightward));
-
-    if (movingForward) {
+    // If any movement key pressed, face that direction instantly
+    let bounce = 0;
+    if (dirX !== 0 || dirZ !== 0) {
+      const targetRot = Math.atan2(dirX, dirZ);
+      rot = targetRot;
       x += Math.sin(rot) * speed * delta;
       z += Math.cos(rot) * speed * delta;
-    }
-
-    if (controls.backward) {
-      x -= Math.sin(rot) * speed * delta;
-      z -= Math.cos(rot) * speed * delta;
+      // simple walking bounce effect
+      bounce = Math.sin(state.clock.elapsedTime * 8) * 0.1;
     }
 
     positionRef.current = [x, y, z];
     rotationRef.current = rot;
 
-    groupRef.current.position.set(x, y, z);
+    groupRef.current.position.set(x, y + bounce, z);
     groupRef.current.rotation.y = rot;
 
     if (
