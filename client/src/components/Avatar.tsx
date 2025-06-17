@@ -112,6 +112,7 @@ export function Avatar({
           object={ninaModel.clone()}
           scale={[2.5, 2.5, 2.5]}
           position={[0, -0.9, 0]}
+          rotation={[0, -Math.PI / 2, 0]}
           castShadow
         />
       ) : (
