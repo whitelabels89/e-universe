@@ -1,96 +1,116 @@
-import { useRef, useEffect } from "react";
-import { useFrame, useThree } from "@react-three/fiber";
+import { useRef } from "react";
+import { useFrame } from "@react-three/fiber";
 import { useKeyboardControls, useGLTF } from "@react-three/drei";
 import { useAvatarCustomization } from "../lib/stores/useAvatarCustomization";
 import * as THREE from "three";
 
 // Define movement controls
 enum Controls {
-  forward = 'forward',
-  backward = 'backward',
-  leftward = 'leftward',
-  rightward = 'rightward'
+  forward = "forward",
+  backward = "backward",
+  leftward = "leftward",
+  rightward = "rightward",
 }
 
 interface AvatarProps {
   position?: [number, number, number];
   onPositionChange?: (position: [number, number, number]) => void;
+  onMove?: (position: [number, number, number], rotation: number) => void;
 }
 
-export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps) {
+export function Avatar({
+  position = [0, 2, 0],
+  onPositionChange,
+  onMove,
+}: AvatarProps) {
   const groupRef = useRef<THREE.Group>(null);
-  const [subscribe, getControls] = useKeyboardControls<Controls>();
-  const { camera } = useThree();
+  const [, getControls] = useKeyboardControls<Controls>();
   const { customization } = useAvatarCustomization();
-  
+
+  // Apply rotation offset for the imported model so its forward direction
+  // matches the movement logic. The Nina model faces -Z by default, so
+  // rotate it 180 degrees to align with +Z forward.
+  const MODEL_ROT_OFFSET = Math.PI;
+
   // Load Nina 3D model with error handling
-  const gltf = useGLTF('/models/nina_avatar.glb');
+  const gltf = useGLTF("/models/nina_avatar.glb");
   const ninaModel = gltf?.scene;
-  
-  // Avatar movement state
-  const velocity = useRef(new THREE.Vector3());
-  const currentPosition = useRef(new THREE.Vector3(...position));
-  const rotation = useRef(0);
-  const cameraOffset = useRef(new THREE.Vector3(0, 8, 10));
-  const cameraTarget = useRef(new THREE.Vector3());
-  
-  // Initialize position
-  useEffect(() => {
-    if (groupRef.current) {
-      groupRef.current.position.set(...position);
-      currentPosition.current.set(...position);
-    }
-  }, [position]);
-  
-  // Working movement system
+
+  // Simple position/rotation state (similar to SimpleAvatar)
+  const positionRef = useRef<[number, number, number]>(position);
+  // Current rotation in radians, 0 means avatar faces world +Z
+  const rotationRef = useRef(0);
+
+  // Temporary vectors for camera-relative movement calculations
+  const camDir = new THREE.Vector3();
+  const rightDir = new THREE.Vector3();
+  const moveDir = new THREE.Vector3();
+
   useFrame((state, delta) => {
     if (!groupRef.current) return;
-    
+
     const controls = getControls();
-    const speed = 15;
-    
-    // Get current position from mesh
-    let x = groupRef.current.position.x;
-    let z = groupRef.current.position.z;
-    let rot = groupRef.current.rotation.y;
-    
-    // Handle rotation
-    if (controls.leftward) {
-      rot += 4 * delta;
+    const speed = 10;
+
+    let [x, y, z] = positionRef.current;
+    let rot = rotationRef.current;
+
+    // Determine camera forward and right vectors on the XZ plane
+    state.camera.getWorldDirection(camDir);
+    camDir.y = 0;
+    camDir.normalize();
+    rightDir.set(camDir.z, 0, -camDir.x);
+
+    moveDir.set(0, 0, 0);
+    if (controls.forward) moveDir.add(camDir);
+    if (controls.backward) moveDir.sub(camDir);
+    if (controls.leftward) moveDir.sub(rightDir);
+    if (controls.rightward) moveDir.add(rightDir);
+
+    // If any movement key pressed, face and move in that direction
+    let bounce = 0;
+    if (moveDir.lengthSq() > 0) {
+      moveDir.normalize();
+      rot = Math.atan2(moveDir.x, moveDir.z);
+      x += moveDir.x * speed * delta;
+      z += moveDir.z * speed * delta;
+      bounce = Math.sin(state.clock.elapsedTime * 8) * 0.1;
     }
-    if (controls.rightward) {
-      rot -= 4 * delta;
+
+    positionRef.current = [x, y, z];
+    rotationRef.current = rot;
+
+    groupRef.current.position.set(x, y + bounce, z);
+    groupRef.current.rotation.y = rot + MODEL_ROT_OFFSET;
+
+    if (
+      onPositionChange &&
+      (controls.forward ||
+        controls.backward ||
+        controls.leftward ||
+        controls.rightward)
+    ) {
+      onPositionChange([x, y, z]);
     }
-    
-    // Handle movement in facing direction
-    if (controls.forward) {
-      x += Math.sin(rot) * speed * delta;
-      z += Math.cos(rot) * speed * delta;
-    }
-    if (controls.backward) {
-      x -= Math.sin(rot) * speed * delta;
-      z -= Math.cos(rot) * speed * delta;
-    }
-    
-    // Update position with higher Y to clear terrain obstacles
-    groupRef.current.position.set(x, 10, z);
-    groupRef.current.rotation.y = rot;
-    currentPosition.current.set(x, 10, z);
-    rotation.current = rot;
-    
-    // Update camera target
-    if (onPositionChange) {
-      onPositionChange([x, 2, z]);
+
+    if (
+      onMove &&
+      (controls.forward ||
+        controls.backward ||
+        controls.leftward ||
+        controls.rightward)
+    ) {
+      onMove([x, y, z], rot);
     }
   });
-  
+
   return (
     <group ref={groupRef}>
       {/* 3D Nina Model with fallback */}
       {ninaModel ? (
-        <primitive 
-          object={ninaModel.clone()} 
-          scale={[2.5, 2.5, 2.5]} 
+        <primitive
+          object={ninaModel.clone()}
+          scale={[2.5, 2.5, 2.5]}
           position={[0, -0.9, 0]}
           castShadow
         />
@@ -107,7 +127,7 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
           </mesh>
         </>
       )}
-      
+
       {/* Avatar name label */}
       <mesh position={[0, 2, 0]}>
         <planeGeometry args={[1, 0.3]} />
@@ -118,4 +138,4 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
 }
 
 // Preload the Nina model for better performance
-useGLTF.preload('/models/nina_avatar.glb');
+useGLTF.preload("/models/nina_avatar.glb");
