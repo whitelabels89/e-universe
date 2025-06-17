@@ -73,9 +73,9 @@ export function Avatar({ position = [0, 0.5, 0], onPositionChange }: AvatarProps
     }
     
     // Update position with higher Y to clear terrain obstacles
-    groupRef.current.position.set(x, 10, z);
+    groupRef.current.position.set(x, 0, z);
     groupRef.current.rotation.y = rot;
-    currentPosition.current.set(x, 10, z);
+    currentPosition.current.set(x, 0, z);
     rotation.current = rot;
     
     // Update camera target
