@@ -12,8 +12,13 @@ export function GridWorld({ size = 80, onGridClick }: GridWorldProps) {
   const groundRef = useRef<THREE.Mesh>(null);
   const { isBuildMode, setPreviewPosition, selectedBuildingType } = useBuildMode();
   
-  // Load grass texture
+  // Load grass texture (must be called before any early returns)
   const grassTexture = useTexture("/textures/grass.png");
+  
+  // Only render in build mode
+  if (!isBuildMode) {
+    return null;
+  }
   
   // Configure texture tiling
   grassTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping;

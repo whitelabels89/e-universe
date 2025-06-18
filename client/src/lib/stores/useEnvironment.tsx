@@ -127,8 +127,8 @@ const DEFAULT_THEMES: EnvironmentTheme[] = [
     skyColors: ["#DEB887", "#F4A460", "#FFE4B5"],
     terrainColor: "#F4A460",
     terrainTexture: "/textures/sand.jpg",
-    isUnlocked: false,
-    requiredLevel: 3
+    isUnlocked: true,
+    requiredLevel: 0
   },
   {
     id: "island",
@@ -146,8 +146,8 @@ const DEFAULT_THEMES: EnvironmentTheme[] = [
     skyColors: ["#00CED1", "#40E0D0", "#AFEEEE"],
     terrainColor: "#DEB887",
     terrainTexture: "/textures/sand.jpg",
-    isUnlocked: false,
-    requiredLevel: 5
+    isUnlocked: true,
+    requiredLevel: 0
   },
   {
     id: "city",
@@ -219,7 +219,7 @@ const DEFAULT_WEATHER: WeatherCondition[] = [
     particleType: "rain",
     particleCount: 1000,
     ambientSound: "/sounds/rain.mp3",
-    isUnlocked: false
+    isUnlocked: true
   },
   {
     id: "snow",
@@ -230,7 +230,7 @@ const DEFAULT_WEATHER: WeatherCondition[] = [
     hasParticles: true,
     particleType: "snow",
     particleCount: 500,
-    isUnlocked: false
+    isUnlocked: true
   },
   {
     id: "storm",
@@ -242,7 +242,7 @@ const DEFAULT_WEATHER: WeatherCondition[] = [
     particleType: "rain",
     particleCount: 2000,
     ambientSound: "/sounds/storm.mp3",
-    isUnlocked: false
+    isUnlocked: true
   },
   {
     id: "sunset",
@@ -252,7 +252,7 @@ const DEFAULT_WEATHER: WeatherCondition[] = [
     lightIntensity: 0.9,
     hasParticles: false,
     particleCount: 0,
-    isUnlocked: false
+    isUnlocked: true
   }
 ];
 
@@ -268,12 +268,12 @@ export const useEnvironment = create<EnvironmentState>()(
     
     setTheme: (themeId: string) => {
       const theme = get().themes.find(t => t.id === themeId);
-      if (theme && theme.isUnlocked) {
+      if (theme) {
         set({ currentTheme: themeId });
         get().saveToStorage();
         console.log("Environment theme changed to:", themeId);
       } else {
-        console.log("Theme is locked:", themeId);
+        console.error("Theme not found:", themeId);
       }
     },
     
@@ -351,7 +351,16 @@ export const useEnvironment = create<EnvironmentState>()(
             themes: data.themes || DEFAULT_THEMES,
             weatherConditions: data.weatherConditions || DEFAULT_WEATHER
           });
-          console.log("Environment settings loaded");
+          console.log("Environment settings loaded:", data.currentTheme, data.currentWeather);
+        } else {
+          // Set default values if no stored data
+          set({
+            currentTheme: "grassland",
+            currentWeather: "clear",
+            themes: DEFAULT_THEMES,
+            weatherConditions: DEFAULT_WEATHER
+          });
+          console.log("Environment settings set to defaults");
         }
       } catch (error) {
         console.error("Failed to load environment settings:", error);

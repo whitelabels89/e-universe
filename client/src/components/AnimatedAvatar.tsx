@@ -44,6 +44,7 @@ export function AnimatedAvatar({ onMove }: AnimatedAvatarProps) {
   const isRunning = useRef(false);
   const isJumping = useRef(false);
   const jumpVelocity = useRef(0);
+  const jumpCooldown = useRef(0);
   const mobileControls = useRef({
     forward: false,
     backward: false,
@@ -80,9 +81,26 @@ export function AnimatedAvatar({ onMove }: AnimatedAvatarProps) {
   };
 
   const handleMobileJump = () => {
-    if (!isJumping.current && groupRef.current) {
-      jumpVelocity.current = jumpForce;
-      isJumping.current = true;
+    if (!isJumping.current && jumpCooldown.current <= 0 && groupRef.current) {
+      // Import TerrainPhysics dynamically for mobile too
+      import('./PhysicsWorld').then(({ TerrainPhysics }) => {
+        if (!groupRef.current) return;
+        
+        // Get terrain type and adjust jump force for mobile too
+        const terrainType = TerrainPhysics.getTerrainType([
+          groupRef.current.position.x,
+          groupRef.current.position.y,
+          groupRef.current.position.z
+        ]);
+        const jumpMultiplier = TerrainPhysics.getJumpMultiplier(terrainType);
+        const adaptiveJumpForce = jumpForce * jumpMultiplier;
+        
+        jumpVelocity.current = adaptiveJumpForce;
+        isJumping.current = true;
+        jumpCooldown.current = 1.0;
+        
+        console.log(`📱 Mobile jump on ${terrainType} with force ${adaptiveJumpForce.toFixed(1)} (${jumpMultiplier}x)`);
+      });
     }
   };
 
@@ -123,10 +141,37 @@ export function AnimatedAvatar({ onMove }: AnimatedAvatarProps) {
     const isRunningActive = keys.run || mobileControls.current.run;
     isRunning.current = isRunningActive;
 
-    // Check for jumping (Space key)
-    if (keys.jump && !isJumping.current) {
-      jumpVelocity.current = jumpForce;
-      isJumping.current = true;
+    // Update jump cooldown
+    if (jumpCooldown.current > 0) {
+      jumpCooldown.current -= delta;
+    }
+
+    // Check for jumping (Space key) with cooldown and adaptive height
+    if (keys.jump && !isJumping.current && jumpCooldown.current <= 0 && groupRef.current) {
+      // Import TerrainPhysics dynamically to avoid circular import
+      import('./PhysicsWorld').then(({ TerrainPhysics }) => {
+        if (!groupRef.current) return;
+        
+        // Get terrain type and adjust jump force
+        const terrainType = TerrainPhysics.getTerrainType([
+          groupRef.current.position.x,
+          groupRef.current.position.y,
+          groupRef.current.position.z
+        ]);
+        const jumpMultiplier = TerrainPhysics.getJumpMultiplier(terrainType);
+        const adaptiveJumpForce = jumpForce * jumpMultiplier;
+        
+        jumpVelocity.current = adaptiveJumpForce;
+        isJumping.current = true;
+        jumpCooldown.current = 1.0; // 1 second cooldown
+        
+        // Debug terrain-based jumping
+        console.log(`🦘 Jumping on ${terrainType} with force ${adaptiveJumpForce.toFixed(1)} (${jumpMultiplier}x)`);
+        
+        // Update userData untuk physics system
+        groupRef.current.userData.isJumping = true;
+        groupRef.current.userData.jumpVelocity = jumpVelocity.current;
+      });
     }
     
     // Apply rotation change
@@ -134,16 +179,28 @@ export function AnimatedAvatar({ onMove }: AnimatedAvatarProps) {
       rotation.current += rotationChange * delta * 2; // Rotation speed
     }
     
-    // Handle jumping physics
+    // Handle jumping physics - completely separate from terrain snapping
     if (isJumping.current) {
+      // Disable terrain snapping during jump
+      groupRef.current.userData.needsGroundSnap = false;
+      
       groupRef.current.position.y += jumpVelocity.current * delta;
       jumpVelocity.current -= 25 * delta; // Gravity
       
-      // Land when hitting ground
-      if (groupRef.current.position.y <= 1) {
-        groupRef.current.position.y = 1;
+      // Land when falling and close to ground level
+      if (jumpVelocity.current < 0 && groupRef.current.position.y <= 1.2) {
+        groupRef.current.position.y = 1.2;
         isJumping.current = false;
         jumpVelocity.current = 0;
+        
+        // Re-enable terrain snapping after landing delay
+        setTimeout(() => {
+          if (groupRef.current) {
+            groupRef.current.userData.needsGroundSnap = true;
+            groupRef.current.userData.isJumping = false;
+            groupRef.current.userData.jumpVelocity = 0;
+          }
+        }, 500); // Longer delay untuk mencegah konflik
       }
     }
 
@@ -228,7 +285,19 @@ export function AnimatedAvatar({ onMove }: AnimatedAvatarProps) {
   }, []);
 
   return (
-    <group ref={groupRef} position={[0, 1, 0]}>
+    <group 
+      ref={groupRef} 
+      position={[0, 1, 0]}
+      userData={{ 
+        needsGroundSnap: true, 
+        isCharacter: true, 
+        heightOffset: 0.5,
+        isCollidable: true,
+        collisionRadius: 0.5,
+        isJumping: false,
+        jumpVelocity: 0
+      }}
+    >
       {/* Body */}
       <Box args={[0.8, 1.2, 0.4]} position={[0, 0.6, 0]}>
         <meshStandardMaterial color={customization.clothingColor} />

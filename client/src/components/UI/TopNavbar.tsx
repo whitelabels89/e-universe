@@ -63,7 +63,9 @@ export function TopNavbar() {
   const {
     toggleEnvironmentPanel,
     getCurrentTheme,
-    getCurrentWeather
+    getCurrentWeather,
+    setTheme,
+    setWeather
   } = useEnvironment();
 
   const {
@@ -190,8 +192,8 @@ export function TopNavbar() {
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-gray-900/95 backdrop-blur-sm border-b border-gray-700">
       <div className="flex items-center justify-between px-4 py-2 min-w-0">
-        {/* Logo & Title with Hide Button */}
-        <div className="flex items-center gap-3 flex-shrink-0">
+        {/* Menu Button Only */}
+        <div className="flex items-center flex-shrink-0">
           <Button
             onClick={() => setIsNavbarMinimized(true)}
             className="bg-transparent hover:bg-gray-800 text-gray-400 hover:text-white p-1"
@@ -199,32 +201,42 @@ export function TopNavbar() {
           >
             <ChevronUp className="w-4 h-4" />
           </Button>
-          <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-            <BookOpen className="w-5 h-5 text-white" />
-          </div>
-          <div>
-            <input
-              type="text"
-              value={settings.universeName}
-              onChange={(e) => updateUniverseName(e.target.value)}
-              className="text-lg font-bold text-white bg-transparent border-none focus:outline-none focus:bg-white/10 rounded px-1 transition-all"
-              placeholder="Universe Name"
-              maxLength={30}
-            />
-            <input
-              type="text"
-              value={settings.universeSubtitle}
-              onChange={(e) => updateUniverseSubtitle(e.target.value)}
-              className="text-xs text-gray-400 bg-transparent border-none focus:outline-none focus:bg-white/10 rounded px-1 transition-all block w-full"
-              placeholder="Subtitle"
-              maxLength={20}
-            />
-          </div>
         </div>
 
-        {/* Navigation Tabs */}
-        <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide max-w-full">
-          <div className="flex items-center gap-1 min-w-max">
+        {/* Scrollable Navigation with Title */}
+        <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide flex-1 min-w-0">
+          <div className="flex items-center gap-3 min-w-max">
+            {/* Universe Title */}
+            <div className="flex items-center gap-2 px-2 py-1 bg-gray-800/50 rounded-lg">
+              <div className="w-6 h-6 bg-blue-600 rounded flex items-center justify-center flex-shrink-0">
+                <BookOpen className="w-3 h-3 text-white" />
+              </div>
+              <div className="flex flex-col min-w-0">
+                <input
+                  type="text"
+                  value={settings.universeName}
+                  onChange={(e) => updateUniverseName(e.target.value)}
+                  className="text-sm font-bold text-white bg-transparent border-none focus:outline-none focus:bg-white/10 rounded px-1 transition-all"
+                  placeholder="Universe"
+                  maxLength={15}
+                  style={{ width: `${Math.max(6, settings.universeName.length * 0.6)}rem` }}
+                />
+                <input
+                  type="text"
+                  value={settings.universeSubtitle}
+                  onChange={(e) => updateUniverseSubtitle(e.target.value)}
+                  className="text-xs text-gray-400 bg-transparent border-none focus:outline-none focus:bg-white/10 rounded px-1 transition-all"
+                  placeholder="Subtitle"
+                  maxLength={12}
+                  style={{ width: `${Math.max(4, settings.universeSubtitle.length * 0.6)}rem` }}
+                />
+              </div>
+            </div>
+
+            {/* Separator */}
+            <div className="w-px h-6 bg-gray-600 flex-shrink-0"></div>
+
+            {/* Navigation Tabs */}
             {tabs.map((tab) => (
             <Button
               key={tab.id}
@@ -546,7 +558,7 @@ export function TopNavbar() {
                   size="sm"
                   className="bg-gray-700 text-gray-200 hover:bg-gray-600 text-xs p-2 flex flex-col items-center"
                   onClick={() => {
-                    const { setTheme } = useEnvironment.getState();
+                    console.log("Quick theme button clicked:", theme.id);
                     setTheme(theme.id);
                     setShowEnvironmentMenu(false);
                   }}

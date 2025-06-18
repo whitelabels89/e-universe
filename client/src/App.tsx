@@ -29,6 +29,8 @@ import { InteriorEnvironment } from "./components/InteriorEnvironment";
 import { EnvironmentRenderer } from "./components/EnvironmentRenderer";
 import { BuildModeCamera } from "./components/BuildModeCamera";
 import { BuildPreviewGhost } from "./components/BuildPreviewGhost";
+import { BuildingSystem } from "./components/BuildingSystem";
+import { PhysicsWorld } from "./components/PhysicsWorld";
 import { PREFAB_TYPES } from "./types/education";
 
 // Define control keys for the game
@@ -184,40 +186,43 @@ function App() {
           {/* Lighting setup */}
           <Lights />
 
-          {/* 3D Scene Components */}
-          <Suspense fallback={null}>
-            {isInsideBuilding ? (
-              /* Interior Environment */
-              <>
-                <InteriorEnvironment />
-                <AnimatedAvatar onMove={handleAvatarMove} />
-              </>
-            ) : (
-              /* Outdoor Campus */
-              <>
-                {/* Realistic Terrain */}
-                <Terrain size={50} />
-                
-                {/* World Grid */}
-                <GridWorld size={50} onGridClick={handleGridClick} />
-                
-                {/* Campus Buildings */}
-                <CampusBuildings />
-                
-                {/* Build Preview Ghost */}
-                <BuildPreviewGhost />
-                
-                {/* Player Avatar */}
-                <AnimatedAvatar onMove={handleAvatarMove} />
-                
-                {/* Placed Objects */}
-                <PrefabObjects />
-                
-                {/* Build System */}
-                <BuildSystem />
-              </>
-            )}
-          </Suspense>
+          {/* Physics World Wrapper */}
+          <PhysicsWorld>
+            {/* 3D Scene Components */}
+            <Suspense fallback={null}>
+              {isInsideBuilding ? (
+                /* Interior Environment */
+                <>
+                  <InteriorEnvironment />
+                  <AnimatedAvatar onMove={handleAvatarMove} />
+                </>
+              ) : (
+                /* Outdoor Campus */
+                <>
+                  {/* Realistic Terrain */}
+                  <Terrain size={50} />
+                  
+                  {/* World Grid */}
+                  <GridWorld size={50} onGridClick={handleGridClick} />
+                  
+                  {/* Campus Buildings */}
+                  <CampusBuildings />
+                  
+                  {/* Build Preview Ghost */}
+                  <BuildPreviewGhost />
+                  
+                  {/* Player Avatar */}
+                  <AnimatedAvatar onMove={handleAvatarMove} />
+                  
+                  {/* Placed Objects */}
+                  <PrefabObjects />
+                  
+                  {/* Build System */}
+                  <BuildSystem />
+                </>
+              )}
+            </Suspense>
+          </PhysicsWorld>
 
           {/* Build Mode Camera Controller */}
           <BuildModeCamera />

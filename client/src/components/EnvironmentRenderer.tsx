@@ -5,10 +5,27 @@ import * as THREE from "three";
 
 export function EnvironmentRenderer() {
   const { scene, gl } = useThree();
-  const { getCurrentTheme, getCurrentWeather } = useEnvironment();
+  const { 
+    getCurrentTheme, 
+    getCurrentWeather, 
+    currentTheme, 
+    currentWeather,
+    loadFromStorage 
+  } = useEnvironment();
+  
+  // Load environment settings on mount
+  useEffect(() => {
+    loadFromStorage();
+  }, [loadFromStorage]);
   
   const theme = getCurrentTheme();
   const weather = getCurrentWeather();
+
+  // Debug logging
+  useEffect(() => {
+    console.log("Environment Renderer - Current theme:", currentTheme, theme);
+    console.log("Environment Renderer - Current weather:", currentWeather, weather);
+  }, [currentTheme, currentWeather, theme, weather]);
 
   // Create sky background
   const skyGeometry = useMemo(() => new THREE.SphereGeometry(100, 32, 32), []);
@@ -45,6 +62,15 @@ export function EnvironmentRenderer() {
 
   // Update scene lighting and fog
   useEffect(() => {
+    if (!theme || !weather) {
+      console.log("Environment Renderer - Missing theme or weather data");
+      return;
+    }
+
+    console.log("Environment Renderer - Applying environment:", theme.name, weather.name);
+    console.log("Environment Renderer - Theme colors:", theme.backgroundColor, theme.terrainColor);
+    console.log("Environment Renderer - Weather effects:", weather.fogDensity, weather.lightIntensity);
+
     // Clear existing lights
     const lightsToRemove = scene.children.filter(child => 
       child instanceof THREE.Light && !child.userData.keepLight
