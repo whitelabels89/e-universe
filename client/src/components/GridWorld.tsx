@@ -8,7 +8,7 @@ interface GridWorldProps {
   onGridClick?: (position: [number, number, number]) => void;
 }
 
-export function GridWorld({ size = 400, onGridClick }: GridWorldProps) {
+export function GridWorld({ size = 30, onGridClick }: GridWorldProps) {
   const groundRef = useRef<THREE.Mesh>(null);
   const { isBuildMode, setPreviewPosition, selectedBuildingType } = useBuildMode();
   

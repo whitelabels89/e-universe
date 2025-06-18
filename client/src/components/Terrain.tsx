@@ -7,9 +7,11 @@ interface TerrainProps {
   size?: number;
 }
 
-export function Terrain({ size = 400 }: TerrainProps) {
+export function Terrain({ size = 30 }: TerrainProps) {
   const { getCurrentTheme, currentTheme } = useEnvironment();
   const theme = getCurrentTheme();
+  
+  console.log("🌍 Terrain size:", size, "units");
   
   const grassTexture = useTexture("/textures/grass.png");
   const sandTexture = useTexture("/textures/sand.jpg");
@@ -32,13 +34,13 @@ export function Terrain({ size = 400 }: TerrainProps) {
     }
   }, [theme?.id, grassTexture, sandTexture, asphaltTexture]);
 
-  // Configure textures for high-quality tiled look
+  // Configure textures for tiny map
   [grassTexture, sandTexture, asphaltTexture].forEach(texture => {
     texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-    texture.repeat.set(size / 1.5, size / 1.5); // Optimal tiling density
-    texture.magFilter = THREE.LinearFilter; // Smooth but crisp
-    texture.minFilter = THREE.LinearMipmapLinearFilter; // High quality scaling
-    texture.anisotropy = 16; // Maximum anisotropy for crisp distant textures
+    texture.repeat.set(size / 3, size / 3); // Even smaller tiling for tiny map
+    texture.magFilter = THREE.LinearFilter;
+    texture.minFilter = THREE.LinearFilter;
+    texture.anisotropy = 2; // Minimal anisotropy
   });
 
   // Get terrain color based on theme
@@ -122,14 +124,10 @@ export function Terrain({ size = 400 }: TerrainProps) {
       {/* Terrain chunks for varied height */}
       <TerrainChunks size={size} theme={theme} currentTexture={currentTexture} terrainColor={terrainColor} />
       
-      {/* Water bodies */}
-      <WaterBodies size={size} theme={theme} />
+      {/* Water and islands disabled for performance */}
       
-      {/* Distant islands */}
-      <DistantIslands theme={theme} />
-      
-      {/* Trees and vegetation */}
-      <Vegetation size={size} heightData={heightData} theme={theme} />
+      {/* Trees and vegetation - disabled for ultra performance */}
+      {/* <Vegetation size={size} heightData={heightData} theme={theme} /> */}
     </group>
   );
 }
@@ -141,7 +139,7 @@ function TerrainChunks({ size, theme, currentTexture, terrainColor }: {
   terrainColor: string; 
 }) {
   const chunks = useMemo(() => {
-    const chunkSize = 8;
+    const chunkSize = 6; // Smaller chunks for tiny map
     const chunks = [];
     
     for (let x = -size/2; x < size/2; x += chunkSize) {

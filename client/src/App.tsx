@@ -33,25 +33,30 @@ import { BuildingSystem } from "./components/BuildingSystem";
 import { PhysicsWorld } from "./components/PhysicsWorld";
 import { PythonEditor } from "./components/PythonEditor";
 import { PythonBridge } from "./components/PythonBridge";
+import { DynamicSky } from "./components/DynamicSky";
+import { TimeOfDayController } from "./components/TimeOfDayController";
+import { TimeControls } from "./components/UI/TimeControls";
+import { InteractiveCameraController } from "./components/InteractiveCameraController";
+import { CameraControls } from "./components/UI/CameraControls";
 import { PREFAB_TYPES } from "./types/education";
 
 // Define control keys for the game
 enum Controls {
-  forward = 'forward',
-  backward = 'backward',
-  leftward = 'leftward',
-  rightward = 'rightward',
-  jump = 'jump',
-  run = 'run'
+  forward = "forward",
+  backward = "backward",
+  leftward = "leftward",
+  rightward = "rightward",
+  jump = "jump",
+  run = "run",
 }
 
 const keyMap = [
-  { name: Controls.forward, keys: ['KeyW', 'ArrowUp'] },
-  { name: Controls.backward, keys: ['KeyS', 'ArrowDown'] },
-  { name: Controls.leftward, keys: ['KeyA', 'ArrowLeft'] },
-  { name: Controls.rightward, keys: ['KeyD', 'ArrowRight'] },
-  { name: Controls.jump, keys: ['Space'] },
-  { name: Controls.run, keys: ['ShiftLeft', 'ShiftRight'] },
+  { name: Controls.forward, keys: ["KeyW", "ArrowUp"] },
+  { name: Controls.backward, keys: ["KeyS", "ArrowDown"] },
+  { name: Controls.leftward, keys: ["KeyA", "ArrowLeft"] },
+  { name: Controls.rightward, keys: ["KeyD", "ArrowRight"] },
+  { name: Controls.jump, keys: ["Space"] },
+  { name: Controls.run, keys: ["ShiftLeft", "ShiftRight"] },
 ];
 
 // Lighting component
@@ -60,7 +65,7 @@ function Lights() {
     <>
       {/* Ambient light for overall illumination */}
       <ambientLight intensity={0.4} />
-      
+
       {/* Directional light for shadows and depth */}
       <directionalLight
         position={[10, 10, 5]}
@@ -74,12 +79,9 @@ function Lights() {
         shadow-camera-top={10}
         shadow-camera-bottom={-10}
       />
-      
+
       {/* Fill light from opposite side */}
-      <directionalLight
-        position={[-5, 5, -5]}
-        intensity={0.3}
-      />
+      <directionalLight position={[-5, 5, -5]} intensity={0.3} />
     </>
   );
 }
@@ -89,8 +91,12 @@ function LoadingScreen() {
   return (
     <div className="fixed inset-0 bg-gradient-to-b from-blue-600 to-purple-700 flex items-center justify-center z-50">
       <div className="text-center">
-        <div className="text-white text-2xl font-bold mb-4">🌍 Loading Educational World...</div>
-        <div className="text-white/70">Preparing your 3D learning environment</div>
+        <div className="text-white text-2xl font-bold mb-4">
+          🌍 Loading Educational World...
+        </div>
+        <div className="text-white/70">
+          Preparing your 3D learning environment
+        </div>
         <div className="mt-4">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mx-auto"></div>
         </div>
@@ -102,23 +108,27 @@ function LoadingScreen() {
 // Main App component
 function App() {
   const { student } = useEducation();
-  const { 
-    selectedPrefab, 
-    isPlacementMode, 
-    addObject, 
-    setPlacementMode, 
+  const {
+    selectedPrefab,
+    isPlacementMode,
+    addObject,
+    setPlacementMode,
     setSelectedPrefab,
-    loadFromStorage 
+    loadFromStorage,
   } = useWorldObjects();
   const { loadFromStorage: loadAvatarCustomization } = useAvatarCustomization();
   const { isInsideBuilding } = useCampus();
 
   // Avatar transform state for camera following
-  const [avatarPosition, setAvatarPosition] = useState<[number, number, number]>([0, 2, 0]);
+  const [avatarPosition, setAvatarPosition] = useState<
+    [number, number, number]
+  >([0, 2, 0]);
   const [avatarRotation, setAvatarRotation] = useState(0);
   const [avatarMoving, setAvatarMoving] = useState(false);
   const [isPythonEditorOpen, setIsPythonEditorOpen] = useState(false);
-  const [pythonExecutor, setPythonExecutor] = useState<((code: string) => void) | null>(null);
+  const [pythonExecutor, setPythonExecutor] = useState<
+    ((code: string) => void) | null
+  >(null);
   const controlsRef = useRef<any>(null);
 
   // Load saved data on app start
@@ -131,25 +141,25 @@ function App() {
   // Handle grid clicks for object placement
   const handleGridClick = (position: [number, number, number]) => {
     if (!isPlacementMode || !selectedPrefab) return;
-    
-    const prefabType = PREFAB_TYPES.find(p => p.id === selectedPrefab);
+
+    const prefabType = PREFAB_TYPES.find((p) => p.id === selectedPrefab);
     if (!prefabType) return;
-    
+
     // Check if student can place this object
     const isUnlocked = student.level >= prefabType.requiredLevel;
-    
+
     // Add object to world
     addObject({
       type: prefabType.type,
       position,
       isUnlocked,
-      requiredLevel: prefabType.requiredLevel
+      requiredLevel: prefabType.requiredLevel,
     });
-    
+
     // Exit placement mode
     setPlacementMode(false);
     setSelectedPrefab(null);
-    
+
     console.log(`Placed ${prefabType.name} at position:`, position);
   };
 
@@ -174,31 +184,37 @@ function App() {
   };
 
   return (
-    <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
+    <div
+      style={{
+        width: "100vw",
+        height: "100vh",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
       <KeyboardControls map={keyMap}>
         {/* 3D Canvas */}
         <Canvas
           shadows
           camera={{
-            position: [0, 15, 20],
-            fov: 60,
+            position: [0, 6, 8],
+            fov: 45,
             near: 0.1,
-            far: 1000
+            far: 80,
           }}
           gl={{
-            antialias: true,
-            powerPreference: "high-performance"
+            antialias: false,
+            alpha: false,
+            powerPreference: "high-performance",
+            pixelRatio: Math.min(window.devicePixelRatio, 1),
           }}
-          style={{ background: 'linear-gradient(to bottom, #87CEEB, #98FB98)' }}
+          style={{ background: "linear-gradient(to bottom, #87CEEB, #98FB98)" }}
         >
-          {/* Sky background */}
-          <color attach="background" args={["#87CEEB"]} />
+          {/* Dynamic Sky and Lighting System */}
+          <DynamicSky />
           
-          {/* Fog for depth */}
-          <fog attach="fog" args={["#87CEEB", 20, 100]} />
-
-          {/* Lighting setup */}
-          <Lights />
+          {/* Time of Day Controller */}
+          <TimeOfDayController />
 
           {/* Physics World Wrapper */}
           <PhysicsWorld>
@@ -214,23 +230,23 @@ function App() {
                 /* Outdoor Campus */
                 <>
                   {/* Realistic Terrain */}
-                  <Terrain size={400} />
-                  
+                  <Terrain size={100} />
+
                   {/* World Grid */}
-                  <GridWorld size={400} onGridClick={handleGridClick} />
-                  
+                  <GridWorld size={100} onGridClick={handleGridClick} />
+
                   {/* Campus Buildings */}
                   <CampusBuildings />
-                  
+
                   {/* Build Preview Ghost */}
                   <BuildPreviewGhost />
-                  
+
                   {/* Player Avatar */}
                   <AnimatedAvatar onMove={handleAvatarMove} />
-                  
+
                   {/* Placed Objects */}
                   <PrefabObjects />
-                  
+
                   {/* Build System */}
                   <BuildSystem />
                 </>
@@ -242,40 +258,15 @@ function App() {
           <BuildModeCamera />
 
           {/* Python Bridge for 3D World Control */}
-          <PythonBridge onCodeExecute={(executor) => setPythonExecutor(() => executor)} />
-
-          {/* Camera follow component */}
-          <FollowCamera
-            position={avatarPosition}
-            rotation={avatarRotation}
-            moving={avatarMoving}
-            controls={controlsRef}
+          <PythonBridge
+            onCodeExecute={(executor) => setPythonExecutor(() => executor)}
           />
 
-          {/* Camera Controls - Enhanced for better drag control */}
-          <OrbitControls
-            ref={controlsRef}
-            enablePan={false}
-            enableZoom={true}
-            enableRotate={true}
-            mouseButtons={{ 
-              LEFT: THREE.MOUSE.ROTATE,
-              RIGHT: THREE.MOUSE.ROTATE 
-            }}
-            screenSpacePanning={false}
-            touches={{ 
-              ONE: THREE.TOUCH.ROTATE,
-              TWO: THREE.TOUCH.DOLLY_ROTATE 
-            }}
-            maxDistance={isInsideBuilding ? 12 : 40}
-            minDistance={isInsideBuilding ? 2 : 5}
-            maxPolarAngle={Math.PI / 2.1}
-            minPolarAngle={Math.PI / 8}
-            enableDamping={true}
-            dampingFactor={0.05}
-            rotateSpeed={isInsideBuilding ? 1.0 : 0.8}
-            zoomSpeed={1.2}
-            autoRotate={false}
+          {/* Interactive Camera Controller */}
+          <InteractiveCameraController
+            targetPosition={avatarPosition}
+            targetRotation={avatarRotation}
+            moving={avatarMoving}
           />
         </Canvas>
 
@@ -286,12 +277,18 @@ function App() {
         <GameUI />
         <CampusUI />
         <MobileControls />
-        
+
         {/* Python Editor Panel */}
-        <PythonEditor 
+        <PythonEditor
           isVisible={isPythonEditorOpen}
           onExecute={handlePythonExecute}
         />
+        
+        {/* Time of Day Controls */}
+        <TimeControls />
+        
+        {/* Camera Controls */}
+        <CameraControls />
       </KeyboardControls>
     </div>
   );

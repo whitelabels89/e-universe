@@ -8,7 +8,7 @@ interface BuildingSystemProps {
   size?: number;
 }
 
-export function BuildingSystem({ size = 400 }: BuildingSystemProps) {
+export function BuildingSystem({ size = 30 }: BuildingSystemProps) {
   const { getCurrentTheme } = useEnvironment();
   const { isBuildMode } = useBuildMode();
   const theme = getCurrentTheme();
