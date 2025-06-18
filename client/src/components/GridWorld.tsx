@@ -8,7 +8,7 @@ interface GridWorldProps {
   onGridClick?: (position: [number, number, number]) => void;
 }
 
-export function GridWorld({ size = 80, onGridClick }: GridWorldProps) {
+export function GridWorld({ size = 400, onGridClick }: GridWorldProps) {
   const groundRef = useRef<THREE.Mesh>(null);
   const { isBuildMode, setPreviewPosition, selectedBuildingType } = useBuildMode();
   
@@ -22,8 +22,20 @@ export function GridWorld({ size = 80, onGridClick }: GridWorldProps) {
   
   // Configure texture tiling
   grassTexture.wrapS = grassTexture.wrapT = THREE.RepeatWrapping;
-  grassTexture.repeat.set(size, size);
+  grassTexture.repeat.set(size / 4, size / 4); // Adjust tiling for larger terrain
   
+  const handlePointerMove = (event: any) => {
+    if (!isBuildMode || !selectedBuildingType) return;
+    
+    const point = event.point;
+    
+    // Snap to grid for preview
+    const gridX = Math.round(point.x);
+    const gridZ = Math.round(point.z);
+    
+    setPreviewPosition([gridX, 0, gridZ]);
+  };
+
   // Handle ground clicks for object placement
   const handleClick = (event: any) => {
     event.stopPropagation();
@@ -36,26 +48,27 @@ export function GridWorld({ size = 80, onGridClick }: GridWorldProps) {
     
     if (isBuildMode && selectedBuildingType) {
       // In build mode, place building
-      if (onGridClick) {
-        onGridClick([gridX, 0, gridZ]); // Use ground level for buildings
-      }
+      import('../lib/stores/useWorldObjects').then(({ useWorldObjects }) => {
+        const { addObject } = useWorldObjects.getState();
+        const newBuilding = {
+          id: `${selectedBuildingType}-${Date.now()}`,
+          type: selectedBuildingType as 'school' | 'coding-lab' | 'house',
+          position: [gridX, 0, gridZ] as [number, number, number],
+          isUnlocked: true,
+          requiredLevel: 1
+        };
+        addObject(newBuilding);
+        
+        // Show success notification
+        import('./UI/NotificationSystem').then(({ showNotification }) => {
+          showNotification(`${selectedBuildingType} placed successfully!`, 'success');
+        });
+      });
       setPreviewPosition(null); // Clear preview after placement
     } else if (!isBuildMode && onGridClick) {
       // Normal mode
       onGridClick([gridX, gridY, gridZ]);
     }
-  };
-
-  const handlePointerMove = (event: any) => {
-    if (!isBuildMode || !selectedBuildingType) return;
-    
-    const point = event.point;
-    
-    // Snap to grid for preview
-    const gridX = Math.round(point.x);
-    const gridZ = Math.round(point.z);
-    
-    setPreviewPosition([gridX, 0, gridZ]);
   };
 
   const handlePointerLeave = () => {

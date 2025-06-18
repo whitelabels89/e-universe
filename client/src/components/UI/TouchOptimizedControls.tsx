@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useIsMobile } from "../../hooks/use-is-mobile";
-import { Button } from "@/components/ui/button";
+import { Button } from "./button";
 import { 
   ArrowUp, ArrowDown, ArrowLeft, ArrowRight, 
   Zap, RotateCcw, Eye, Hand, Settings, X

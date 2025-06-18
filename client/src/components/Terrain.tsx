@@ -7,7 +7,7 @@ interface TerrainProps {
   size?: number;
 }
 
-export function Terrain({ size = 80 }: TerrainProps) {
+export function Terrain({ size = 400 }: TerrainProps) {
   const { getCurrentTheme, currentTheme } = useEnvironment();
   const theme = getCurrentTheme();
   

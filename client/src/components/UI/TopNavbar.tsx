@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import { Button } from "./button";
+import { Separator } from "./separator";
 import { useCampus } from "../../lib/stores/useCampus";
 import { useEducation } from "../../lib/stores/useEducation";
 import { useBuildMode } from "../../lib/stores/useBuildMode";
@@ -15,7 +15,11 @@ import {
 } from "lucide-react";
 import { PREFAB_TYPES } from "../../types/education";
 
-export function TopNavbar() {
+interface TopNavbarProps {
+  onPythonToggle?: () => void;
+}
+
+export function TopNavbar({ onPythonToggle }: TopNavbarProps = {}) {
   const [activeTab, setActiveTab] = useState<string>("home");
   const [isNavbarVisible, setIsNavbarVisible] = useState<boolean>(true);
   const [isNavbarMinimized, setIsNavbarMinimized] = useState<boolean>(false);
@@ -235,6 +239,17 @@ export function TopNavbar() {
 
             {/* Separator */}
             <div className="w-px h-6 bg-gray-600 flex-shrink-0"></div>
+
+            {/* Python Editor Button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onPythonToggle}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-white hover:bg-white/10"
+            >
+              <span>🐍</span>
+              <span className="hidden sm:inline">Python</span>
+            </Button>
 
             {/* Navigation Tabs */}
             {tabs.map((tab) => (

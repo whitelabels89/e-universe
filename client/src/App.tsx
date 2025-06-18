@@ -31,6 +31,8 @@ import { BuildModeCamera } from "./components/BuildModeCamera";
 import { BuildPreviewGhost } from "./components/BuildPreviewGhost";
 import { BuildingSystem } from "./components/BuildingSystem";
 import { PhysicsWorld } from "./components/PhysicsWorld";
+import { PythonEditor } from "./components/PythonEditor";
+import { PythonBridge } from "./components/PythonBridge";
 import { PREFAB_TYPES } from "./types/education";
 
 // Define control keys for the game
@@ -115,6 +117,8 @@ function App() {
   const [avatarPosition, setAvatarPosition] = useState<[number, number, number]>([0, 2, 0]);
   const [avatarRotation, setAvatarRotation] = useState(0);
   const [avatarMoving, setAvatarMoving] = useState(false);
+  const [isPythonEditorOpen, setIsPythonEditorOpen] = useState(false);
+  const [pythonExecutor, setPythonExecutor] = useState<((code: string) => void) | null>(null);
   const controlsRef = useRef<any>(null);
 
   // Load saved data on app start
@@ -159,6 +163,16 @@ function App() {
     setAvatarMoving(moving);
   };
 
+  const handlePythonExecute = (code: string) => {
+    if (pythonExecutor) {
+      pythonExecutor(code);
+    }
+  };
+
+  const togglePythonEditor = () => {
+    setIsPythonEditorOpen(!isPythonEditorOpen);
+  };
+
   return (
     <div style={{ width: '100vw', height: '100vh', position: 'relative', overflow: 'hidden' }}>
       <KeyboardControls map={keyMap}>
@@ -200,10 +214,10 @@ function App() {
                 /* Outdoor Campus */
                 <>
                   {/* Realistic Terrain */}
-                  <Terrain size={50} />
+                  <Terrain size={400} />
                   
                   {/* World Grid */}
-                  <GridWorld size={50} onGridClick={handleGridClick} />
+                  <GridWorld size={400} onGridClick={handleGridClick} />
                   
                   {/* Campus Buildings */}
                   <CampusBuildings />
@@ -226,6 +240,9 @@ function App() {
 
           {/* Build Mode Camera Controller */}
           <BuildModeCamera />
+
+          {/* Python Bridge for 3D World Control */}
+          <PythonBridge onCodeExecute={(executor) => setPythonExecutor(() => executor)} />
 
           {/* Camera follow component */}
           <FollowCamera
@@ -263,12 +280,18 @@ function App() {
         </Canvas>
 
         {/* Top Navigation Bar */}
-        <TopNavbar />
+        <TopNavbar onPythonToggle={togglePythonEditor} />
 
         {/* UI Overlay */}
         <GameUI />
         <CampusUI />
         <MobileControls />
+        
+        {/* Python Editor Panel */}
+        <PythonEditor 
+          isVisible={isPythonEditorOpen}
+          onExecute={handlePythonExecute}
+        />
       </KeyboardControls>
     </div>
   );

@@ -82,19 +82,10 @@ export function AnimatedAvatar({ onMove }: AnimatedAvatarProps) {
 
   const handleMobileJump = () => {
     if (!isJumping.current && jumpCooldown.current <= 0 && groupRef.current) {
-      // Immediately mark the character as jumping to avoid initial snapping
-      isJumping.current = true;
-      jumpCooldown.current = 1.0;
-      groupRef.current.userData.isJumping = true;
-      groupRef.current.userData.needsGroundSnap = false;
-
-      // Default jump force before terrain data resolves
-      jumpVelocity.current = jumpForce;
-
       // Import TerrainPhysics dynamically for mobile too
       import('./PhysicsWorld').then(({ TerrainPhysics }) => {
         if (!groupRef.current) return;
-
+        
         // Get terrain type and adjust jump force for mobile too
         const terrainType = TerrainPhysics.getTerrainType([
           groupRef.current.position.x,
@@ -103,10 +94,11 @@ export function AnimatedAvatar({ onMove }: AnimatedAvatarProps) {
         ]);
         const jumpMultiplier = TerrainPhysics.getJumpMultiplier(terrainType);
         const adaptiveJumpForce = jumpForce * jumpMultiplier;
-
+        
         jumpVelocity.current = adaptiveJumpForce;
-        groupRef.current.userData.jumpVelocity = adaptiveJumpForce;
-
+        isJumping.current = true;
+        jumpCooldown.current = 1.0;
+        
         console.log(`📱 Mobile jump on ${terrainType} with force ${adaptiveJumpForce.toFixed(1)} (${jumpMultiplier}x)`);
       });
     }
@@ -156,19 +148,10 @@ export function AnimatedAvatar({ onMove }: AnimatedAvatarProps) {
 
     // Check for jumping (Space key) with cooldown and adaptive height
     if (keys.jump && !isJumping.current && jumpCooldown.current <= 0 && groupRef.current) {
-      // Immediately flag jump to prevent ground snapping before async import resolves
-      isJumping.current = true;
-      jumpCooldown.current = 1.0; // 1 second cooldown
-      groupRef.current.userData.isJumping = true;
-      groupRef.current.userData.needsGroundSnap = false;
-
-      // Default jump force until terrain info is loaded
-      jumpVelocity.current = jumpForce;
-
       // Import TerrainPhysics dynamically to avoid circular import
       import('./PhysicsWorld').then(({ TerrainPhysics }) => {
         if (!groupRef.current) return;
-
+        
         // Get terrain type and adjust jump force
         const terrainType = TerrainPhysics.getTerrainType([
           groupRef.current.position.x,
@@ -177,12 +160,17 @@ export function AnimatedAvatar({ onMove }: AnimatedAvatarProps) {
         ]);
         const jumpMultiplier = TerrainPhysics.getJumpMultiplier(terrainType);
         const adaptiveJumpForce = jumpForce * jumpMultiplier;
-
+        
         jumpVelocity.current = adaptiveJumpForce;
-        groupRef.current.userData.jumpVelocity = adaptiveJumpForce;
-
+        isJumping.current = true;
+        jumpCooldown.current = 1.0; // 1 second cooldown
+        
         // Debug terrain-based jumping
         console.log(`🦘 Jumping on ${terrainType} with force ${adaptiveJumpForce.toFixed(1)} (${jumpMultiplier}x)`);
+        
+        // Update userData untuk physics system
+        groupRef.current.userData.isJumping = true;
+        groupRef.current.userData.jumpVelocity = jumpVelocity.current;
       });
     }
     
@@ -201,26 +189,18 @@ export function AnimatedAvatar({ onMove }: AnimatedAvatarProps) {
       
       // Land when falling and close to ground level
       if (jumpVelocity.current < 0 && groupRef.current.position.y <= 1.2) {
-        import('./PhysicsWorld').then(({ TerrainPhysics }) => {
-          if (!groupRef.current) return;
-          const groundY = TerrainPhysics.getGroundHeight([
-            groupRef.current.position.x,
-            groupRef.current.position.y,
-            groupRef.current.position.z
-          ]);
-          groupRef.current.position.y = groundY + 0.9;
-          isJumping.current = false;
-          jumpVelocity.current = 0;
-
-          // Re-enable terrain snapping after landing delay
-          setTimeout(() => {
-            if (groupRef.current) {
-              groupRef.current.userData.needsGroundSnap = true;
-              groupRef.current.userData.isJumping = false;
-              groupRef.current.userData.jumpVelocity = 0;
-            }
-          }, 500);
-        });
+        groupRef.current.position.y = 1.2;
+        isJumping.current = false;
+        jumpVelocity.current = 0;
+        
+        // Re-enable terrain snapping after landing delay
+        setTimeout(() => {
+          if (groupRef.current) {
+            groupRef.current.userData.needsGroundSnap = true;
+            groupRef.current.userData.isJumping = false;
+            groupRef.current.userData.jumpVelocity = 0;
+          }
+        }, 500); // Longer delay untuk mencegah konflik
       }
     }
 
@@ -311,7 +291,7 @@ export function AnimatedAvatar({ onMove }: AnimatedAvatarProps) {
       userData={{ 
         needsGroundSnap: true, 
         isCharacter: true, 
-        heightOffset: 0.9,
+        heightOffset: 0.5,
         isCollidable: true,
         collisionRadius: 0.5,
         isJumping: false,

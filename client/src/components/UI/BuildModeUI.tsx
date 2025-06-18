@@ -86,16 +86,6 @@ export function BuildModeUI() {
             <p className="mb-1">3. Click grid to place</p>
             <p>Ghost preview shows placement</p>
           </div>
-
-          {/* Scene Builder Link */}
-          <a
-            href="/scene-builder.html"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="block mt-4 px-3 py-2 text-xs rounded bg-purple-600 hover:bg-purple-700 text-center"
-          >
-            🚧 Open Scene Builder
-          </a>
         </div>
       )}
     </div>

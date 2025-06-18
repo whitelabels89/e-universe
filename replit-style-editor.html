@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Replit-Style Python 3D Editor</title>
+    
+    <!-- Babylon.js CDN -->
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    
+    <!-- Pyodide CDN -->
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js"></script>
+    
+    <!-- Monaco Editor CDN for syntax highlighting -->
+    <script src="https://unpkg.com/monaco-editor@0.44.0/min/vs/loader.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1e1e1e;
+            color: #ffffff;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Header Bar */
+        .header {
+            background: #2d2d30;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid #3e3e42;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #cccccc;
+        }
+
+        /* Main Layout */
+        .container {
+            display: flex;
+            height: calc(100vh - 50px);
+        }
+
+        /* Left Panel - Python Editor */
+        .left-panel {
+            width: 40%;
+            background: #1e1e1e;
+            border-right: 1px solid #3e3e42;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .editor-header {
+            background: #2d2d30;
+            padding: 10px 15px;
+            border-bottom: 1px solid #3e3e42;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .editor-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #cccccc;
+        }
+
+        .run-button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .run-button:hover {
+            background: #005a9e;
+        }
+
+        .run-button:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+
+        /* Monaco Editor Container */
+        .editor-container {
+            flex: 1;
+            position: relative;
+        }
+
+        /* Output Panel */
+        .output-panel {
+            height: 120px;
+            background: #252526;
+            border-top: 1px solid #3e3e42;
+            padding: 10px;
+            overflow-y: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 12px;
+        }
+
+        .output-panel .output-line {
+            margin-bottom: 2px;
+        }
+
+        .output-panel .error {
+            color: #f14c4c;
+        }
+
+        .output-panel .success {
+            color: #4ec9b0;
+        }
+
+        /* Right Panel - 3D Canvas */
+        .right-panel {
+            width: 60%;
+            background: #1e1e1e;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .canvas-header {
+            background: #2d2d30;
+            padding: 10px 15px;
+            border-bottom: 1px solid #3e3e42;
+        }
+
+        .canvas-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #cccccc;
+        }
+
+        .canvas-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #renderCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            outline: none;
+        }
+
+        /* Loading Indicator */
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #cccccc;
+            font-size: 14px;
+        }
+
+        /* Status Bar */
+        .status-bar {
+            background: #007acc;
+            color: white;
+            padding: 5px 15px;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .left-panel, .right-panel {
+                width: 100%;
+            }
+            
+            .left-panel {
+                height: 50%;
+            }
+            
+            .right-panel {
+                height: 50%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Bar -->
+    <div class="header">
+        <h1>🐍 Python 3D Editor - Replit Style</h1>
+    </div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Left Panel - Python Editor -->
+        <div class="left-panel">
+            <div class="editor-header">
+                <span class="editor-title">📝 main.py</span>
+                <button id="runBtn" class="run-button">▶ Run Script</button>
+            </div>
+            
+            <!-- Monaco Editor Container -->
+            <div class="editor-container" id="editor-container"></div>
+            
+            <!-- Output Panel -->
+            <div class="output-panel" id="output">
+                <div class="output-line">🚀 Ready to execute Python scripts...</div>
+                <div class="output-line">💡 Try running the default script to spawn a red box!</div>
+            </div>
+        </div>
+
+        <!-- Right Panel - 3D Canvas -->
+        <div class="right-panel">
+            <div class="canvas-header">
+                <span class="canvas-title">🎮 3D Scene Preview</span>
+            </div>
+            
+            <div class="canvas-container">
+                <canvas id="renderCanvas"></canvas>
+                <div id="loading" class="loading">Initializing 3D engine...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar" id="status">
+        Initializing Pyodide and Babylon.js...
+    </div>
+
+    <script>
+        // Global variables
+        let pyodide;
+        let engine;
+        let scene;
+        let camera;
+        let editor;
+        let isInitialized = false;
+
+        // Default Python script
+        const defaultPythonScript = `# Welcome to Python 3D Editor!
+# Use these functions to manipulate the 3D scene:
+
+# Spawn a red box at position (0, 1, 0)
+spawn_box(x=0, y=1, z=0, color='red')
+
+# Spawn a blue sphere at position (2, 1, 0)
+spawn_sphere(x=2, y=1, z=0, color='blue')
+
+# Change background color
+set_background('darkblue')
+
+# Print messages to output
+print("🎉 Welcome to 3D Python programming!")
+print("✨ Your objects have been created!")`;
+
+        // Initialize Monaco Editor
+        function initializeEditor() {
+            require.config({ paths: { vs: 'https://unpkg.com/monaco-editor@0.44.0/min/vs' } });
+            
+            require(['vs/editor/editor.main'], function () {
+                editor = monaco.editor.create(document.getElementById('editor-container'), {
+                    value: defaultPythonScript,
+                    language: 'python',
+                    theme: 'vs-dark',
+                    fontSize: 14,
+                    minimap: { enabled: false },
+                    scrollBeyondLastLine: false,
+                    automaticLayout: true,
+                    lineNumbers: 'on',
+                    roundedSelection: false,
+                    scrollbar: {
+                        vertical: 'visible',
+                        horizontal: 'visible'
+                    }
+                });
+                
+                updateStatus("Monaco Editor initialized ✓");
+            });
+        }
+
+        // Initialize Babylon.js 3D Engine
+        function initializeBabylonJS() {
+            const canvas = document.getElementById('renderCanvas');
+            engine = new BABYLON.Engine(canvas, true);
+
+            // Create scene
+            scene = new BABYLON.Scene(engine);
+            scene.clearColor = new BABYLON.Color3(0.1, 0.1, 0.2);
+
+            // Create camera
+            camera = new BABYLON.ArcRotateCamera("camera", -Math.PI / 2, Math.PI / 2.5, 10, BABYLON.Vector3.Zero(), scene);
+            camera.attachControls(canvas, true);
+
+            // Create lighting
+            const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+            light.intensity = 0.7;
+
+            // Create ground
+            const ground = BABYLON.MeshBuilder.CreateGround("ground", { width: 10, height: 10 }, scene);
+            const groundMaterial = new BABYLON.StandardMaterial("groundMat", scene);
+            groundMaterial.diffuseColor = new BABYLON.Color3(0.3, 0.3, 0.3);
+            ground.material = groundMaterial;
+
+            // Start render loop
+            engine.runRenderLoop(() => {
+                scene.render();
+            });
+
+            // Handle window resize
+            window.addEventListener("resize", () => {
+                engine.resize();
+            });
+
+            document.getElementById('loading').style.display = 'none';
+            updateStatus("Babylon.js 3D engine initialized ✓");
+        }
+
+        // Initialize Pyodide
+        async function initializePyodide() {
+            try {
+                updateStatus("Loading Pyodide Python runtime...");
+                pyodide = await loadPyodide();
+                
+                // Define Python bridge functions
+                pyodide.globals.set("spawn_box", spawn_box);
+                pyodide.globals.set("spawn_sphere", spawn_sphere);
+                pyodide.globals.set("set_background", set_background);
+                pyodide.globals.set("clear_scene", clear_scene);
+                pyodide.globals.set("move_object", move_object);
+                
+                updateStatus("Pyodide Python runtime initialized ✓");
+                isInitialized = true;
+                
+                // Enable run button
+                document.getElementById('runBtn').disabled = false;
+                updateStatus("🎯 Ready! Click 'Run Script' to execute Python code");
+                
+            } catch (error) {
+                addOutput(`❌ Error initializing Pyodide: ${error.message}`, 'error');
+                updateStatus("❌ Initialization failed");
+            }
+        }
+
+        // Bridge Functions: Python → JavaScript → Babylon.js
+
+        // Spawn a box in the 3D scene
+        function spawn_box(x, y, z, color = 'red') {
+            const box = BABYLON.MeshBuilder.CreateBox(`box_${Date.now()}`, { size: 1 }, scene);
+            box.position = new BABYLON.Vector3(x, y, z);
+            
+            const material = new BABYLON.StandardMaterial(`boxMat_${Date.now()}`, scene);
+            material.diffuseColor = getColor(color);
+            box.material = material;
+            
+            addOutput(`📦 Box spawned at (${x}, ${y}, ${z}) with color ${color}`, 'success');
+        }
+
+        // Spawn a sphere in the 3D scene
+        function spawn_sphere(x, y, z, color = 'blue') {
+            const sphere = BABYLON.MeshBuilder.CreateSphere(`sphere_${Date.now()}`, { diameter: 1 }, scene);
+            sphere.position = new BABYLON.Vector3(x, y, z);
+            
+            const material = new BABYLON.StandardMaterial(`sphereMat_${Date.now()}`, scene);
+            material.diffuseColor = getColor(color);
+            sphere.material = material;
+            
+            addOutput(`🔵 Sphere spawned at (${x}, ${y}, ${z}) with color ${color}`, 'success');
+        }
+
+        // Set background color
+        function set_background(color) {
+            scene.clearColor = getColor(color);
+            addOutput(`🎨 Background color changed to ${color}`, 'success');
+        }
+
+        // Clear all objects from scene (except ground)
+        function clear_scene() {
+            scene.meshes.forEach(mesh => {
+                if (mesh.name !== 'ground') {
+                    mesh.dispose();
+                }
+            });
+            addOutput(`🧹 Scene cleared`, 'success');
+        }
+
+        // Move an object (advanced function)
+        function move_object(name, x, y, z) {
+            const mesh = scene.getMeshByName(name);
+            if (mesh) {
+                mesh.position = new BABYLON.Vector3(x, y, z);
+                addOutput(`🏃 Object '${name}' moved to (${x}, ${y}, ${z})`, 'success');
+            } else {
+                addOutput(`❌ Object '${name}' not found`, 'error');
+            }
+        }
+
+        // Helper function to convert color names to Babylon.js colors
+        function getColor(colorName) {
+            const colors = {
+                'red': new BABYLON.Color3(1, 0, 0),
+                'green': new BABYLON.Color3(0, 1, 0),
+                'blue': new BABYLON.Color3(0, 0, 1),
+                'yellow': new BABYLON.Color3(1, 1, 0),
+                'purple': new BABYLON.Color3(1, 0, 1),
+                'cyan': new BABYLON.Color3(0, 1, 1),
+                'white': new BABYLON.Color3(1, 1, 1),
+                'black': new BABYLON.Color3(0, 0, 0),
+                'orange': new BABYLON.Color3(1, 0.5, 0),
+                'pink': new BABYLON.Color3(1, 0.7, 0.8),
+                'darkblue': new BABYLON.Color3(0, 0, 0.5),
+                'darkgreen': new BABYLON.Color3(0, 0.5, 0),
+                'gray': new BABYLON.Color3(0.5, 0.5, 0.5),
+                'brown': new BABYLON.Color3(0.6, 0.3, 0.1)
+            };
+            
+            return colors[colorName.toLowerCase()] || colors['red'];
+        }
+
+        // Execute Python script
+        async function runPythonScript() {
+            if (!isInitialized) {
+                addOutput("❌ System not initialized yet. Please wait...", 'error');
+                return;
+            }
+
+            const code = editor.getValue();
+            const runBtn = document.getElementById('runBtn');
+            
+            try {
+                // Disable button during execution
+                runBtn.disabled = true;
+                runBtn.textContent = "⏳ Running...";
+                
+                addOutput("🏃 Executing Python script...", 'success');
+                
+                // Capture Python print output
+                pyodide.runPython(`
+import sys
+from io import StringIO
+import contextlib
+
+output_capture = StringIO()
+                `);
+                
+                // Execute user code with output capture
+                pyodide.runPython(`
+with contextlib.redirect_stdout(output_capture):
+    ${code}
+                `);
+                
+                // Get captured output
+                const pythonOutput = pyodide.runPython("output_capture.getvalue()");
+                
+                if (pythonOutput) {
+                    // Display Python print statements
+                    pythonOutput.split('\n').forEach(line => {
+                        if (line.trim()) {
+                            addOutput(`🐍 ${line}`, 'success');
+                        }
+                    });
+                }
+                
+                addOutput("✅ Script executed successfully!", 'success');
+                
+            } catch (error) {
+                addOutput(`❌ Python Error: ${error.message}`, 'error');
+                console.error("Python execution error:", error);
+            } finally {
+                // Re-enable button
+                runBtn.disabled = false;
+                runBtn.textContent = "▶ Run Script";
+            }
+        }
+
+        // Utility Functions
+
+        // Add output to the output panel
+        function addOutput(message, type = 'normal') {
+            const outputPanel = document.getElementById('output');
+            const line = document.createElement('div');
+            line.className = `output-line ${type}`;
+            line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            outputPanel.appendChild(line);
+            outputPanel.scrollTop = outputPanel.scrollHeight;
+        }
+
+        // Update status bar
+        function updateStatus(message) {
+            document.getElementById('status').textContent = message;
+        }
+
+        // Event Listeners
+        document.getElementById('runBtn').addEventListener('click', runPythonScript);
+
+        // Keyboard shortcut: Ctrl+Enter to run script
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                runPythonScript();
+            }
+        });
+
+        // Initialize everything when page loads
+        window.addEventListener('load', async () => {
+            try {
+                // Initialize components in sequence
+                initializeEditor();
+                initializeBabylonJS();
+                await initializePyodide();
+                
+                addOutput("🎉 All systems initialized! Ready to code in Python!", 'success');
+                addOutput("💡 Pro tip: Use Ctrl+Enter to quickly run your script", 'success');
+                
+            } catch (error) {
+                addOutput(`❌ Initialization error: ${error.message}`, 'error');
+                updateStatus("❌ Initialization failed");
+            }
+        });
+
+        // Handle page unload
+        window.addEventListener('beforeunload', () => {
+            if (engine) {
+                engine.dispose();
+            }
+        });
+    </script>
+</body>
+</html>
