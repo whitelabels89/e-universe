@@ -1,6 +1,6 @@
 import React from "react";
 import { useAvatarCustomization } from "../../lib/stores/useAvatarCustomization";
-import { Button } from "./button";
+import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, User, Palette, Shirt, Star, Target, CheckCircle } from "lucide-react";
 
 const CUSTOMIZATION_OPTIONS = {

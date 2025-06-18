@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Babylon.js Scene Builder</title>
+<script src="https://cdn.babylonjs.com/babylon.js"></script>
+<script src="https://cdn.babylonjs.com/loaders/babylonjs.loaders.min.js"></script>
+<style>
+  body { margin:0; padding:0; display:flex; height:100vh; font-family:Arial, sans-serif; }
+  #panel { width:300px; padding:10px; background:#f2f2f2; overflow-y:auto; box-sizing:border-box; }
+  #panel label { display:block; margin-top:8px; }
+  #panel input[type="number"] { width:70px; }
+  #panel button { width:100%; margin-top:8px; padding:6px; }
+  #canvas-container { flex:1; }
+  canvas { width:100%; height:100%; display:block; }
+</style>
+</head>
+<body>
+  <div id="panel">
+    <h3>Scene Builder</h3>
+    <label>Upload GLB/GLTF
+      <input type="file" id="file-input" accept=".glb,.gltf" />
+    </label>
+    <fieldset style="border:1px solid #ccc; padding:5px; margin-top:10px;">
+      <legend>Position</legend>
+      X <input type="number" id="posX" value="0" step="0.1">
+      Y <input type="number" id="posY" value="0" step="0.1">
+      Z <input type="number" id="posZ" value="0" step="0.1">
+    </fieldset>
+    <fieldset style="border:1px solid #ccc; padding:5px; margin-top:10px;">
+      <legend>Scale</legend>
+      X <input type="number" id="scaleX" value="1" step="0.1">
+      Y <input type="number" id="scaleY" value="1" step="0.1">
+      Z <input type="number" id="scaleZ" value="1" step="0.1">
+    </fieldset>
+    <fieldset style="border:1px solid #ccc; padding:5px; margin-top:10px;">
+      <legend>Rotation (deg)</legend>
+      X <input type="number" id="rotX" value="0" step="1">
+      Y <input type="number" id="rotY" value="0" step="1">
+      Z <input type="number" id="rotZ" value="0" step="1">
+    </fieldset>
+    <button id="place-btn">Place into Scene</button>
+    <button id="reset-btn">Reset</button>
+    <button id="delete-btn">Delete Object</button>
+  </div>
+  <div id="canvas-container">
+    <canvas id="renderCanvas"></canvas>
+  </div>
+<script>
+const canvas = document.getElementById('renderCanvas');
+const engine = new BABYLON.Engine(canvas, true);
+const scene = new BABYLON.Scene(engine);
+const camera = new BABYLON.ArcRotateCamera("camera", -Math.PI/2, Math.PI/2.5, 10, new BABYLON.Vector3(0,1,0), scene);
+camera.attachControl(canvas, true);
+const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(1,1,0), scene);
+let currentMesh = null;
+let currentUrl = null;
+
+function render() { scene.render(); }
+engine.runRenderLoop(render);
+window.addEventListener('resize', () => engine.resize());
+
+function updateTransform(){
+  if(!currentMesh) return;
+  currentMesh.position.set(parseFloat(posX.value)||0, parseFloat(posY.value)||0, parseFloat(posZ.value)||0);
+  currentMesh.scaling.set(parseFloat(scaleX.value)||1, parseFloat(scaleY.value)||1, parseFloat(scaleZ.value)||1);
+  currentMesh.rotation.set(
+    BABYLON.Tools.ToRadians(parseFloat(rotX.value)||0),
+    BABYLON.Tools.ToRadians(parseFloat(rotY.value)||0),
+    BABYLON.Tools.ToRadians(parseFloat(rotZ.value)||0)
+  );
+  console.log('Updated transform', currentMesh.position, currentMesh.scaling, currentMesh.rotation);
+}
+
+function resetTransform(){
+  if(!currentMesh) return;
+  posX.value = posY.value = posZ.value = 0;
+  rotX.value = rotY.value = rotZ.value = 0;
+  scaleX.value = scaleY.value = scaleZ.value = 1;
+  updateTransform();
+}
+
+document.getElementById('file-input').addEventListener('change', function(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    const arrayBuffer = ev.target.result;
+    if(currentUrl) URL.revokeObjectURL(currentUrl);
+    const blob = new Blob([arrayBuffer], {type: file.type});
+    currentUrl = URL.createObjectURL(blob);
+    if(currentMesh){ currentMesh.dispose(); }
+    BABYLON.SceneLoader.ImportMesh('', '', currentUrl, scene, function(meshes){
+      currentMesh = new BABYLON.TransformNode('modelRoot', scene);
+      meshes.forEach(m=>{ m.parent = currentMesh; });
+      resetTransform();
+      console.log('Model loaded', file.name);
+    }, null, function(scene, msg){ console.error('Load error', msg); });
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+inputs = document.querySelectorAll('#panel input[type="number"]');
+inputs.forEach(i => i.addEventListener('input', updateTransform));
+
+document.getElementById('place-btn').addEventListener('click', () => {
+  updateTransform();
+  console.log('Placed into scene');
+});
+
+document.getElementById('reset-btn').addEventListener('click', resetTransform);
+
+document.getElementById('delete-btn').addEventListener('click', () => {
+  if(currentMesh){ currentMesh.dispose(); currentMesh = null; console.log('Object deleted'); }
+});
+</script>
+</body>
+</html>
