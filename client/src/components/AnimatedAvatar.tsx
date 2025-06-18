@@ -11,6 +11,8 @@ enum Controls {
   backward = "backward",
   leftward = "leftward",
   rightward = "rightward",
+  jump = "jump",
+  run = "run"
 }
 
 interface AnimatedAvatarProps {
@@ -39,13 +41,62 @@ export function AnimatedAvatar({ onMove }: AnimatedAvatarProps) {
   const rotation = useRef(0);
   const walkCycle = useRef(0);
   const isMoving = useRef(false);
+  const isRunning = useRef(false);
+  const isJumping = useRef(false);
+  const jumpVelocity = useRef(0);
+  const mobileControls = useRef({
+    forward: false,
+    backward: false,
+    left: false,
+    right: false,
+    run: false
+  });
 
-  const moveSpeed = isInsideBuilding ? 3 : 5;
+  const baseMoveSpeed = isInsideBuilding ? 3 : 5;
+  const runMultiplier = 1.8;
+  const jumpForce = 12;
   
+  // Mobile control handlers
+  const handleMobileMove = (direction: string, active: boolean) => {
+    switch (direction) {
+      case 'forward':
+        mobileControls.current.forward = active;
+        break;
+      case 'backward':
+        mobileControls.current.backward = active;
+        break;
+      case 'left':
+        mobileControls.current.left = active;
+        break;
+      case 'right':
+        mobileControls.current.right = active;
+        break;
+    }
+  };
+
+  const handleMobileRun = (active: boolean) => {
+    mobileControls.current.run = active;
+    isRunning.current = active;
+  };
+
+  const handleMobileJump = () => {
+    if (!isJumping.current && groupRef.current) {
+      jumpVelocity.current = jumpForce;
+      isJumping.current = true;
+    }
+  };
+
   useFrame((state, delta) => {
     if (!groupRef.current) return;
 
-    const { forward, backward, leftward, rightward } = getKeys();
+    const keys = getKeys();
+    const { forward, backward, leftward, rightward } = keys;
+    
+    // Combine keyboard and mobile controls
+    const forwardActive = forward || mobileControls.current.forward;
+    const backwardActive = backward || mobileControls.current.backward;
+    const leftActive = leftward || mobileControls.current.left;
+    const rightActive = rightward || mobileControls.current.right;
     
     // Reset movement state
     isMoving.current = false;
@@ -53,19 +104,29 @@ export function AnimatedAvatar({ onMove }: AnimatedAvatarProps) {
     let rotationChange = 0;
     
     // Pure character-relative movement (tank-style controls)
-    if (forward) {
+    if (forwardActive) {
       moveDirection.z += 1; // Always move forward in character's facing direction
       isMoving.current = true;
     }
-    if (backward) {
+    if (backwardActive) {
       moveDirection.z -= 1; // Always move backward from character's facing direction
       isMoving.current = true;
     }
-    if (leftward) {
+    if (leftActive) {
       rotationChange += 2; // Turn left (rotate character)
     }
-    if (rightward) {
+    if (rightActive) {
       rotationChange -= 2; // Turn right (rotate character)
+    }
+
+    // Check for running (Shift key or mobile run button)
+    const isRunningActive = keys.run || mobileControls.current.run;
+    isRunning.current = isRunningActive;
+
+    // Check for jumping (Space key)
+    if (keys.jump && !isJumping.current) {
+      jumpVelocity.current = jumpForce;
+      isJumping.current = true;
     }
     
     // Apply rotation change
@@ -73,6 +134,19 @@ export function AnimatedAvatar({ onMove }: AnimatedAvatarProps) {
       rotation.current += rotationChange * delta * 2; // Rotation speed
     }
     
+    // Handle jumping physics
+    if (isJumping.current) {
+      groupRef.current.position.y += jumpVelocity.current * delta;
+      jumpVelocity.current -= 25 * delta; // Gravity
+      
+      // Land when hitting ground
+      if (groupRef.current.position.y <= 1) {
+        groupRef.current.position.y = 1;
+        isJumping.current = false;
+        jumpVelocity.current = 0;
+      }
+    }
+
     // Apply movement relative to character's current rotation
     if (isMoving.current && moveDirection.length() > 0) {
       // Normalize movement direction
@@ -84,12 +158,16 @@ export function AnimatedAvatar({ onMove }: AnimatedAvatarProps) {
         rotation.current
       );
       
+      // Calculate current move speed (base speed + running multiplier)
+      const currentMoveSpeed = baseMoveSpeed * (isRunning.current ? runMultiplier : 1);
+      
       // Apply velocity
-      velocity.current.copy(rotatedDirection).multiplyScalar(moveSpeed * delta);
+      velocity.current.copy(rotatedDirection).multiplyScalar(currentMoveSpeed * delta);
       groupRef.current.position.add(velocity.current);
       
-      // Update walk cycle
-      walkCycle.current += delta * 8;
+      // Update walk cycle (faster when running)
+      const cycleSpeed = isRunning.current ? 12 : 8;
+      walkCycle.current += delta * cycleSpeed;
     } else {
       walkCycle.current = 0;
     }
@@ -101,7 +179,7 @@ export function AnimatedAvatar({ onMove }: AnimatedAvatarProps) {
     animateLimbs();
     
     // Boundary limits (adjust for indoor vs outdoor)
-    const boundary = isInsideBuilding ? 8 : 50;
+    const boundary = isInsideBuilding ? 8 : 80;
     groupRef.current.position.x = Math.max(-boundary, Math.min(boundary, groupRef.current.position.x));
     groupRef.current.position.z = Math.max(-boundary, Math.min(boundary, groupRef.current.position.z));
     
@@ -219,6 +297,8 @@ export function AnimatedAvatar({ onMove }: AnimatedAvatarProps) {
           <meshStandardMaterial color="#333333" />
         </Box>
       </group>
+      
+
     </group>
   );
 }

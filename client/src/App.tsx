@@ -18,11 +18,15 @@ import { PrefabObjects } from "./components/PrefabObjects";
 import { Terrain } from "./components/Terrain";
 import { BuildSystem } from "./components/BuildSystem";
 import { GameUI } from "./components/UI/GameUI";
+import { AdaptiveLayoutManager } from "./components/UI/AdaptiveLayoutManager";
 import { CampusUI } from "./components/UI/CampusUI";
 import { BuildModeUI } from "./components/UI/BuildModeUI";
 import { CameraControlsInfo } from "./components/UI/CameraControlsInfo";
+import { MobileControls } from "./components/UI/MobileControls";
+import { TopNavbar } from "./components/UI/TopNavbar";
 import { CampusBuildings } from "./components/CampusBuildings";
 import { InteriorEnvironment } from "./components/InteriorEnvironment";
+import { EnvironmentRenderer } from "./components/EnvironmentRenderer";
 import { BuildModeCamera } from "./components/BuildModeCamera";
 import { BuildPreviewGhost } from "./components/BuildPreviewGhost";
 import { PREFAB_TYPES } from "./types/education";
@@ -32,7 +36,9 @@ enum Controls {
   forward = 'forward',
   backward = 'backward',
   leftward = 'leftward',
-  rightward = 'rightward'
+  rightward = 'rightward',
+  jump = 'jump',
+  run = 'run'
 }
 
 const keyMap = [
@@ -40,6 +46,8 @@ const keyMap = [
   { name: Controls.backward, keys: ['KeyS', 'ArrowDown'] },
   { name: Controls.leftward, keys: ['KeyA', 'ArrowLeft'] },
   { name: Controls.rightward, keys: ['KeyD', 'ArrowRight'] },
+  { name: Controls.jump, keys: ['Space'] },
+  { name: Controls.run, keys: ['ShiftLeft', 'ShiftRight'] },
 ];
 
 // Lighting component
@@ -249,11 +257,13 @@ function App() {
           />
         </Canvas>
 
+        {/* Top Navigation Bar */}
+        <TopNavbar />
+
         {/* UI Overlay */}
         <GameUI />
         <CampusUI />
-        <BuildModeUI />
-        <CameraControlsInfo />
+        <MobileControls />
       </KeyboardControls>
     </div>
   );

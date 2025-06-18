@@ -17,15 +17,12 @@ function DecorativeElementMesh({ element }: DecorativeElementMeshProps) {
     case 'computer':
       return (
         <group position={position} rotation={rotation} scale={scale}>
-          {/* Monitor */}
           <Box args={[1.2, 0.8, 0.1]} position={[0, 0.4, 0]}>
             <meshStandardMaterial color="#1a1a1a" />
           </Box>
-          {/* Screen */}
           <Box args={[1.1, 0.7, 0.05]} position={[0, 0.4, 0.05]}>
             <meshStandardMaterial color="#00ff88" emissive="#004400" />
           </Box>
-          {/* Base */}
           <Cylinder args={[0.3, 0.3, 0.1]} position={[0, 0, 0]}>
             <meshStandardMaterial color="#333333" />
           </Cylinder>
@@ -35,15 +32,11 @@ function DecorativeElementMesh({ element }: DecorativeElementMeshProps) {
     case 'book':
       return (
         <group position={position} rotation={rotation} scale={scale}>
-          {/* Book stack */}
           <Box args={[0.3, 1.5, 0.2]} position={[0, 0, 0]}>
             <meshStandardMaterial color="#8B4513" />
           </Box>
           <Box args={[0.3, 1.4, 0.2]} position={[0.1, 0, 0.1]}>
             <meshStandardMaterial color="#CD853F" />
-          </Box>
-          <Box args={[0.3, 1.3, 0.2]} position={[0.2, 0, 0.2]}>
-            <meshStandardMaterial color="#DEB887" />
           </Box>
         </group>
       );
@@ -51,15 +44,12 @@ function DecorativeElementMesh({ element }: DecorativeElementMeshProps) {
     case 'robot':
       return (
         <group position={position} rotation={rotation} scale={scale}>
-          {/* Body */}
           <Box args={[0.8, 1.2, 0.6]} position={[0, 0.6, 0]}>
             <meshStandardMaterial color="#FF6B35" />
           </Box>
-          {/* Head */}
           <Box args={[0.5, 0.5, 0.5]} position={[0, 1.5, 0]}>
             <meshStandardMaterial color="#FF6B35" />
           </Box>
-          {/* Eyes */}
           <Sphere args={[0.08]} position={[-0.15, 1.5, 0.2]}>
             <meshStandardMaterial color="#00ffff" emissive="#0088ff" />
           </Sphere>
@@ -72,15 +62,12 @@ function DecorativeElementMesh({ element }: DecorativeElementMeshProps) {
     case 'plant':
       return (
         <group position={position} rotation={rotation} scale={scale}>
-          {/* Pot */}
           <Cylinder args={[0.3, 0.2, 0.4]} position={[0, 0.2, 0]}>
             <meshStandardMaterial color="#8B4513" />
           </Cylinder>
-          {/* Stem */}
           <Cylinder args={[0.05, 0.05, 1]} position={[0, 0.9, 0]}>
             <meshStandardMaterial color="#228B22" />
           </Cylinder>
-          {/* Leaves */}
           <Sphere args={[0.4, 0.2, 0.4]} position={[0, 1.3, 0]}>
             <meshStandardMaterial color="#32CD32" />
           </Sphere>
@@ -90,18 +77,13 @@ function DecorativeElementMesh({ element }: DecorativeElementMeshProps) {
     case 'easel':
       return (
         <group position={position} rotation={rotation} scale={scale}>
-          {/* Legs */}
           <Cylinder args={[0.02, 0.02, 1.5]} position={[-0.3, 0.75, -0.3]}>
             <meshStandardMaterial color="#8B4513" />
           </Cylinder>
           <Cylinder args={[0.02, 0.02, 1.5]} position={[0.3, 0.75, -0.3]}>
             <meshStandardMaterial color="#8B4513" />
           </Cylinder>
-          <Cylinder args={[0.02, 0.02, 1]} position={[0, 0.5, 0.3]}>
-            <meshStandardMaterial color="#8B4513" />
-          </Cylinder>
-          {/* Canvas */}
-          <Box args={[0.8, 0.6, 0.05]} position={[0, 1.2, 0]}>
+          <Box args={[0.8, 1, 0.02]} position={[0, 1, 0]}>
             <meshStandardMaterial color="#FFFAF0" />
           </Box>
         </group>
@@ -110,21 +92,19 @@ function DecorativeElementMesh({ element }: DecorativeElementMeshProps) {
     case 'desk':
       return (
         <group position={position} rotation={rotation} scale={scale}>
-          {/* Top */}
-          <Box args={[2, 0.1, 1]} position={[0, 0.8, 0]}>
+          <Box args={[1.2, 0.05, 0.6]} position={[0, 0.75, 0]}>
             <meshStandardMaterial color="#8B4513" />
           </Box>
-          {/* Legs */}
-          <Cylinder args={[0.05, 0.05, 0.8]} position={[-0.9, 0.4, -0.4]}>
+          <Cylinder args={[0.03, 0.03, 0.75]} position={[-0.5, 0.375, -0.25]}>
             <meshStandardMaterial color="#8B4513" />
           </Cylinder>
-          <Cylinder args={[0.05, 0.05, 0.8]} position={[0.9, 0.4, -0.4]}>
+          <Cylinder args={[0.03, 0.03, 0.75]} position={[0.5, 0.375, -0.25]}>
             <meshStandardMaterial color="#8B4513" />
           </Cylinder>
-          <Cylinder args={[0.05, 0.05, 0.8]} position={[-0.9, 0.4, 0.4]}>
+          <Cylinder args={[0.03, 0.03, 0.75]} position={[-0.5, 0.375, 0.25]}>
             <meshStandardMaterial color="#8B4513" />
           </Cylinder>
-          <Cylinder args={[0.05, 0.05, 0.8]} position={[0.9, 0.4, 0.4]}>
+          <Cylinder args={[0.03, 0.03, 0.75]} position={[0.5, 0.375, 0.25]}>
             <meshStandardMaterial color="#8B4513" />
           </Cylinder>
         </group>
@@ -133,25 +113,22 @@ function DecorativeElementMesh({ element }: DecorativeElementMeshProps) {
     case 'chair':
       return (
         <group position={position} rotation={rotation} scale={scale}>
-          {/* Seat */}
-          <Box args={[0.5, 0.05, 0.5]} position={[0, 0.5, 0]}>
+          <Box args={[0.4, 0.05, 0.4]} position={[0, 0.5, 0]}>
             <meshStandardMaterial color="#8B4513" />
           </Box>
-          {/* Back */}
-          <Box args={[0.5, 0.6, 0.05]} position={[0, 0.8, -0.2]}>
+          <Box args={[0.4, 0.6, 0.05]} position={[0, 0.8, -0.175]}>
             <meshStandardMaterial color="#8B4513" />
           </Box>
-          {/* Legs */}
-          <Cylinder args={[0.03, 0.03, 0.5]} position={[-0.2, 0.25, -0.2]}>
+          <Cylinder args={[0.03, 0.03, 0.5]} position={[-0.15, 0.25, -0.15]}>
             <meshStandardMaterial color="#8B4513" />
           </Cylinder>
-          <Cylinder args={[0.03, 0.03, 0.5]} position={[0.2, 0.25, -0.2]}>
+          <Cylinder args={[0.03, 0.03, 0.5]} position={[0.15, 0.25, -0.15]}>
             <meshStandardMaterial color="#8B4513" />
           </Cylinder>
-          <Cylinder args={[0.03, 0.03, 0.5]} position={[-0.2, 0.25, 0.2]}>
+          <Cylinder args={[0.03, 0.03, 0.5]} position={[-0.15, 0.25, 0.15]}>
             <meshStandardMaterial color="#8B4513" />
           </Cylinder>
-          <Cylinder args={[0.03, 0.03, 0.5]} position={[0.2, 0.25, 0.2]}>
+          <Cylinder args={[0.03, 0.03, 0.5]} position={[0.15, 0.25, 0.15]}>
             <meshStandardMaterial color="#8B4513" />
           </Cylinder>
         </group>
@@ -210,6 +187,139 @@ export function InteriorEnvironment() {
     return null;
   }
 
+  const renderWallDetails = () => {
+    switch (selectedBuilding.type) {
+      case 'lab-coding':
+        return (
+          <group>
+            {/* Tech walls */}
+            <mesh position={[0, 4, -9.9]} receiveShadow>
+              <planeGeometry args={[20, 8]} />
+              <meshStandardMaterial color="#1a1a2e" />
+            </mesh>
+            
+            {/* LED screens */}
+            {Array.from({ length: 4 }, (_, i) => (
+              <group key={`screen-${i}`}>
+                <Box args={[3, 2, 0.1]} position={[-7.5 + i * 5, 5, -9.8]}>
+                  <meshStandardMaterial color="#0066cc" emissive="#0033aa" emissiveIntensity={0.3} />
+                </Box>
+              </group>
+            ))}
+
+            {/* Side walls */}
+            <mesh position={[-9.9, 4, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow>
+              <planeGeometry args={[20, 8]} />
+              <meshStandardMaterial color="#2a2a3e" />
+            </mesh>
+            
+            <mesh position={[9.9, 4, 0]} rotation={[0, -Math.PI / 2, 0]} receiveShadow>
+              <planeGeometry args={[20, 8]} />
+              <meshStandardMaterial color="#2a2a3e" />
+            </mesh>
+
+            {/* Server racks */}
+            {Array.from({ length: 6 }, (_, i) => (
+              <Box key={`server-${i}`} args={[0.8, 3, 0.3]} position={[-9.7, 2, -8 + i * 2.5]}>
+                <meshStandardMaterial color="#333366" />
+              </Box>
+            ))}
+          </group>
+        );
+
+      case 'library':
+        return (
+          <group>
+            {/* Wooden walls */}
+            <mesh position={[0, 4, -9.9]} receiveShadow>
+              <planeGeometry args={[20, 8]} />
+              <meshStandardMaterial color="#8B4513" />
+            </mesh>
+
+            {/* Bookshelves */}
+            {Array.from({ length: 6 }, (_, i) => (
+              <group key={`bookshelf-${i}`}>
+                <Box args={[3, 7, 0.4]} position={[-9 + i * 3, 3.5, -9.6]}>
+                  <meshStandardMaterial color="#654321" />
+                </Box>
+                {/* Books */}
+                {Array.from({ length: 15 }, (_, j) => (
+                  <Box key={`book-${i}-${j}`} args={[0.15, 0.8, 0.3]} position={[-10.2 + i * 3 + (j % 8) * 0.3, 1 + Math.floor(j / 8) * 1.5, -9.4]}>
+                    <meshStandardMaterial color={`hsl(${(i * 40 + j * 20) % 360}, 60%, ${40 + (j % 3) * 15}%)`} />
+                  </Box>
+                ))}
+              </group>
+            ))}
+
+            {/* Side walls */}
+            <mesh position={[-9.9, 4, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow>
+              <planeGeometry args={[20, 8]} />
+              <meshStandardMaterial color="#8B4513" />
+            </mesh>
+
+            <mesh position={[9.9, 4, 0]} rotation={[0, -Math.PI / 2, 0]} receiveShadow>
+              <planeGeometry args={[20, 8]} />
+              <meshStandardMaterial color="#8B4513" />
+            </mesh>
+          </group>
+        );
+
+      case 'robotic':
+        return (
+          <group>
+            {/* Metallic walls */}
+            <mesh position={[0, 4, -9.9]} receiveShadow>
+              <planeGeometry args={[20, 8]} />
+              <meshStandardMaterial color="#36454F" metalness={0.8} roughness={0.2} />
+            </mesh>
+
+            {/* Robotic displays */}
+            {Array.from({ length: 3 }, (_, i) => (
+              <group key={`robot-${i}`} position={[-5 + i * 5, 2, -9.5]}>
+                <Box args={[0.8, 0.5, 0.8]} position={[0, 0, 0]}>
+                  <meshStandardMaterial color="#708090" metalness={0.9} roughness={0.1} />
+                </Box>
+                <Box args={[0.3, 2, 0.3]} position={[0, 1.5, 0]}>
+                  <meshStandardMaterial color="#A9A9A9" metalness={0.8} roughness={0.2} />
+                </Box>
+              </group>
+            ))}
+
+            {/* Side walls */}
+            <mesh position={[-9.9, 4, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow>
+              <planeGeometry args={[20, 8]} />
+              <meshStandardMaterial color="#36454F" metalness={0.8} roughness={0.2} />
+            </mesh>
+
+            <mesh position={[9.9, 4, 0]} rotation={[0, -Math.PI / 2, 0]} receiveShadow>
+              <planeGeometry args={[20, 8]} />
+              <meshStandardMaterial color="#36454F" metalness={0.8} roughness={0.2} />
+            </mesh>
+          </group>
+        );
+
+      default:
+        return (
+          <group>
+            <mesh position={[0, 4, -9.9]} receiveShadow>
+              <planeGeometry args={[20, 8]} />
+              <meshStandardMaterial color="#e8e8e8" />
+            </mesh>
+            
+            <mesh position={[-9.9, 4, 0]} rotation={[0, Math.PI / 2, 0]} receiveShadow>
+              <planeGeometry args={[20, 8]} />
+              <meshStandardMaterial color="#e8e8e8" />
+            </mesh>
+            
+            <mesh position={[9.9, 4, 0]} rotation={[0, -Math.PI / 2, 0]} receiveShadow>
+              <planeGeometry args={[20, 8]} />
+              <meshStandardMaterial color="#e8e8e8" />
+            </mesh>
+          </group>
+        );
+    }
+  };
+
   return (
     <group>
       {/* Interior Lighting */}
@@ -223,22 +333,15 @@ export function InteriorEnvironment() {
 
       {/* Floor */}
       <Box args={[20, 0.1, 20]} position={[0, -0.05, 0]}>
-        <meshStandardMaterial color="#f0f0f0" />
+        <meshStandardMaterial 
+          color={selectedBuilding.type === 'lab-coding' ? "#1a1a1a" : 
+                selectedBuilding.type === 'library' ? "#654321" :
+                selectedBuilding.type === 'robotic' ? "#2F4F4F" : "#f0f0f0"} 
+        />
       </Box>
 
-      {/* Walls */}
-      <Box args={[20, 8, 0.2]} position={[0, 4, -10]}>
-        <meshStandardMaterial color="#e0e0e0" />
-      </Box>
-      <Box args={[20, 8, 0.2]} position={[0, 4, 10]}>
-        <meshStandardMaterial color="#e0e0e0" />
-      </Box>
-      <Box args={[0.2, 8, 20]} position={[-10, 4, 0]}>
-        <meshStandardMaterial color="#e0e0e0" />
-      </Box>
-      <Box args={[0.2, 8, 20]} position={[10, 4, 0]}>
-        <meshStandardMaterial color="#e0e0e0" />
-      </Box>
+      {/* Detailed Walls */}
+      {renderWallDetails()}
 
       {/* Ceiling */}
       <Box args={[20, 0.1, 20]} position={[0, 8, 0]}>
@@ -247,42 +350,20 @@ export function InteriorEnvironment() {
 
       {/* Decorative Elements */}
       {environment.decorativeElements.map((element, index) => (
-        <DecorativeElementMesh
-          key={`${currentInterior}-element-${index}`}
-          element={element}
-        />
+        <DecorativeElementMesh key={index} element={element} />
       ))}
 
-      {/* Exit Door */}
-      <group position={[0, 0, 9.5]}>
-        <Box args={[2, 3, 0.2]} position={[0, 1.5, 0]}>
-          <meshStandardMaterial color="#8B4513" />
-        </Box>
-        <Text
-          position={[0, 3.5, 0]}
-          fontSize={0.5}
-          color="#ffffff"
-          anchorX="center"
-          anchorY="middle"
-          outlineWidth={0.02}
-          outlineColor="#000000"
-          onClick={exitBuilding}
-        >
-          📤 Exit Building
-        </Text>
-      </group>
-
-      {/* Building Title */}
+      {/* Exit instruction text */}
       <Text
-        position={[0, 7, 0]}
-        fontSize={1.5}
+        position={[0, 2, 9]}
+        fontSize={0.5}
         color="#ffffff"
         anchorX="center"
         anchorY="middle"
-        outlineWidth={0.05}
+        outlineWidth={0.02}
         outlineColor="#000000"
       >
-        {selectedBuilding.name}
+        Press ESC to exit building
       </Text>
     </group>
   );

@@ -27,7 +27,9 @@ export function AvatarCustomizationPanel() {
     loadFromStorage();
   }, [loadFromStorage]);
 
-  if (!showCustomizationPanel) return null;
+  // Don't show desktop panel on mobile when mobile version should be shown
+  const isMobile = window.innerWidth <= 768;
+  if (!showCustomizationPanel || isMobile) return null;
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50">

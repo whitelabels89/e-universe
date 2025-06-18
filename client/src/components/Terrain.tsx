@@ -5,7 +5,7 @@ interface TerrainProps {
   size?: number;
 }
 
-export function Terrain({ size = 50 }: TerrainProps) {
+export function Terrain({ size = 80 }: TerrainProps) {
   // Generate heightmap for terrain
   const heightData = useMemo(() => {
     const width = size;
