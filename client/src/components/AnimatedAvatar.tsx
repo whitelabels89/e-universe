@@ -4,6 +4,7 @@ import { useKeyboardControls } from "@react-three/drei";
 import { Box, Sphere, Cylinder } from "@react-three/drei";
 import { useAvatarCustomization } from "../lib/stores/useAvatarCustomization";
 import { useCampus } from "../lib/stores/useCampus";
+import { TerrainPhysics } from "./PhysicsWorld";
 import * as THREE from "three";
 
 enum Controls {
@@ -20,6 +21,8 @@ interface AnimatedAvatarProps {
     position: [number, number, number],
     rotation: number,
     moving: boolean,
+    jumping?: boolean,
+    velocity?: number
   ) => void;
 }
 
@@ -179,29 +182,37 @@ export function AnimatedAvatar({ onMove }: AnimatedAvatarProps) {
       rotation.current += rotationChange * delta * 2; // Rotation speed
     }
     
-    // Handle jumping physics - completely separate from terrain snapping
+    // Handle jumping physics with terrain awareness
     if (isJumping.current) {
-      // Disable terrain snapping during jump
-      groupRef.current.userData.needsGroundSnap = false;
-      
-      groupRef.current.position.y += jumpVelocity.current * delta;
       jumpVelocity.current -= 25 * delta; // Gravity
+      groupRef.current.position.y += jumpVelocity.current * delta;
       
-      // Land when falling and close to ground level
-      if (jumpVelocity.current < 0 && groupRef.current.position.y <= 1.2) {
-        groupRef.current.position.y = 1.2;
+      // Get terrain height at current position
+      const terrainHeight = TerrainPhysics.getGroundHeight([
+        groupRef.current.position.x,
+        groupRef.current.position.y,
+        groupRef.current.position.z
+      ]);
+      
+      // Check if landed on terrain
+      if (jumpVelocity.current < 0 && groupRef.current.position.y <= terrainHeight + 1.0) {
+        groupRef.current.position.y = terrainHeight + 1.0;
         isJumping.current = false;
         jumpVelocity.current = 0;
         
-        // Re-enable terrain snapping after landing delay
-        setTimeout(() => {
-          if (groupRef.current) {
-            groupRef.current.userData.needsGroundSnap = true;
-            groupRef.current.userData.isJumping = false;
-            groupRef.current.userData.jumpVelocity = 0;
-          }
-        }, 500); // Longer delay untuk mencegah konflik
+        // Snap to terrain surface properly
+        TerrainPhysics.snapCharacterToGround(groupRef.current);
       }
+    } else {
+      // Ensure character stays properly positioned on terrain
+      const terrainHeight = TerrainPhysics.getGroundHeight([
+        groupRef.current.position.x,
+        groupRef.current.position.y,
+        groupRef.current.position.z
+      ]);
+      
+      // Apply proper ground snapping every frame
+      TerrainPhysics.snapCharacterToGround(groupRef.current);
     }
 
     // Apply movement relative to character's current rotation
@@ -240,12 +251,14 @@ export function AnimatedAvatar({ onMove }: AnimatedAvatarProps) {
     groupRef.current.position.x = Math.max(-boundary, Math.min(boundary, groupRef.current.position.x));
     groupRef.current.position.z = Math.max(-boundary, Math.min(boundary, groupRef.current.position.z));
     
-    // Notify parent of movement
+    // Notify parent of movement with debug info
     if (onMove) {
       onMove(
         [groupRef.current.position.x, groupRef.current.position.y, groupRef.current.position.z],
         rotation.current,
-        isMoving.current
+        isMoving.current,
+        isJumping.current,
+        jumpVelocity.current
       );
     }
   });

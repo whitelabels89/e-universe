@@ -22,6 +22,11 @@ import { AdaptiveLayoutManager } from "./components/UI/AdaptiveLayoutManager";
 import { CampusUI } from "./components/UI/CampusUI";
 import { BuildModeUI } from "./components/UI/BuildModeUI";
 import { CameraControlsInfo } from "./components/UI/CameraControlsInfo";
+import { CameraTutorial } from "./components/UI/CameraTutorial";
+import { TutorialHints } from "./components/UI/TutorialHints";
+import { TerrainIndicator } from "./components/UI/TerrainIndicator";
+import { TerrainVisualizer } from "./components/TerrainVisualizer";
+import { DebugPanel } from "./components/UI/DebugPanel";
 import { MobileControls } from "./components/UI/MobileControls";
 import { TopNavbar } from "./components/UI/TopNavbar";
 import { CampusBuildings } from "./components/CampusBuildings";
@@ -125,6 +130,8 @@ function App() {
   >([0, 2, 0]);
   const [avatarRotation, setAvatarRotation] = useState(0);
   const [avatarMoving, setAvatarMoving] = useState(false);
+  const [avatarJumping, setAvatarJumping] = useState(false);
+  const [avatarVelocity, setAvatarVelocity] = useState(0);
   const [isPythonEditorOpen, setIsPythonEditorOpen] = useState(false);
   const [pythonExecutor, setPythonExecutor] = useState<
     ((code: string) => void) | null
@@ -167,10 +174,14 @@ function App() {
     pos: [number, number, number],
     rot: number,
     moving: boolean,
+    jumping?: boolean,
+    velocity?: number
   ) => {
     setAvatarPosition(pos);
     setAvatarRotation(rot);
     setAvatarMoving(moving);
+    if (jumping !== undefined) setAvatarJumping(jumping);
+    if (velocity !== undefined) setAvatarVelocity(velocity);
   };
 
   const handlePythonExecute = (code: string) => {
@@ -231,6 +242,9 @@ function App() {
                 <>
                   {/* Realistic Terrain */}
                   <Terrain size={100} />
+                  
+                  {/* Terrain Visualizer for Jump Zones */}
+                  <TerrainVisualizer size={100} />
 
                   {/* World Grid */}
                   <GridWorld size={100} onGridClick={handleGridClick} />
@@ -274,6 +288,12 @@ function App() {
         <TopNavbar onPythonToggle={togglePythonEditor} />
 
         {/* UI Overlay */}
+        <TerrainIndicator position={avatarPosition} />
+        <DebugPanel 
+          position={avatarPosition} 
+          isJumping={avatarJumping}
+          velocity={avatarVelocity}
+        />
         <GameUI />
         <CampusUI />
         <MobileControls />

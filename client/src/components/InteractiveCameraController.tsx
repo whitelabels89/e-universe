@@ -1,5 +1,6 @@
 import { useFrame, useThree } from '@react-three/fiber';
 import { useCameraSettings } from '../lib/stores/useCameraSettings';
+import { useCampus } from '../lib/stores/useCampus';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
 import { useRef, useEffect } from 'react';
@@ -30,6 +31,7 @@ export function InteractiveCameraController({
     smoothing,
     lookAtTarget
   } = useCameraSettings();
+  const { isInsideBuilding } = useCampus();
   
   const currentPosition = useRef(new THREE.Vector3());
   const currentLookAt = useRef(new THREE.Vector3());
@@ -199,12 +201,10 @@ export function InteractiveCameraController({
           TWO: THREE.TOUCH.ROTATE, // Two finger gesture for rotation only
         }}
         target={new THREE.Vector3(...targetPosition)}
-        minDistance={2}
-        maxDistance={50}
+        minDistance={isInsideBuilding ? 1.5 : 2}
+        maxDistance={isInsideBuilding ? 12 : 50}
         maxPolarAngle={Math.PI / 2.1}
         minPolarAngle={Math.PI / 8}
-        enableDamping={true}
-        dampingFactor={0.05}
         rotateSpeed={0.8}
         zoomSpeed={1.2}
         onStart={() => {

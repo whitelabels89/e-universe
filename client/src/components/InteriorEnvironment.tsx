@@ -157,6 +157,18 @@ export function InteriorEnvironment() {
   const { scene, camera } = useThree();
   const fogRef = useRef<THREE.Fog>();
 
+  // Handle ESC key to exit building
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && currentInterior) {
+        exitBuilding();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [currentInterior, exitBuilding]);
+
   useEffect(() => {
     if (!currentInterior) return;
 
@@ -167,7 +179,7 @@ export function InteriorEnvironment() {
     scene.background = new THREE.Color(environment.backgroundColor);
     
     // Set fog
-    const fog = new THREE.Fog(environment.fogColor, 10, 50);
+    const fog = new THREE.Fog(environment.fogColor, 5, 25);
     scene.fog = fog;
     fogRef.current = fog;
 
@@ -323,13 +335,28 @@ export function InteriorEnvironment() {
   return (
     <group>
       {/* Interior Lighting */}
-      <ambientLight intensity={environment.ambientLightIntensity} />
+      <ambientLight intensity={0.8} />
       <directionalLight
-        position={[5, 10, 5]}
-        intensity={0.8}
-        color={environment.directionalLightColor}
-        castShadow
+        position={[0, 10, 0]}
+        intensity={0.4}
+        color="#ffffff"
+        castShadow={false}
       />
+      <pointLight position={[5, 6, 5]} intensity={0.3} color="#ffffff" />
+      <pointLight position={[-5, 6, -5]} intensity={0.3} color="#ffffff" />
+      
+      {/* Exit instruction */}
+      <Text
+        position={[0, 4, -7]}
+        fontSize={0.8}
+        color="#ffffff"
+        anchorX="center"
+        anchorY="middle"
+        outlineWidth={0.05}
+        outlineColor="#000000"
+      >
+        Press ESC to exit building
+      </Text>
 
       {/* Floor */}
       <Box args={[20, 0.1, 20]} position={[0, -0.05, 0]}>

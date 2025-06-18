@@ -57,12 +57,12 @@ export class TerrainPhysics {
     const intersects = this.raycaster.intersectObjects(this.terrainMeshes, true);
     
     if (intersects.length > 0) {
-      // Return the highest intersection point (closest to ray origin)
-      return intersects[0].point.y;
+      // Add small offset to prevent sinking
+      return intersects[0].point.y + 0.05;
     }
     
-    // Fallback: calculate height based on terrain generation algorithm
-    return this.calculateTerrainHeight(position[0], position[2]);
+    // Fallback: calculate height based on terrain generation algorithm with offset
+    return this.calculateTerrainHeight(position[0], position[2]) + 0.05;
   }
   
   // Calculate terrain height using the same algorithm as terrain generation
@@ -154,26 +154,34 @@ export class TerrainPhysics {
     object.userData.lastSnapZ = object.position.z;
   }
   
-  // Snap character to ground with smooth interpolation
+  // Snap character to ground with physics-aware positioning
   static snapCharacterToGround(
-    object: THREE.Object3D, 
-    smoothness: number = 0.1
-  ): void {
-    const groundHeight = this.getGroundHeight([
-      object.position.x, 
-      object.position.y, 
-      object.position.z
-    ]);
+    object: THREE.Object3D,
+    velocity?: THREE.Vector3,
+    characterHeight: number = 1.0
+  ): boolean {
+    const currentPos = object.position;
+    const groundHeight = this.getGroundHeight([currentPos.x, currentPos.y, currentPos.z]);
     
-    const heightOffset = object.userData.heightOffset || 0.5;
-    const targetY = groundHeight + heightOffset;
-    const currentY = object.position.y;
+    // Calculate the desired character position (feet on ground)
+    // Add extra offset to ensure feet are clearly above ground
+    const targetY = groundHeight + characterHeight / 2 + 0.1;
     
-    // Snap karakter ke ground level baik naik maupun turun
-    const heightDifference = Math.abs(currentY - targetY);
-    if (heightDifference < 3.0) { // Maksimal 3 unit perbedaan
+    // Check if character is on ground with more precise detection
+    const onGround = Math.abs(currentPos.y - targetY) < 0.15;
+    
+    // Apply ground snapping with smooth transition
+    if (velocity && velocity.y <= 0 && currentPos.y <= targetY + 0.3) {
+      object.position.y = Math.max(targetY, object.position.y - 0.5); // Prevent sudden drops
+      velocity.y = 0;
+      return true; // Character is on ground
+    } else if (!velocity) {
+      // Direct snapping for non-physics objects
       object.position.y = targetY;
+      return true;
     }
+    
+    return false; // Character is in air
   }
   
   // Get surface normal at position for object orientation

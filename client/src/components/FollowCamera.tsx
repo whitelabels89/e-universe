@@ -65,7 +65,7 @@ export function FollowCamera({
     
     if (isInsideBuilding) {
       // Keep camera within interior bounds
-      const interiorBounds = 8;
+      const interiorBounds = 6;
       constrainedX = Math.max(-interiorBounds, Math.min(interiorBounds, x));
       constrainedZ = Math.max(-interiorBounds, Math.min(interiorBounds, z));
     }
@@ -83,14 +83,14 @@ export function FollowCamera({
     }
 
     // Calculate camera position with hybrid behavior
-    const followStrength = moving ? (isInsideBuilding ? 0.08 : 0.05) : (isInsideBuilding ? 0.04 : 0.02);
+    const followStrength = moving ? (isInsideBuilding ? 0.12 : 0.05) : (isInsideBuilding ? 0.06 : 0.02);
     const rotOffset = offset
       .clone()
       .applyAxisAngle(new THREE.Vector3(0, 1, 0), rotation + manualYaw.current);
     
     const desiredPos = new THREE.Vector3(
       constrainedX - rotOffset.x,
-      y + rotOffset.y,
+      isInsideBuilding ? y + 2 : y + rotOffset.y, // Lower camera height inside
       constrainedZ - rotOffset.z,
     );
 
