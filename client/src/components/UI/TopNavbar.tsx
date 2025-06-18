@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Button } from "./button";
-import { Separator } from "./separator";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { useCampus } from "../../lib/stores/useCampus";
 import { useEducation } from "../../lib/stores/useEducation";
 import { useBuildMode } from "../../lib/stores/useBuildMode";

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useAvatarCustomization } from "../../lib/stores/useAvatarCustomization";
-import { Button } from "./button";
+import { Button } from "@/components/ui/button";
 import { useIsMobile } from "../../hooks/use-is-mobile";
 import { 
   ChevronLeft, 
