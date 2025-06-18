@@ -4,7 +4,7 @@ import { useAvatarCustomization } from "../../lib/stores/useAvatarCustomization"
 import { MobileCustomizationDrawer } from "./MobileCustomizationDrawer";
 import { AvatarCustomizationPanel } from "./AvatarCustomizationPanel";
 import { PersonalizedAvatarWizard } from "./PersonalizedAvatarWizard";
-import { Button } from "./button";
+import { Button } from "@/components/ui/button";
 import { Palette, User, Monitor, Smartphone } from "lucide-react";
 
 export function ResponsiveCustomizationInterface() {

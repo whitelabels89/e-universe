@@ -4,8 +4,8 @@ import { useEnvironment } from "../../lib/stores/useEnvironment";
 import { useUniverseSettings } from "../../lib/stores/useUniverseSettings";
 import { useEducation } from "../../lib/stores/useEducation";
 import { useIsMobile } from "../../hooks/use-is-mobile";
-import { Button } from "./button";
-import { Separator } from "./separator";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
 import { 
   X, User, Palette, Mountain, Settings, Save, RotateCcw, 
   Smartphone, Eye, Heart, Shirt, Sparkles, Monitor

@@ -201,18 +201,26 @@ export function AnimatedAvatar({ onMove }: AnimatedAvatarProps) {
       
       // Land when falling and close to ground level
       if (jumpVelocity.current < 0 && groupRef.current.position.y <= 1.2) {
-        groupRef.current.position.y = 1.2;
-        isJumping.current = false;
-        jumpVelocity.current = 0;
-        
-        // Re-enable terrain snapping after landing delay
-        setTimeout(() => {
-          if (groupRef.current) {
-            groupRef.current.userData.needsGroundSnap = true;
-            groupRef.current.userData.isJumping = false;
-            groupRef.current.userData.jumpVelocity = 0;
-          }
-        }, 500); // Longer delay untuk mencegah konflik
+        import('./PhysicsWorld').then(({ TerrainPhysics }) => {
+          if (!groupRef.current) return;
+          const groundY = TerrainPhysics.getGroundHeight([
+            groupRef.current.position.x,
+            groupRef.current.position.y,
+            groupRef.current.position.z
+          ]);
+          groupRef.current.position.y = groundY + 0.9;
+          isJumping.current = false;
+          jumpVelocity.current = 0;
+
+          // Re-enable terrain snapping after landing delay
+          setTimeout(() => {
+            if (groupRef.current) {
+              groupRef.current.userData.needsGroundSnap = true;
+              groupRef.current.userData.isJumping = false;
+              groupRef.current.userData.jumpVelocity = 0;
+            }
+          }, 500);
+        });
       }
     }
 
@@ -303,7 +311,7 @@ export function AnimatedAvatar({ onMove }: AnimatedAvatarProps) {
       userData={{ 
         needsGroundSnap: true, 
         isCharacter: true, 
-        heightOffset: 0.5,
+        heightOffset: 0.9,
         isCollidable: true,
         collisionRadius: 0.5,
         isJumping: false,
