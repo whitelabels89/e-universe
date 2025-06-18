@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useEnvironment } from "../../lib/stores/useEnvironment";
 import { useEducation } from "../../lib/stores/useEducation";
-import { Button } from "./button";
+import { Button } from "@/components/ui/button";
 import { X, Mountain, Sun, Cloud, Unlock, Lock } from "lucide-react";
 
 export function EnvironmentPanel() {

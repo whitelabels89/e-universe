@@ -2,10 +2,10 @@ import { useState } from "react";
 import { useEnvironment } from "../../lib/stores/useEnvironment";
 import { useBuildMode } from "../../lib/stores/useBuildMode";
 import { BUILDING_TEMPLATES } from "../BuildingSystem";
-import { Button } from "./button";
-import { Card, CardDescription, CardHeader, CardTitle } from "./card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
-import { Badge } from "./badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
 
 export function BuildingPalette() {
   const { getCurrentTheme } = useEnvironment();
