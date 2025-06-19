@@ -247,8 +247,8 @@ function App() {
                   {/* Realistic Terrain */}
                   <Terrain size={100} />
                   
-                  {/* Terrain Visualizer for Jump Zones */}
-                  <TerrainVisualizer size={100} />
+                  {/* Terrain Visualizer for Jump Zones - disabled to remove grid lines */}
+                  {/* <TerrainVisualizer size={100} /> */}
 
                   {/* World Grid */}
                   <GridWorld size={100} onGridClick={handleGridClick} />

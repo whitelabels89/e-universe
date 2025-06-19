@@ -93,11 +93,11 @@ export function GridWorld({ size = 30, onGridClick }: GridWorldProps) {
         <meshLambertMaterial map={grassTexture} />
       </mesh>
       
-      {/* Grid lines for visual reference */}
-      <gridHelper args={[size, size, "#4CAF50", "#81C784"]} position={[0, 0.01, 0]} />
+      {/* Grid lines for visual reference - only show when needed */}
+      {isBuildMode && <gridHelper args={[size, size, "#4CAF50", "#81C784"]} position={[0, 0.01, 0]} />}
       
-      {/* Boundary markers */}
-      {Array.from({ length: size + 1 }, (_, i) => {
+      {/* Boundary markers - only show in build mode */}
+      {isBuildMode && Array.from({ length: size + 1 }, (_, i) => {
         const pos = (i - size / 2);
         return (
           <group key={`boundary-${i}`}>

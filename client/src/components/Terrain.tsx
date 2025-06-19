@@ -138,61 +138,72 @@ function TerrainChunks({ size, theme, currentTexture, terrainColor }: {
   currentTexture: any; 
   terrainColor: string; 
 }) {
-  const chunks = useMemo(() => {
-    const chunkSize = 6; // Smaller chunks for tiny map
-    const chunks = [];
+  const terrainGeometry = useMemo(() => {
+    const segments = 64; // Higher resolution for smoother terrain
+    const geometry = new THREE.PlaneGeometry(size, size, segments, segments);
     
-    for (let x = -size/2; x < size/2; x += chunkSize) {
-      for (let z = -size/2; z < size/2; z += chunkSize) {
-        // Create more stable terrain based on theme
-        let height = 0;
-        
-        if (theme?.id === 'desert') {
-          // Desert dunes - smoother, higher variation
-          height = Math.sin(x * 0.05) * Math.cos(z * 0.08) * 3 + 
-                   Math.sin(x * 0.1) * 1.5 + 
-                   Math.cos(z * 0.12) * 2;
-          height = Math.max(0.5, height); // Keep above water level
-        } else if (theme?.id === 'island') {
-          // Tropical terrain - gentle hills with consistent elevation
-          const distanceFromCenter = Math.sqrt(x * x + z * z);
-          height = Math.max(2, 4 - distanceFromCenter * 0.02) + 
-                   Math.sin(x * 0.1) * Math.cos(z * 0.1) * 1.5;
-        } else if (theme?.id === 'mountain') {
-          // Mountain terrain - high peaks
-          height = Math.sin(x * 0.08) * Math.cos(z * 0.06) * 4 + 
-                   Math.abs(Math.sin(x * 0.15)) * 3;
-        } else {
-          // Default grassland - gentle rolling hills
-          height = Math.sin(x * 0.1) * Math.cos(z * 0.1) * 2 + 
-                   Math.sin(x * 0.2) * 0.5;
-        }
-        
-        chunks.push({ x, z, height: Math.max(0.2, height), size: chunkSize });
+    // Get vertex positions
+    const vertices = geometry.attributes.position.array as Float32Array;
+    
+    // Apply height displacement to create smooth hills
+    for (let i = 0; i < vertices.length; i += 3) {
+      const x = vertices[i];
+      const z = vertices[i + 1];
+      
+      let height = 0;
+      
+      if (theme?.id === 'desert') {
+        // Desert dunes - smooth rolling sand dunes
+        height = Math.sin(x * 0.05) * Math.cos(z * 0.08) * 4 + 
+                 Math.sin(x * 0.1) * Math.cos(z * 0.15) * 2 + 
+                 Math.sin(x * 0.2) * Math.cos(z * 0.25) * 1;
+        height = Math.max(0.5, height);
+      } else if (theme?.id === 'island') {
+        // Tropical terrain - central highlands with coastal lowlands
+        const distanceFromCenter = Math.sqrt(x * x + z * z);
+        height = Math.max(1, 6 - distanceFromCenter * 0.08) + 
+                 Math.sin(x * 0.1) * Math.cos(z * 0.1) * 2 +
+                 Math.sin(x * 0.3) * Math.cos(z * 0.3) * 0.5;
+      } else if (theme?.id === 'mountain') {
+        // Mountain terrain - dramatic peaks and valleys
+        height = Math.sin(x * 0.03) * Math.cos(z * 0.04) * 8 + 
+                 Math.sin(x * 0.08) * Math.cos(z * 0.06) * 4 + 
+                 Math.sin(x * 0.15) * Math.cos(z * 0.12) * 2;
+        height = Math.max(0, height);
+      } else {
+        // Default grassland - gentle rolling hills
+        height = Math.sin(x * 0.08) * Math.cos(z * 0.1) * 3 + 
+                 Math.sin(x * 0.15) * Math.cos(z * 0.2) * 1.5 + 
+                 Math.sin(x * 0.25) * Math.cos(z * 0.3) * 0.8;
+        height = Math.max(0, height);
       }
+      
+      // Set the Y coordinate (height)
+      vertices[i + 2] = height;
     }
     
-    return chunks;
+    // Update the geometry
+    geometry.attributes.position.needsUpdate = true;
+    geometry.computeVertexNormals(); // Smooth lighting
+    
+    return geometry;
   }, [size, theme]);
 
   return (
-    <group>
-      {chunks.map((chunk, index) => (
-        <mesh 
-          key={index} 
-          position={[chunk.x + chunk.size/2, chunk.height/2 + 0.1, chunk.z + chunk.size/2]}
-          receiveShadow
-          castShadow
-          userData={{ isTerrain: true }}
-        >
-          <boxGeometry args={[chunk.size - 0.1, chunk.height, chunk.size - 0.1]} />
-          <meshLambertMaterial 
-            map={currentTexture}
-            color={terrainColor}
-          />
-        </mesh>
-      ))}
-    </group>
+    <mesh 
+      geometry={terrainGeometry}
+      position={[0, 0, 0]}
+      rotation={[-Math.PI / 2, 0, 0]}
+      receiveShadow
+      castShadow
+      userData={{ isTerrain: true }}
+    >
+      <meshLambertMaterial 
+        map={currentTexture}
+        color={terrainColor}
+        side={THREE.DoubleSide}
+      />
+    </mesh>
   );
 }
 
