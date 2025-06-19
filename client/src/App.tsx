@@ -27,6 +27,9 @@ import { TutorialHints } from "./components/UI/TutorialHints";
 import { TerrainIndicator } from "./components/UI/TerrainIndicator";
 import { TerrainVisualizer } from "./components/TerrainVisualizer";
 import { DebugPanel } from "./components/UI/DebugPanel";
+import { Minimap } from "./components/UI/Minimap";
+import { MinimapLegend } from "./components/UI/MinimapLegend";
+import { ProfileMenu } from "./components/UI/ProfileMenu";
 import { MobileControls } from "./components/UI/MobileControls";
 import { TopNavbar } from "./components/UI/TopNavbar";
 import { CampusBuildings } from "./components/CampusBuildings";
@@ -114,6 +117,7 @@ function LoadingScreen() {
 function App() {
   const { student } = useEducation();
   const {
+    objects: worldObjects,
     selectedPrefab,
     isPlacementMode,
     addObject,
@@ -294,8 +298,13 @@ function App() {
           isJumping={avatarJumping}
           velocity={avatarVelocity}
         />
+        <Minimap 
+          playerPosition={avatarPosition}
+          playerRotation={avatarRotation}
+          worldObjects={worldObjects}
+          terrainSize={100}
+        />
         <GameUI />
-        <CampusUI />
         <MobileControls />
 
         {/* Python Editor Panel */}

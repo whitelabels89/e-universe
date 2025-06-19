@@ -1,5 +1,4 @@
 import { LeftPanel } from "./LeftPanel";
-import { RightPanel } from "./RightPanel";
 import { ResponsiveCustomizationInterface } from "./ResponsiveCustomizationInterface";
 import { TouchOptimizedControls } from "./TouchOptimizedControls";
 import { EnvironmentPanel } from "./EnvironmentPanel";
@@ -10,7 +9,6 @@ export function GameUI() {
   return (
     <>
       <LeftPanel />
-      <RightPanel />
       <ResponsiveCustomizationInterface />
       <TouchOptimizedControls 
         onMove={(direction, active) => {
