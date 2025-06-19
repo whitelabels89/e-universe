@@ -9,23 +9,22 @@ interface PythonEditorProps {
 }
 
 export function PythonEditor({ onExecute, isVisible = false }: PythonEditorProps) {
-  const [code, setCode] = useState(`# Python 3D World Editor
-# Control the 3D world with Python commands!
+  const [code, setCode] = useState(`# Welcome to the Creative Game Engine!
+# Define a new shape and spawn it
+define_shape("trapezoid", {
+  "vertices": [[0,0], [2,0], [1.5,1], [0.5,1]],
+  "color": "orange"
+})
+spawn_custom("trapezoid", x=0, y=0, z=0)
 
-# Spawn objects
-spawn_box(x=0, y=1, z=0, color='red')
-spawn_sphere(x=2, y=1, z=0, color='blue')
-
-# Change environment
-set_background('purple')
-set_lighting(intensity=0.8)
-
-# Advanced operations
-create_building(x=5, y=0, z=5, type='school')
-add_avatar_animation('wave')
-
-print("🎉 Python script executed!")
-print("✨ Check the 3D world for changes!")`);
+# Define a custom NPC
+define_npc("dino_guard", {
+  "mesh": "/models/nina_avatar.glb",
+  "scale": [2,2,2],
+  "message": "Aku penjaga dari masa lalu!"
+})
+spawn_npc("dino_guard", x=3, y=0, z=0)
+`);
 
   const [output, setOutput] = useState<string[]>([
     '🐍 Python 3D Editor Ready',

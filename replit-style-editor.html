@@ -247,23 +247,25 @@
         let camera;
         let editor;
         let isInitialized = false;
+        window.blueprintShapes = {};
+        window.blueprintNPCs = {};
 
         // Default Python script
-        const defaultPythonScript = `# Welcome to Python 3D Editor!
-# Use these functions to manipulate the 3D scene:
+        const defaultPythonScript = `# Welcome to the Creative Game Engine!
+# Define a new trapezoid shape and spawn it
+define_shape("trapezoid", {
+  "vertices": [[0,0], [2,0], [1.5,1], [0.5,1]],
+  "color": "orange"
+})
+spawn_custom("trapezoid", x=0, y=0, z=0)
 
-# Spawn a red box at position (0, 1, 0)
-spawn_box(x=0, y=1, z=0, color='red')
-
-# Spawn a blue sphere at position (2, 1, 0)
-spawn_sphere(x=2, y=1, z=0, color='blue')
-
-# Change background color
-set_background('darkblue')
-
-# Print messages to output
-print("🎉 Welcome to 3D Python programming!")
-print("✨ Your objects have been created!")`;
+# Define an NPC with a custom model
+define_npc("dino_guard", {
+  "mesh": "dino.glb",
+  "scale": [2,2,2],
+  "message": "Aku penjaga dari masa lalu!"
+})
+spawn_npc("dino_guard", x=3, y=0, z=0)`;
 
         // Initialize Monaco Editor
         function initializeEditor() {
@@ -339,6 +341,11 @@ print("✨ Your objects have been created!")`;
                 pyodide.globals.set("set_background", set_background);
                 pyodide.globals.set("clear_scene", clear_scene);
                 pyodide.globals.set("move_object", move_object);
+                pyodide.globals.set("define_shape", define_shape);
+                pyodide.globals.set("spawn_custom", spawn_custom);
+                pyodide.globals.set("define_npc", define_npc);
+                pyodide.globals.set("spawn_npc", spawn_npc);
+                pyodide.globals.set("export_blueprints", export_blueprints);
                 
                 updateStatus("Pyodide Python runtime initialized ✓");
                 isInitialized = true;
@@ -359,9 +366,9 @@ print("✨ Your objects have been created!")`;
         function spawn_box(x, y, z, color = 'red') {
             const box = BABYLON.MeshBuilder.CreateBox(`box_${Date.now()}`, { size: 1 }, scene);
             box.position = new BABYLON.Vector3(x, y, z);
-            
+
             const material = new BABYLON.StandardMaterial(`boxMat_${Date.now()}`, scene);
-            material.diffuseColor = getColor(color);
+            material.diffuseColor = parseColor(color);
             box.material = material;
             
             addOutput(`📦 Box spawned at (${x}, ${y}, ${z}) with color ${color}`, 'success');
@@ -371,9 +378,9 @@ print("✨ Your objects have been created!")`;
         function spawn_sphere(x, y, z, color = 'blue') {
             const sphere = BABYLON.MeshBuilder.CreateSphere(`sphere_${Date.now()}`, { diameter: 1 }, scene);
             sphere.position = new BABYLON.Vector3(x, y, z);
-            
+
             const material = new BABYLON.StandardMaterial(`sphereMat_${Date.now()}`, scene);
-            material.diffuseColor = getColor(color);
+            material.diffuseColor = parseColor(color);
             sphere.material = material;
             
             addOutput(`🔵 Sphere spawned at (${x}, ${y}, ${z}) with color ${color}`, 'success');
@@ -381,7 +388,7 @@ print("✨ Your objects have been created!")`;
 
         // Set background color
         function set_background(color) {
-            scene.clearColor = getColor(color);
+            scene.clearColor = parseColor(color);
             addOutput(`🎨 Background color changed to ${color}`, 'success');
         }
 
@@ -406,6 +413,76 @@ print("✨ Your objects have been created!")`;
             }
         }
 
+        // Define a new custom shape blueprint
+        function define_shape(name, config) {
+            window.blueprintShapes[name] = {
+                vertices: config.vertices || [],
+                color: config.color || 'white'
+            };
+            addOutput(`🔧 Shape '${name}' defined`, 'success');
+        }
+
+        // Spawn a custom shape from blueprint
+        function spawn_custom(name, x, y, z) {
+            const blueprint = window.blueprintShapes[name];
+            if (!blueprint) {
+                console.error("Shape not defined:", name);
+                addOutput(`❌ Shape '${name}' not found`, 'error');
+                return;
+            }
+
+            const shapeVec = blueprint.vertices.map(v => new BABYLON.Vector3(v[0], v[1], 0));
+            const mesh = BABYLON.MeshBuilder.CreatePolygon(`${name}_${Date.now()}`, {
+                shape: shapeVec,
+                sideOrientation: BABYLON.Mesh.DOUBLESIDE
+            }, scene);
+
+            mesh.position = new BABYLON.Vector3(x, y, z);
+            const mat = new BABYLON.StandardMaterial(`${name}_mat_${Date.now()}`, scene);
+            mat.diffuseColor = parseColor(blueprint.color);
+            mesh.material = mat;
+
+            addOutput(`🔺 Custom '${name}' spawned at (${x}, ${y}, ${z})`, 'success');
+        }
+
+        // Define an NPC blueprint
+        function define_npc(name, config) {
+            window.blueprintNPCs[name] = {
+                mesh: config.mesh || null,
+                scale: config.scale || [1, 1, 1],
+                message: config.message || ''
+            };
+            addOutput(`🤖 NPC '${name}' defined`, 'success');
+        }
+
+        // Spawn NPC from blueprint
+        function spawn_npc(name, x, y, z) {
+            const npc = window.blueprintNPCs[name];
+            if (!npc) {
+                addOutput(`❌ NPC '${name}' not found`, 'error');
+                return;
+            }
+            const pos = new BABYLON.Vector3(x, y, z);
+            if (npc.mesh) {
+                BABYLON.SceneLoader.ImportMesh('', '', npc.mesh, scene, (meshes) => {
+                    const root = meshes[0];
+                    root.position = pos;
+                    root.scaling = new BABYLON.Vector3(...npc.scale);
+                    addOutput(`💬 NPC '${name}' says: ${npc.message}`, 'success');
+                });
+            } else {
+                const box = BABYLON.MeshBuilder.CreateBox(`${name}_${Date.now()}`, { size: 1 }, scene);
+                box.position = pos;
+                box.scaling = new BABYLON.Vector3(...npc.scale);
+                addOutput(`💬 NPC '${name}' says: ${npc.message}`, 'success');
+            }
+        }
+
+        // Export blueprints as JSON
+        function export_blueprints() {
+            return JSON.stringify({ shapes: window.blueprintShapes, npcs: window.blueprintNPCs });
+        }
+
         // Helper function to convert color names to Babylon.js colors
         function getColor(colorName) {
             const colors = {
@@ -424,8 +501,20 @@ print("✨ Your objects have been created!")`;
                 'gray': new BABYLON.Color3(0.5, 0.5, 0.5),
                 'brown': new BABYLON.Color3(0.6, 0.3, 0.1)
             };
-            
+
             return colors[colorName.toLowerCase()] || colors['red'];
+        }
+
+        // Parse color that could be a hex string or a name
+        function parseColor(value) {
+            if (typeof value === 'string' && value.trim().startsWith('#')) {
+                try {
+                    return BABYLON.Color3.FromHexString(value);
+                } catch (_) {
+                    return getColor('red');
+                }
+            }
+            return getColor(String(value || 'red'));
         }
 
         // Execute Python script
