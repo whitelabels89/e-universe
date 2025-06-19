@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { useFrame, useThree } from '@react-three/fiber';
 import { useWorldObjects } from '../lib/stores/useWorldObjects';
 import { useEnvironment } from '../lib/stores/useEnvironment';
@@ -21,6 +22,8 @@ export function PythonBridge({ onCodeExecute }: PythonBridgeProps) {
   const { setTheme, setWeather } = useEnvironment();
   const commandQueue = useRef<PythonCommand[]>([]);
   const spawnedObjects = useRef<Map<string, THREE.Object3D>>(new Map());
+  const blueprintShapes = useRef<Record<string, { vertices: number[][]; color: string }>>({});
+  const blueprintNPCs = useRef<Record<string, { mesh?: string; scale: number[]; message?: string }>>({});
 
   // Python bridge functions
   const pythonFunctions = {
@@ -138,6 +141,88 @@ export function PythonBridge({ onCodeExecute }: PythonBridgeProps) {
       }
     },
 
+    // Define a custom 2D shape blueprint
+    define_shape: (name: string, config: any) => {
+      blueprintShapes.current[name] = {
+        vertices: config.vertices || [],
+        color: config.color || 'white'
+      };
+      showNotification(`🔧 Shape '${name}' defined`, 'success');
+    },
+
+    // Spawn a custom shape from blueprint
+    spawn_custom: (name: string, x: number, y: number, z: number) => {
+      const bp = blueprintShapes.current[name];
+      if (!bp) {
+        showNotification(`❌ Shape '${name}' not defined`, 'error');
+        return;
+      }
+      const shape = new THREE.Shape();
+      bp.vertices.forEach(([vx, vy], idx) => {
+        if (idx === 0) shape.moveTo(vx, vy); else shape.lineTo(vx, vy);
+      });
+      const geometry = new THREE.ExtrudeGeometry(shape, { depth: 0.2, bevelEnabled: false });
+      const material = new THREE.MeshLambertMaterial({ color: parseColor(bp.color) });
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.position.set(x, y, z);
+      const id = `shape_${name}_${Date.now()}`;
+      mesh.name = id;
+      scene.add(mesh);
+      spawnedObjects.current.set(id, mesh);
+      showNotification(`🔺 Custom '${name}' spawned`, 'success');
+    },
+
+    // Define an NPC blueprint
+    define_npc: (name: string, config: any) => {
+      blueprintNPCs.current[name] = {
+        mesh: config.mesh,
+        scale: config.scale || [1, 1, 1],
+        message: config.message || ''
+      };
+      showNotification(`🤖 NPC '${name}' defined`, 'success');
+    },
+
+    // Spawn NPC from blueprint
+    spawn_npc: (name: string, x: number, y: number, z: number) => {
+      const npc = blueprintNPCs.current[name];
+      if (!npc) {
+        showNotification(`❌ NPC '${name}' not defined`, 'error');
+        return;
+      }
+      const id = `npc_${name}_${Date.now()}`;
+      const pos = new THREE.Vector3(x, y, z);
+      if (npc.mesh) {
+        const loader = new GLTFLoader();
+        loader.load(npc.mesh, (gltf: any) => {
+          const obj = gltf.scene;
+          obj.position.copy(pos);
+          obj.scale.set(npc.scale[0], npc.scale[1], npc.scale[2]);
+          obj.name = id;
+          scene.add(obj);
+          spawnedObjects.current.set(id, obj);
+          if (npc.message) showNotification(`💬 ${npc.message}`, 'info');
+        });
+      } else {
+        const geometry = new THREE.BoxGeometry(1, 1, 1);
+        const material = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
+        const box = new THREE.Mesh(geometry, material);
+        box.position.copy(pos);
+        box.scale.set(npc.scale[0], npc.scale[1], npc.scale[2]);
+        box.name = id;
+        scene.add(box);
+        spawnedObjects.current.set(id, box);
+        if (npc.message) showNotification(`💬 ${npc.message}`, 'info');
+      }
+    },
+
+    // Export all blueprints
+    export_blueprints: () => {
+      const data = JSON.stringify({ shapes: blueprintShapes.current, npcs: blueprintNPCs.current });
+      console.log(data);
+      showNotification('📤 Blueprints exported to console', 'info');
+      return data;
+    },
+
     // Animation (placeholder)
     add_avatar_animation: (animationType: string) => {
       showNotification(`💃 Avatar animation: ${animationType}`, 'info');
@@ -171,6 +256,13 @@ export function PythonBridge({ onCodeExecute }: PythonBridgeProps) {
     };
     
     return colors[colorName.toLowerCase()] || 0xff0000;
+  };
+
+  const parseColor = (value: string): number => {
+    if (value && value.trim().startsWith('#')) {
+      return new THREE.Color(value).getHex();
+    }
+    return getColorFromName(value);
   };
 
   // Execute Python code by parsing and calling functions
@@ -221,43 +313,58 @@ export function PythonBridge({ onCodeExecute }: PythonBridgeProps) {
   // Simple argument parser for Python-like syntax
   const parseArguments = (argsString: string): any[] => {
     if (!argsString.trim()) return [];
-    
-    const args: any[] = [];
-    const parts = argsString.split(',');
-    
-    for (const part of parts) {
-      const trimmed = part.trim();
-      
-      // Handle keyword arguments (x=1, color='red')
-      if (trimmed.includes('=')) {
-        const [, value] = trimmed.split('=');
-        args.push(parseValue(value.trim()));
-      } else {
-        args.push(parseValue(trimmed));
+
+    const args: string[] = [];
+    let current = '';
+    let depth = 0;
+    for (let i = 0; i < argsString.length; i++) {
+      const ch = argsString[i];
+      if (ch === ',' && depth === 0) {
+        args.push(current.trim());
+        current = '';
+        continue;
       }
+      if (['[', '{', '('].includes(ch)) depth++;
+      if ([']', '}', ')'].includes(ch)) depth--;
+      current += ch;
     }
-    
-    return args;
+    if (current.trim()) args.push(current.trim());
+
+    return args.map(arg => {
+      if (arg.includes('=')) {
+        const [, value] = arg.split('=');
+        return parseValue(value.trim());
+      }
+      return parseValue(arg);
+    });
   };
 
   // Parse individual values
   const parseValue = (value: string): any => {
-    // String
-    if ((value.startsWith('"') && value.endsWith('"')) || 
-        (value.startsWith("'") && value.endsWith("'"))) {
-      return value.slice(1, -1);
+    const trimmed = value.trim();
+
+    if ((trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+        (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
+      return trimmed.slice(1, -1);
     }
-    
-    // Number
-    if (!isNaN(Number(value))) {
-      return Number(value);
+
+    if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+      try {
+        const json = trimmed.replace(/'/g, '"');
+        return JSON.parse(json);
+      } catch {
+        return trimmed;
+      }
     }
-    
-    // Boolean
-    if (value === 'True') return true;
-    if (value === 'False') return false;
-    
-    return value;
+
+    if (!isNaN(Number(trimmed))) {
+      return Number(trimmed);
+    }
+
+    if (trimmed === 'True') return true;
+    if (trimmed === 'False') return false;
+
+    return trimmed;
   };
 
   // Set up the bridge
