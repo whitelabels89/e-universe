@@ -1,0 +1,25 @@
+🐍 Executing Python code: define_npc("dragon_mentor", {
+  "mesh": "dragon.glb",
+  "scale": [3,3,3],
+  "message": "Aku akan memberimu kekuatan... jika kamu bisa memanggil bentuk bintang!"
+})
+spawn_npc("dragon_mentor", getSpawnPositionInFront())
+
+PythonBridge.tsx:417 🔍 Found function calls: (2) ['define_npc("dragon_mentor", { "mesh": "dragon.glb"…n... jika kamu bisa memanggil bentuk bintang!" })', 'spawn_npc("dragon_mentor", getSpawnPositionInFront())']
+PythonBridge.tsx:425 🔍 Parsing function call: define_npc with args: "dragon_mentor", { "mesh": "dragon.glb", "scale": [3,3,3], "message": "Aku akan memberimu kekuatan... jika kamu bisa memanggil bentuk bintang!" }
+PythonBridge.tsx:430 🔍 Parsed arguments: (2) ['dragon_mentor', {…}]
+PythonBridge.tsx:431 🔍 Calling function: define_npc with: (2) ['dragon_mentor', {…}]
+PythonBridge.tsx:319 🤖 Python calling define_npc: dragon_mentor {mesh: 'dragon.glb', scale: Array(3), message: 'Aku akan memberimu kekuatan... jika kamu bisa memanggil bentuk bintang!'}
+CreativeEngine.ts:102 🤖 NPC "dragon_mentor" defined successfully! {name: 'dragon_mentor', mesh: 'default_character', scale: Array(3), message: 'Aku akan memberimu kekuatan... jika kamu bisa memanggil bentuk bintang!', color: '#00FF00', …}
+PythonBridge.tsx:434 🔍 Function result: true
+PythonBridge.tsx:425 🔍 Parsing function call: spawn_npc with args: "dragon_mentor", getSpawnPositionInFront()
+PythonBridge.tsx:430 🔍 Parsed arguments: (2) ['dragon_mentor', 'getSpawnPositionInFront()']0: "dragon_mentor"1: "getSpawnPositionInFront()"length: 2[[Prototype]]: Array(0)at: ƒ at()concat: ƒ concat()constructor: ƒ Array()copyWithin: ƒ copyWithin()entries: ƒ entries()every: ƒ every()fill: ƒ fill()filter: ƒ filter()find: ƒ find()findIndex: ƒ findIndex()findLast: ƒ findLast()findLastIndex: ƒ findLastIndex()flat: ƒ flat()flatMap: ƒ flatMap()forEach: ƒ forEach()includes: ƒ includes()indexOf: ƒ indexOf()join: ƒ join()keys: ƒ keys()lastIndexOf: ƒ lastIndexOf()length: 0map: ƒ map()pop: ƒ pop()push: ƒ push()reduce: ƒ reduce()reduceRight: ƒ reduceRight()reverse: ƒ reverse()shift: ƒ shift()slice: ƒ slice()some: ƒ some()sort: ƒ sort()splice: ƒ splice()toLocaleString: ƒ toLocaleString()toReversed: ƒ toReversed()toSorted: ƒ toSorted()toSpliced: ƒ toSpliced()toString: ƒ toString()unshift: ƒ unshift()values: ƒ values()with: ƒ with()Symbol(Symbol.iterator): ƒ values()Symbol(Symbol.unscopables): {at: true, copyWithin: true, entries: true, fill: true, find: true, …}[[Prototype]]: Object
+PythonBridge.tsx:431 🔍 Calling function: spawn_npc with: (2) ['dragon_mentor', 'getSpawnPositionInFront()']
+PythonBridge.tsx:338 🤖 Python calling spawn_npc: dragon_mentor (3) ['getSpawnPositionInFront()', 0, 0]
+CreativeEngine.ts:165 🤖 Spawned NPC "dragon_mentor" at (getSpawnPositionInFront(), 0, 0)
+PythonBridge.tsx:434 🔍 Function result: custom_npc_1
+244Terrain.tsx:14 🌍 Terrain size: 100 units
+Terrain.tsx:14 🌍 Terrain size: 100 units
+3228Terrain.tsx:14 🌍 Terrain size: 100 units
+Terrain.tsx:14 🌍 Terrain size: 100 units
+742Terrain.tsx:14 🌍 Terrain size: 100 units

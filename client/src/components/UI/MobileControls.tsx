@@ -1,189 +1,409 @@
-import React, { useState, useEffect } from 'react';
-import { useKeyboardControls } from '@react-three/drei';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useIsMobile } from '../../hooks/use-is-mobile';
+import { ArrowUp, ArrowDown, ArrowLeft, ArrowRight, Zap, Settings, Eye, EyeOff } from 'lucide-react';
 
-interface MobileControlsProps {
-  onMove?: (direction: string, active: boolean) => void;
-  onRun?: (active: boolean) => void;
-  onJump?: () => void;
+enum Controls {
+  forward = 'forward',
+  backward = 'backward',
+  leftward = 'leftward',
+  rightward = 'rightward',
+  jump = 'jump',
+  run = 'run'
 }
 
-export function MobileControls({ onMove, onRun, onJump }: MobileControlsProps) {
+export function MobileControls() {
   const isMobile = useIsMobile();
-  const [isVisible, setIsVisible] = useState(false);
-  const [activeControls, setActiveControls] = useState<Set<string>>(new Set());
-  const [, get] = useKeyboardControls();
+  const [activeButtons, setActiveButtons] = useState<Set<Controls>>(new Set());
+  const [controlsVisible, setControlsVisible] = useState(true);
+  const [controlsOpacity, setControlsOpacity] = useState(0.8);
+  const [joystickSize, setJoystickSize] = useState('normal');
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const intervalRefs = useRef<Map<Controls, NodeJS.Timeout>>(new Map());
+  const lastTouchTime = useRef(0);
 
-  // Auto-hide controls after inactivity
+  // Performance optimization: throttle touch events
+  const throttleTouch = useCallback((callback: () => void) => {
+    const now = Date.now();
+    if (now - lastTouchTime.current > 16) { // ~60fps
+      lastTouchTime.current = now;
+      callback();
+    }
+  }, []);
+
+  // Always call useEffect (maintain hook order)
   useEffect(() => {
-    if (!isVisible) return;
-    
-    const timeout = setTimeout(() => {
-      if (activeControls.size === 0) {
-        setIsVisible(false);
+    return () => {
+      intervalRefs.current.forEach(interval => clearInterval(interval));
+    };
+  }, []);
+
+  // Load mobile preferences from localStorage
+  useEffect(() => {
+    if (isMobile) {
+      const saved = localStorage.getItem('mobile-controls-settings');
+      if (saved) {
+        try {
+          const settings = JSON.parse(saved);
+          setControlsOpacity(settings.opacity || 0.8);
+          setJoystickSize(settings.size || 'normal');
+          setControlsVisible(settings.visible !== false);
+        } catch (e) {
+          console.warn('Failed to load mobile control settings');
+        }
       }
-    }, 3000);
+    }
+  }, [isMobile]);
 
-    return () => clearTimeout(timeout);
-  }, [isVisible, activeControls]);
+  // Save settings to localStorage
+  const saveSettings = useCallback(() => {
+    if (isMobile) {
+      localStorage.setItem('mobile-controls-settings', JSON.stringify({
+        opacity: controlsOpacity,
+        size: joystickSize,
+        visible: controlsVisible
+      }));
+    }
+  }, [isMobile, controlsOpacity, joystickSize, controlsVisible]);
 
-  // Show controls on first touch
-  const handleFirstTouch = () => {
-    if (!isVisible) {
-      setIsVisible(true);
+  useEffect(() => {
+    saveSettings();
+  }, [saveSettings]);
+
+  // Return early AFTER all hooks are called
+  if (!isMobile) {
+    return null;
+  }
+
+  const simulateKeyPress = useCallback((control: Controls, pressed: boolean) => {
+    throttleTouch(() => {
+      if (pressed) {
+        // Start continuous key press
+        setActiveButtons(prev => new Set(prev).add(control));
+        
+        // Clear any existing interval
+        const existingInterval = intervalRefs.current.get(control);
+        if (existingInterval) {
+          clearInterval(existingInterval);
+        }
+        
+        // Create new interval for continuous press
+        const interval = setInterval(() => {
+          // Trigger keyboard event
+          const event = new KeyboardEvent('keydown', {
+            key: getKeyForControl(control),
+            code: getCodeForControl(control),
+            bubbles: true
+          });
+          window.dispatchEvent(event);
+        }, 16); // ~60fps
+        
+        intervalRefs.current.set(control, interval);
+        
+        // Haptic feedback if available
+        if (navigator.vibrate) {
+          navigator.vibrate(10);
+        }
+      } else {
+        // Stop key press
+        setActiveButtons(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(control);
+          return newSet;
+        });
+        
+        const interval = intervalRefs.current.get(control);
+        if (interval) {
+          clearInterval(interval);
+          intervalRefs.current.delete(control);
+          
+          // Trigger key up event
+          const event = new KeyboardEvent('keyup', {
+            key: getKeyForControl(control),
+            code: getCodeForControl(control),
+            bubbles: true
+          });
+          window.dispatchEvent(event);
+        }
+      }
+    });
+  }, [throttleTouch]);
+
+  const getKeyForControl = (control: Controls): string => {
+    switch (control) {
+      case Controls.forward: return 'w';
+      case Controls.backward: return 's';
+      case Controls.leftward: return 'a';
+      case Controls.rightward: return 'd';
+      case Controls.jump: return ' ';
+      case Controls.run: return 'Shift';
+      default: return '';
     }
   };
 
-  const handleTouchStart = (direction: string) => {
-    setActiveControls(prev => new Set(prev).add(direction));
-    onMove?.(direction, true);
+  const getCodeForControl = (control: Controls): string => {
+    switch (control) {
+      case Controls.forward: return 'KeyW';
+      case Controls.backward: return 'KeyS';
+      case Controls.leftward: return 'KeyA';
+      case Controls.rightward: return 'KeyD';
+      case Controls.jump: return 'Space';
+      case Controls.run: return 'ShiftLeft';
+      default: return '';
+    }
   };
 
-  const handleTouchEnd = (direction: string) => {
-    setActiveControls(prev => {
-      const newSet = new Set(prev);
-      newSet.delete(direction);
-      return newSet;
-    });
-    onMove?.(direction, false);
+
+
+  const getButtonSize = () => {
+    switch (joystickSize) {
+      case 'small': return 'w-12 h-12 p-2';
+      case 'large': return 'w-20 h-20 p-5';
+      default: return 'w-16 h-16 p-4';
+    }
   };
 
-  const handleRunToggle = (active: boolean) => {
-    onRun?.(active);
+  const getIconSize = () => {
+    switch (joystickSize) {
+      case 'small': return 'w-4 h-4';
+      case 'large': return 'w-8 h-8';
+      default: return 'w-6 h-6';
+    }
   };
 
-  const handleJump = () => {
-    onJump?.();
+  const ControlButton = ({ 
+    control, 
+    icon, 
+    className = "" 
+  }: { 
+    control: Controls; 
+    icon: React.ReactNode; 
+    className?: string;
+  }) => {
+    const isActive = activeButtons.has(control);
+
+    return (
+      <motion.button
+        className={`
+          bg-white backdrop-blur-sm border border-white border-opacity-30
+          text-white rounded-lg shadow-lg select-none transition-all duration-150
+          ${isActive ? 'scale-95 shadow-inner' : 'hover:bg-opacity-30 active:scale-90'}
+          ${getButtonSize()} ${className}
+        `}
+        style={{ 
+          backgroundColor: `rgba(255, 255, 255, ${isActive ? controlsOpacity * 0.6 : controlsOpacity * 0.2})`,
+          borderColor: `rgba(255, 255, 255, ${controlsOpacity * 0.5})`
+        }}
+        onTouchStart={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          simulateKeyPress(control, true);
+        }}
+        onTouchEnd={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          simulateKeyPress(control, false);
+        }}
+        onTouchCancel={(e) => {
+          e.preventDefault();
+          simulateKeyPress(control, false);
+        }}
+        onMouseDown={(e) => {
+          e.preventDefault();
+          simulateKeyPress(control, true);
+        }}
+        onMouseUp={(e) => {
+          e.preventDefault();
+          simulateKeyPress(control, false);
+        }}
+        onMouseLeave={(e) => {
+          e.preventDefault();
+          simulateKeyPress(control, false);
+        }}
+        whileTap={{ scale: 0.85 }}
+        initial={{ opacity: 0, scale: 0 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0 }}
+      >
+        <div className={getIconSize()}>
+          {icon}
+        </div>
+      </motion.button>
+    );
   };
 
-  if (!isMobile) return null;
+  const getSpacing = () => {
+    switch (joystickSize) {
+      case 'small': return { distance: '-12', gap: 'gap-2' };
+      case 'large': return { distance: '-20', gap: 'gap-4' };
+      default: return { distance: '-16', gap: 'gap-3' };
+    }
+  };
+
+  const spacing = getSpacing();
 
   return (
-    <>
-      {/* Touch detector to show controls */}
-      {!isVisible && (
-        <div 
-          className="fixed inset-0 z-40 pointer-events-auto"
-          onTouchStart={handleFirstTouch}
-          style={{ background: 'transparent' }}
-        />
-      )}
-
-      {/* Mobile Controls */}
-      {isVisible && (
-        <div className="fixed inset-0 z-50 pointer-events-none">
-          {/* Left side - Movement controls */}
-          <div className="absolute bottom-20 left-6 pointer-events-auto">
-            <div className="relative w-32 h-32">
+    <AnimatePresence>
+      {controlsVisible && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 pointer-events-none z-30"
+          style={{ 
+            touchAction: 'none',
+            userSelect: 'none',
+            WebkitUserSelect: 'none'
+          }}
+        >
+          {/* Movement Controls - Left Side */}
+          <div className="absolute left-4 bottom-4 pointer-events-auto">
+            <div className="relative">
               {/* Forward */}
-              <button
-                className={`absolute top-0 left-1/2 transform -translate-x-1/2 w-12 h-12 rounded-full 
-                  ${activeControls.has('forward') ? 'bg-blue-500' : 'bg-gray-700/80'} 
-                  text-white font-bold text-lg shadow-lg backdrop-blur-sm
-                  active:scale-95 transition-all duration-150`}
-                onTouchStart={() => handleTouchStart('forward')}
-                onTouchEnd={() => handleTouchEnd('forward')}
-                onTouchCancel={() => handleTouchEnd('forward')}
-              >
-                ↑
-              </button>
-
+              <ControlButton
+                control={Controls.forward}
+                icon={<ArrowUp className={getIconSize()} />}
+                className={`absolute -top-${spacing.distance.replace('-', '')} left-1/2 transform -translate-x-1/2`}
+              />
+              
               {/* Left */}
-              <button
-                className={`absolute top-1/2 left-0 transform -translate-y-1/2 w-12 h-12 rounded-full 
-                  ${activeControls.has('left') ? 'bg-blue-500' : 'bg-gray-700/80'} 
-                  text-white font-bold text-lg shadow-lg backdrop-blur-sm
-                  active:scale-95 transition-all duration-150`}
-                onTouchStart={() => handleTouchStart('left')}
-                onTouchEnd={() => handleTouchEnd('left')}
-                onTouchCancel={() => handleTouchEnd('left')}
-              >
-                ←
-              </button>
-
+              <ControlButton
+                control={Controls.leftward}
+                icon={<ArrowLeft className={getIconSize()} />}
+                className={`absolute -left-${spacing.distance.replace('-', '')} top-1/2 transform -translate-y-1/2`}
+              />
+              
+              {/* Center (base position) */}
+              <div 
+                className={`${getButtonSize()} bg-white rounded-lg`}
+                style={{ backgroundColor: `rgba(255, 255, 255, ${controlsOpacity * 0.1})` }}
+              ></div>
+              
               {/* Right */}
-              <button
-                className={`absolute top-1/2 right-0 transform -translate-y-1/2 w-12 h-12 rounded-full 
-                  ${activeControls.has('right') ? 'bg-blue-500' : 'bg-gray-700/80'} 
-                  text-white font-bold text-lg shadow-lg backdrop-blur-sm
-                  active:scale-95 transition-all duration-150`}
-                onTouchStart={() => handleTouchStart('right')}
-                onTouchEnd={() => handleTouchEnd('right')}
-                onTouchCancel={() => handleTouchEnd('right')}
-              >
-                →
-              </button>
-
+              <ControlButton
+                control={Controls.rightward}
+                icon={<ArrowRight className={getIconSize()} />}
+                className={`absolute -right-${spacing.distance.replace('-', '')} top-1/2 transform -translate-y-1/2`}
+              />
+              
               {/* Backward */}
-              <button
-                className={`absolute bottom-0 left-1/2 transform -translate-x-1/2 w-12 h-12 rounded-full 
-                  ${activeControls.has('backward') ? 'bg-blue-500' : 'bg-gray-700/80'} 
-                  text-white font-bold text-lg shadow-lg backdrop-blur-sm
-                  active:scale-95 transition-all duration-150`}
-                onTouchStart={() => handleTouchStart('backward')}
-                onTouchEnd={() => handleTouchEnd('backward')}
-                onTouchCancel={() => handleTouchEnd('backward')}
-              >
-                ↓
-              </button>
+              <ControlButton
+                control={Controls.backward}
+                icon={<ArrowDown className={getIconSize()} />}
+                className={`absolute -bottom-${spacing.distance.replace('-', '')} left-1/2 transform -translate-x-1/2`}
+              />
             </div>
           </div>
 
-          {/* Right side - Action controls */}
-          <div className="absolute bottom-20 right-6 pointer-events-auto">
-            <div className="flex flex-col gap-4">
-              {/* Jump Button */}
-              <button
-                className="w-16 h-16 rounded-full bg-green-600/80 text-white font-bold text-sm shadow-lg backdrop-blur-sm
-                  active:scale-95 transition-all duration-150 flex items-center justify-center"
-                onTouchStart={handleJump}
-              >
-                JUMP
-              </button>
-
-              {/* Run Toggle */}
-              <button
-                className={`w-16 h-16 rounded-full text-white font-bold text-sm shadow-lg backdrop-blur-sm
-                  active:scale-95 transition-all duration-150 flex items-center justify-center
-                  ${activeControls.has('run') ? 'bg-orange-500' : 'bg-orange-600/80'}`}
-                onTouchStart={() => {
-                  const isRunning = activeControls.has('run');
-                  if (isRunning) {
-                    setActiveControls(prev => {
-                      const newSet = new Set(prev);
-                      newSet.delete('run');
-                      return newSet;
-                    });
-                    handleRunToggle(false);
-                  } else {
-                    setActiveControls(prev => new Set(prev).add('run'));
-                    handleRunToggle(true);
-                  }
-                }}
-              >
-                RUN
-              </button>
-            </div>
+          {/* Action Controls - Right Side */}
+          <div className={`absolute right-4 bottom-4 pointer-events-auto flex flex-col ${spacing.gap}`}>
+            {/* Jump Button */}
+            <ControlButton
+              control={Controls.jump}
+              icon={<Zap className={getIconSize()} />}
+              className="rounded-full"
+            />
+            
+            {/* Run Button */}
+            <ControlButton
+              control={Controls.run}
+              icon={<span className={`${joystickSize === 'small' ? 'text-xs' : joystickSize === 'large' ? 'text-base' : 'text-sm'} font-bold`}>RUN</span>}
+              className="h-12"
+            />
           </div>
 
-          {/* Hide controls button */}
-          <button
-            className="absolute top-6 right-6 w-10 h-10 rounded-full bg-gray-700/80 text-white 
-              backdrop-blur-sm shadow-lg pointer-events-auto active:scale-95 transition-all duration-150
-              flex items-center justify-center"
-            onTouchStart={() => setIsVisible(false)}
-          >
-            ✕
-          </button>
-
-          {/* Control info */}
-          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 pointer-events-auto">
-            <div className="bg-gray-900/80 text-white text-xs px-3 py-1 rounded-full backdrop-blur-sm">
-              Tap to hide controls
-            </div>
+          {/* Settings Button */}
+          <div className="absolute top-4 right-4 pointer-events-auto">
+            <motion.button
+              className="bg-black bg-opacity-50 text-white p-2 rounded-lg"
+              style={{ opacity: controlsOpacity }}
+              onClick={() => setSettingsOpen(!settingsOpen)}
+              whileTap={{ scale: 0.9 }}
+            >
+              <Settings className="w-5 h-5" />
+            </motion.button>
           </div>
-        </div>
+
+          {/* Visibility Toggle */}
+          <div className="absolute top-4 right-16 pointer-events-auto">
+            <motion.button
+              className="bg-black bg-opacity-50 text-white p-2 rounded-lg"
+              style={{ opacity: controlsOpacity }}
+              onClick={() => setControlsVisible(false)}
+              whileTap={{ scale: 0.9 }}
+            >
+              <EyeOff className="w-5 h-5" />
+            </motion.button>
+          </div>
+
+          {/* Settings Panel */}
+          <AnimatePresence>
+            {settingsOpen && (
+              <motion.div
+                initial={{ opacity: 0, x: 300 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 300 }}
+                className="absolute top-16 right-4 bg-black bg-opacity-80 text-white p-4 rounded-lg pointer-events-auto min-w-48"
+              >
+                <h3 className="text-lg font-bold mb-3">Mobile Controls</h3>
+                
+                {/* Opacity Slider */}
+                <div className="mb-3">
+                  <label className="block text-sm mb-1">Opacity</label>
+                  <input
+                    type="range"
+                    min="0.3"
+                    max="1"
+                    step="0.1"
+                    value={controlsOpacity}
+                    onChange={(e) => setControlsOpacity(parseFloat(e.target.value))}
+                    className="w-full"
+                  />
+                </div>
+
+                {/* Size Selector */}
+                <div className="mb-3">
+                  <label className="block text-sm mb-1">Size</label>
+                  <select
+                    value={joystickSize}
+                    onChange={(e) => setJoystickSize(e.target.value)}
+                    className="w-full bg-gray-700 text-white p-1 rounded"
+                  >
+                    <option value="small">Small</option>
+                    <option value="normal">Normal</option>
+                    <option value="large">Large</option>
+                  </select>
+                </div>
+
+                <button
+                  onClick={() => setSettingsOpen(false)}
+                  className="w-full bg-blue-600 text-white p-2 rounded mt-2 hover:bg-blue-700"
+                >
+                  Done
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
       )}
-    </>
+      
+      {/* Show Controls Button (when hidden) */}
+      {!controlsVisible && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed bottom-4 left-1/2 transform -translate-x-1/2 pointer-events-auto z-30"
+        >
+          <motion.button
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg shadow-lg"
+            onClick={() => setControlsVisible(true)}
+            whileTap={{ scale: 0.9 }}
+          >
+            <Eye className="w-5 h-5 inline mr-2" />
+            Show Controls
+          </motion.button>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }

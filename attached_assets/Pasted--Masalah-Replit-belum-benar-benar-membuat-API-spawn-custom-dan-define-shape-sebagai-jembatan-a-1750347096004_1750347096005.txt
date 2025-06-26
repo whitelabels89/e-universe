@@ -1,0 +1,80 @@
+❌ Masalah:
+Replit belum benar-benar membuat API spawn_custom() dan define_shape() sebagai jembatan antara Pyodide ↔ Babylon.js.
+
+Mereka cuma bikin dummy Python function yang gak punya “nyawa” di game engine-nya. Alias: script Python lo bener, tapi gak terhubung ke "pabrik" dunia 3D-nya.
+
+✅ Solusi: Ulang Prompt-nya dengan lebih spesifik, dan wajib minta implementasi bridge API Python ↔ JS, bukan cuma nambahin fungsi dummy.
+🔁 PROMPT REVISI UNTUK REPLIT / CODEX
+plaintext
+Salin
+Edit
+Perbaiki sistem Creative Game Engine agar benar-benar menjalankan perintah Python `spawn_custom()` dan `define_shape()` untuk menciptakan objek 3D secara nyata di dalam Babylon.js scene.
+
+Masalah saat ini:
+Fungsi `spawn_custom()` hanya dummy di Python, dan tidak terkoneksi ke dunia 3D Babylon.js.
+Padahal, yang diinginkan adalah fungsi Python bisa membuat objek 3D secara live lewat jembatan ke JS.
+
+Solusi:
+
+1. Di JavaScript, buat fungsi asli:
+```js
+function spawn_custom(name, x, y, z) {
+  const shape = window.blueprintShapes[name];
+  if (!shape) {
+    console.error("Shape not defined:", name);
+    return;
+  }
+
+  const polygon = BABYLON.MeshBuilder.CreatePolygon(name, {
+    shape: shape.vertices.map(([x, y]) => new BABYLON.Vector3(x, y, 0)),
+    sideOrientation: BABYLON.Mesh.DOUBLESIDE
+  }, scene);
+  
+  polygon.position = new BABYLON.Vector3(x, y, z);
+  const mat = new BABYLON.StandardMaterial(name + "_mat", scene);
+  mat.diffuseColor = BABYLON.Color3.FromHexString(shape.color || "#FF0000");
+  polygon.material = mat;
+}
+Lalu expose ke Pyodide:
+
+js
+Salin
+Edit
+pyodide.globals.set("spawn_custom", spawn_custom);
+Sama untuk define_shape():
+
+js
+Salin
+Edit
+function define_shape(name, config) {
+  window.blueprintShapes = window.blueprintShapes || {};
+  window.blueprintShapes[name] = config;
+}
+pyodide.globals.set("define_shape", define_shape);
+Pastikan semua fungsi Python yang digunakan player adalah jembatan ke fungsi JS yang menjalankan aksi nyata di Babylon.js.
+
+Uji fungsi berikut agar bisa jalan:
+
+python
+Salin
+Edit
+define_shape("trapezoid", {
+  "vertices": [[0,0], [3,0], [2.5,1.5], [0.5,1.5]],
+  "color": "#FFA500"
+})
+spawn_custom("trapezoid", x=0, y=0, z=0)
+Hanya gunakan Pyodide + Babylon.js. Tidak perlu backend.
+Pastikan log muncul di console browser jika blueprint atau spawn gagal.
+Jangan buat dummy function lagi di Python, semua harus aktif dan validasi ke JS engine.
+
+yaml
+Salin
+Edit
+
+---
+
+## 🧪 Uji Validasi
+Kalau berhasil, kode ini harus:
+- ✅ Membuat bentuk trapesium di world
+- ✅ Berwarna sesuai config
+- ✅ Tampil log kalau gagal spawn atau shape belum didefinisikan

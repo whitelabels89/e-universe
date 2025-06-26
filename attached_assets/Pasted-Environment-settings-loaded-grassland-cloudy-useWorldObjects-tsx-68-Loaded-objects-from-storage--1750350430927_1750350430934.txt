@@ -1,0 +1,57 @@
+Environment settings loaded: grassland cloudy
+useWorldObjects.tsx:68 Loaded objects from storage: []
+App.tsx:150 Educational World App initialized
+12Terrain.tsx:14 🌍 Terrain size: 100 units
+Terrain.tsx:14 🌍 Terrain size: 100 units
+94Terrain.tsx:14 🌍 Terrain size: 100 units
+Terrain.tsx:24 Terrain - Current theme: grassland Green Meadows
+Terrain.tsx:49 Terrain - Using color: #228B22 for theme: Green Meadows
+AnimatedAvatar.tsx:292 Tank-style controls active: {forward: 'W/↑ - Move forward', backward: 'S/↓ - Move backward', left: 'A/← - Turn left', right: 'D/→ - Turn right'}
+499Terrain.tsx:14 🌍 Terrain size: 100 units
+Terrain.tsx:14 🌍 Terrain size: 100 units
+275Terrain.tsx:14 🌍 Terrain size: 100 units
+PythonBridge.tsx:234 🐍 Executing Python code: define_npc("dragon_mentor", {
+  "mesh": "dragon.glb",
+  "scale": [3,3,3],
+  "message": "Aku akan memberimu kekuatan... jika kamu bisa memanggil bentuk bintang!"
+})
+spawn_npc("dragon_mentor")
+PythonBridge.tsx:239 🚀 Creative Engine initialized during execution
+PythonBridge.tsx:416 🔍 Found function calls: (2) ['define_npc("dragon_mentor", { "mesh": "dragon.glb"…n... jika kamu bisa memanggil bentuk bintang!" })', 'spawn_npc("dragon_mentor")']
+PythonBridge.tsx:424 🔍 Parsing function call: define_npc with args: "dragon_mentor", { "mesh": "dragon.glb", "scale": [3,3,3], "message": "Aku akan memberimu kekuatan... jika kamu bisa memanggil bentuk bintang!" }
+PythonBridge.tsx:429 🔍 Parsed arguments: (2) ['dragon_mentor', {…}]
+PythonBridge.tsx:430 🔍 Calling function: define_npc with: (2) ['dragon_mentor', {…}]
+PythonBridge.tsx:318 🤖 Python calling define_npc: dragon_mentor {mesh: 'dragon.glb', scale: Array(3), message: 'Aku akan memberimu kekuatan... jika kamu bisa memanggil bentuk bintang!'}
+CreativeEngine.ts:102 🤖 NPC "dragon_mentor" defined successfully! {name: 'dragon_mentor', mesh: 'default_character', scale: Array(3), message: 'Aku akan memberimu kekuatan... jika kamu bisa memanggil bentuk bintang!', color: '#00FF00', …}
+PythonBridge.tsx:433 🔍 Function result: true
+PythonBridge.tsx:424 🔍 Parsing function call: spawn_npc with args: "dragon_mentor"
+PythonBridge.tsx:429 🔍 Parsed arguments: ['dragon_mentor']
+PythonBridge.tsx:430 🔍 Calling function: spawn_npc with: ['dragon_mentor']
+PythonBridge.tsx:337 🤖 Python calling spawn_npc: dragon_mentor (3) [0, 0, 0]
+CreativeEngine.ts:165 🤖 Spawned NPC "dragon_mentor" at (0, 0, 0)
+PythonBridge.tsx:433 🔍 Function result: custom_npc_0
+308Terrain.tsx:14 🌍 Terrain size: 100 units
+Terrain.tsx:14 🌍 Terrain size: 100 units
+90Terrain.tsx:14 🌍 Terrain size: 100 units
+Terrain.tsx:14 🌍 Terrain size: 100 units
+112Terrain.tsx:14 🌍 Terrain size: 100 units
+PythonBridge.tsx:234 🐍 Executing Python code: define_npc("dragon_mentor", {
+  "mesh": "dragon.glb",
+  "scale": [3,3,3],
+  "message": "Aku akan memberimu kekuatan... jika kamu bisa memanggil bentuk bintang!"
+})
+spawn_npc("dragon_mentor")
+PythonBridge.tsx:416 🔍 Found function calls: (2) ['define_npc("dragon_mentor", { "mesh": "dragon.glb"…n... jika kamu bisa memanggil bentuk bintang!" })', 'spawn_npc("dragon_mentor")']
+PythonBridge.tsx:424 🔍 Parsing function call: define_npc with args: "dragon_mentor", { "mesh": "dragon.glb", "scale": [3,3,3], "message": "Aku akan memberimu kekuatan... jika kamu bisa memanggil bentuk bintang!" }
+PythonBridge.tsx:429 🔍 Parsed arguments: (2) ['dragon_mentor', {…}]
+PythonBridge.tsx:430 🔍 Calling function: define_npc with: (2) ['dragon_mentor', {…}]
+PythonBridge.tsx:318 🤖 Python calling define_npc: dragon_mentor {mesh: 'dragon.glb', scale: Array(3), message: 'Aku akan memberimu kekuatan... jika kamu bisa memanggil bentuk bintang!'}
+CreativeEngine.ts:102 🤖 NPC "dragon_mentor" defined successfully! {name: 'dragon_mentor', mesh: 'default_character', scale: Array(3), message: 'Aku akan memberimu kekuatan... jika kamu bisa memanggil bentuk bintang!', color: '#00FF00', …}
+PythonBridge.tsx:433 🔍 Function result: true
+PythonBridge.tsx:424 🔍 Parsing function call: spawn_npc with args: "dragon_mentor"
+PythonBridge.tsx:429 🔍 Parsed arguments: ['dragon_mentor']
+PythonBridge.tsx:430 🔍 Calling function: spawn_npc with: ['dragon_mentor']
+PythonBridge.tsx:337 🤖 Python calling spawn_npc: dragon_mentor (3) [0, 0, 0]
+CreativeEngine.ts:165 🤖 Spawned NPC "dragon_mentor" at (0, 0, 0)
+PythonBridge.tsx:433 🔍 Function result: custom_npc_1
+2702Terrain.tsx:14 🌍 Terrain size: 100 units

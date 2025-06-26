@@ -301,9 +301,12 @@ export function AnimatedAvatar({ onMove }: AnimatedAvatarProps) {
     <group 
       ref={groupRef} 
       position={[0, 1, 0]}
+      name="animated-avatar"
       userData={{ 
         needsGroundSnap: true, 
         isCharacter: true, 
+        isAvatar: true,
+        type: 'avatar',
         heightOffset: 0.5,
         isCollidable: true,
         collisionRadius: 0.5,

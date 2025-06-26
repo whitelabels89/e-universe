@@ -1,0 +1,285 @@
+Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+useEnvironment.tsx:354 Environment settings loaded: grassland cloudy
+useWorldObjects.tsx:68 Loaded objects from storage: Array(0)
+App.tsx:150 Educational World App initialized
+38Terrain.tsx:14 🌍 Terrain size: 100 units
+Terrain.tsx:24 Terrain - Current theme: grassland Green Meadows
+Terrain.tsx:49 Terrain - Using color: #228B22 for theme: Green Meadows
+AnimatedAvatar.tsx:292 Tank-style controls active: Object
+933Terrain.tsx:14 🌍 Terrain size: 100 units
+305Terrain.tsx:14 🌍 Terrain size: 100 units
+Terrain.tsx:14 🌍 Terrain size: 100 units
+85Terrain.tsx:14 🌍 Terrain size: 100 units
+PythonBridge.tsx:181 🐍 Executing Python code: # 🎮 Creative Game Engine - Build Your World!
+# Create custom shapes, NPCs, and entire worlds with Python!
+
+print("🚀 Welcome to Creative Game Engine!")
+print("Let's create amazing custom objects!")
+
+# 📦 Create custom shapes
+define_shape("trapezoid", {
+  "vertices": [[0,0], [2,0], [1.5,1], [0.5,1]],
+  "color": "orange",
+  "height": 1.5
+})
+
+define_shape("star", {
+  "vertices": [[0,1], [0.2,0.2], [1,0], [0.3,-0.2], [0.5,-1], [0,-0.3], [-0.5,-1], [-0.3,-0.2], [-1,0], [-0.2,0.2]],
+  "color": "gold",
+  "height": 0.5
+})
+
+define_shape("rocket", {
+  "vertices": [[0,0], [0.5,0], [0.4,2], [0.2,2.5], [0,3], [-0.2,2.5], [-0.4,2], [-0.5,0]],
+  "color": "silver",
+  "height": 0.8
+})
+
+# 🤖 Create custom NPCs
+define_npc("dino_guard", {
+  "scale": [2, 2, 2],
+  "message": "Aku penjaga dari masa lalu! Rawr!",
+  "color": "darkgreen"
+})
+
+define_npc("robot_helper", {
+  "scale": [1.5, 1.5, 1.5],
+  "message": "Beep boop! Aku robot penolong!",
+  "color": "cyan"
+})
+
+define_npc("fairy_guide", {
+  "scale": [0.8, 0.8, 0.8],
+  "message": "✨ Aku peri yang akan membimbing perjalananmu!",
+  "color": "pink"
+})
+
+# 🎯 Spawn your creations
+spawn_custom("trapezoid", x=0, y=1, z=0)
+spawn_custom("star", x=3, y=1, z=0)
+spawn_custom("rocket", x=-3, y=1, z=0)
+
+spawn_npc("dino_guard", x=5, y=0, z=0)
+spawn_npc("robot_helper", x=-5, y=0, z=0)
+spawn_npc("fairy_guide", x=0, y=0, z=5)
+
+# 📋 List your blueprints
+list_blueprints()
+
+# 🌍 Environment & traditional objects
+set_theme("grassland")
+spawn_box(x=2, y=2, z=2, color="red")
+spawn_sphere(x=-2, y=2, z=2, color="blue")
+
+print("🎨 Your creative world is ready!")
+print("Try creating more shapes and NPCs!")
+
+# 💡 Ideas to try:
+# - Create a house shape with windows
+# - Make a wizard NPC with special powers
+# - Design a spaceship or castle
+# - Build an entire village with custom NPCs!
+PythonBridge.tsx:186 🚀 Creative Engine initialized during execution
+PythonBridge.tsx:150 🐍 Python: 🚀 Welcome to Creative Game Engine!
+PythonBridge.tsx:150 🐍 Python: Let's create amazing custom objects!
+PythonBridge.tsx:314 🔍 Parsing function call: spawn_custom with args: "trapezoid", x=0, y=1, z=0
+PythonBridge.tsx:319 🔍 Parsed arguments: (4) ['trapezoid', 0, 1, 0]
+PythonBridge.tsx:320 🔍 Calling function: spawn_custom with: (4) ['trapezoid', 0, 1, 0]
+PythonBridge.tsx:228 🎯 Python calling spawn_custom with shapeName: trapezoid
+PythonBridge.tsx:229 🎯 Position: (3) [0, 1, 0]
+PythonBridge.tsx:230 🎯 Available shapes: []
+CreativeEngine.ts:114 ❌ Shape "trapezoid" not found. Use define_shape() first.
+console.error @ chunk-T6SUJGNB.js?v=c8b8a71d:18167
+spawnCustomShape @ CreativeEngine.ts:114
+spawn_custom @ PythonBridge.tsx:238
+executePythonCode @ PythonBridge.tsx:322
+handlePythonExecute @ App.tsx:194
+handleRunScript @ PythonEditor.tsx:100
+callCallback2 @ chunk-PJEEZAML.js?v=c8b8a71d:3674
+invokeGuardedCallbackDev @ chunk-PJEEZAML.js?v=c8b8a71d:3699
+invokeGuardedCallback @ chunk-PJEEZAML.js?v=c8b8a71d:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-PJEEZAML.js?v=c8b8a71d:3736
+executeDispatch @ chunk-PJEEZAML.js?v=c8b8a71d:7014
+processDispatchQueueItemsInOrder @ chunk-PJEEZAML.js?v=c8b8a71d:7034
+processDispatchQueue @ chunk-PJEEZAML.js?v=c8b8a71d:7043
+dispatchEventsForPlugins @ chunk-PJEEZAML.js?v=c8b8a71d:7051
+(anonymous) @ chunk-PJEEZAML.js?v=c8b8a71d:7174
+batchedUpdates$1 @ chunk-PJEEZAML.js?v=c8b8a71d:18913
+batchedUpdates @ chunk-PJEEZAML.js?v=c8b8a71d:3579
+dispatchEventForPluginEventSystem @ chunk-PJEEZAML.js?v=c8b8a71d:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-PJEEZAML.js?v=c8b8a71d:5478
+dispatchEvent @ chunk-PJEEZAML.js?v=c8b8a71d:5472
+dispatchDiscreteEvent @ chunk-PJEEZAML.js?v=c8b8a71d:5449Understand this error
+PythonBridge.tsx:239 🎯 spawnCustomShape result: null
+PythonBridge.tsx:323 🔍 Function result: null
+PythonBridge.tsx:314 🔍 Parsing function call: spawn_custom with args: "star", x=3, y=1, z=0
+PythonBridge.tsx:319 🔍 Parsed arguments: (4) ['star', 3, 1, 0]
+PythonBridge.tsx:320 🔍 Calling function: spawn_custom with: (4) ['star', 3, 1, 0]
+PythonBridge.tsx:228 🎯 Python calling spawn_custom with shapeName: star
+PythonBridge.tsx:229 🎯 Position: (3) [3, 1, 0]
+PythonBridge.tsx:230 🎯 Available shapes: []
+CreativeEngine.ts:114 ❌ Shape "star" not found. Use define_shape() first.
+console.error @ chunk-T6SUJGNB.js?v=c8b8a71d:18167
+spawnCustomShape @ CreativeEngine.ts:114
+spawn_custom @ PythonBridge.tsx:238
+executePythonCode @ PythonBridge.tsx:322
+handlePythonExecute @ App.tsx:194
+handleRunScript @ PythonEditor.tsx:100
+callCallback2 @ chunk-PJEEZAML.js?v=c8b8a71d:3674
+invokeGuardedCallbackDev @ chunk-PJEEZAML.js?v=c8b8a71d:3699
+invokeGuardedCallback @ chunk-PJEEZAML.js?v=c8b8a71d:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-PJEEZAML.js?v=c8b8a71d:3736
+executeDispatch @ chunk-PJEEZAML.js?v=c8b8a71d:7014
+processDispatchQueueItemsInOrder @ chunk-PJEEZAML.js?v=c8b8a71d:7034
+processDispatchQueue @ chunk-PJEEZAML.js?v=c8b8a71d:7043
+dispatchEventsForPlugins @ chunk-PJEEZAML.js?v=c8b8a71d:7051
+(anonymous) @ chunk-PJEEZAML.js?v=c8b8a71d:7174
+batchedUpdates$1 @ chunk-PJEEZAML.js?v=c8b8a71d:18913
+batchedUpdates @ chunk-PJEEZAML.js?v=c8b8a71d:3579
+dispatchEventForPluginEventSystem @ chunk-PJEEZAML.js?v=c8b8a71d:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-PJEEZAML.js?v=c8b8a71d:5478
+dispatchEvent @ chunk-PJEEZAML.js?v=c8b8a71d:5472
+dispatchDiscreteEvent @ chunk-PJEEZAML.js?v=c8b8a71d:5449Understand this error
+PythonBridge.tsx:239 🎯 spawnCustomShape result: null
+PythonBridge.tsx:323 🔍 Function result: null
+PythonBridge.tsx:314 🔍 Parsing function call: spawn_custom with args: "rocket", x=-3, y=1, z=0
+PythonBridge.tsx:319 🔍 Parsed arguments: (4) ['rocket', -3, 1, 0]
+PythonBridge.tsx:320 🔍 Calling function: spawn_custom with: (4) ['rocket', -3, 1, 0]
+PythonBridge.tsx:228 🎯 Python calling spawn_custom with shapeName: rocket
+PythonBridge.tsx:229 🎯 Position: (3) [-3, 1, 0]
+PythonBridge.tsx:230 🎯 Available shapes: []
+CreativeEngine.ts:114 ❌ Shape "rocket" not found. Use define_shape() first.
+console.error @ chunk-T6SUJGNB.js?v=c8b8a71d:18167
+spawnCustomShape @ CreativeEngine.ts:114
+spawn_custom @ PythonBridge.tsx:238
+executePythonCode @ PythonBridge.tsx:322
+handlePythonExecute @ App.tsx:194
+handleRunScript @ PythonEditor.tsx:100
+callCallback2 @ chunk-PJEEZAML.js?v=c8b8a71d:3674
+invokeGuardedCallbackDev @ chunk-PJEEZAML.js?v=c8b8a71d:3699
+invokeGuardedCallback @ chunk-PJEEZAML.js?v=c8b8a71d:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-PJEEZAML.js?v=c8b8a71d:3736
+executeDispatch @ chunk-PJEEZAML.js?v=c8b8a71d:7014
+processDispatchQueueItemsInOrder @ chunk-PJEEZAML.js?v=c8b8a71d:7034
+processDispatchQueue @ chunk-PJEEZAML.js?v=c8b8a71d:7043
+dispatchEventsForPlugins @ chunk-PJEEZAML.js?v=c8b8a71d:7051
+(anonymous) @ chunk-PJEEZAML.js?v=c8b8a71d:7174
+batchedUpdates$1 @ chunk-PJEEZAML.js?v=c8b8a71d:18913
+batchedUpdates @ chunk-PJEEZAML.js?v=c8b8a71d:3579
+dispatchEventForPluginEventSystem @ chunk-PJEEZAML.js?v=c8b8a71d:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-PJEEZAML.js?v=c8b8a71d:5478
+dispatchEvent @ chunk-PJEEZAML.js?v=c8b8a71d:5472
+dispatchDiscreteEvent @ chunk-PJEEZAML.js?v=c8b8a71d:5449Understand this error
+PythonBridge.tsx:239 🎯 spawnCustomShape result: null
+PythonBridge.tsx:323 🔍 Function result: null
+PythonBridge.tsx:314 🔍 Parsing function call: spawn_npc with args: "dino_guard", x=5, y=0, z=0
+PythonBridge.tsx:319 🔍 Parsed arguments: (4) ['dino_guard', 5, 0, 0]
+PythonBridge.tsx:320 🔍 Calling function: spawn_npc with: (4) ['dino_guard', 5, 0, 0]
+PythonBridge.tsx:274 🤖 Python calling spawn_npc: dino_guard (3) [5, 0, 0]
+CreativeEngine.ts:145 ❌ NPC "dino_guard" not found. Use define_npc() first.
+console.error @ chunk-T6SUJGNB.js?v=c8b8a71d:18167
+spawnCustomNPC @ CreativeEngine.ts:145
+spawn_npc @ PythonBridge.tsx:278
+executePythonCode @ PythonBridge.tsx:322
+handlePythonExecute @ App.tsx:194
+handleRunScript @ PythonEditor.tsx:100
+callCallback2 @ chunk-PJEEZAML.js?v=c8b8a71d:3674
+invokeGuardedCallbackDev @ chunk-PJEEZAML.js?v=c8b8a71d:3699
+invokeGuardedCallback @ chunk-PJEEZAML.js?v=c8b8a71d:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-PJEEZAML.js?v=c8b8a71d:3736
+executeDispatch @ chunk-PJEEZAML.js?v=c8b8a71d:7014
+processDispatchQueueItemsInOrder @ chunk-PJEEZAML.js?v=c8b8a71d:7034
+processDispatchQueue @ chunk-PJEEZAML.js?v=c8b8a71d:7043
+dispatchEventsForPlugins @ chunk-PJEEZAML.js?v=c8b8a71d:7051
+(anonymous) @ chunk-PJEEZAML.js?v=c8b8a71d:7174
+batchedUpdates$1 @ chunk-PJEEZAML.js?v=c8b8a71d:18913
+batchedUpdates @ chunk-PJEEZAML.js?v=c8b8a71d:3579
+dispatchEventForPluginEventSystem @ chunk-PJEEZAML.js?v=c8b8a71d:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-PJEEZAML.js?v=c8b8a71d:5478
+dispatchEvent @ chunk-PJEEZAML.js?v=c8b8a71d:5472
+dispatchDiscreteEvent @ chunk-PJEEZAML.js?v=c8b8a71d:5449Understand this error
+PythonBridge.tsx:323 🔍 Function result: null
+PythonBridge.tsx:314 🔍 Parsing function call: spawn_npc with args: "robot_helper", x=-5, y=0, z=0
+PythonBridge.tsx:319 🔍 Parsed arguments: (4) ['robot_helper', -5, 0, 0]
+PythonBridge.tsx:320 🔍 Calling function: spawn_npc with: (4) ['robot_helper', -5, 0, 0]
+PythonBridge.tsx:274 🤖 Python calling spawn_npc: robot_helper (3) [-5, 0, 0]
+CreativeEngine.ts:145 ❌ NPC "robot_helper" not found. Use define_npc() first.
+console.error @ chunk-T6SUJGNB.js?v=c8b8a71d:18167
+spawnCustomNPC @ CreativeEngine.ts:145
+spawn_npc @ PythonBridge.tsx:278
+executePythonCode @ PythonBridge.tsx:322
+handlePythonExecute @ App.tsx:194
+handleRunScript @ PythonEditor.tsx:100
+callCallback2 @ chunk-PJEEZAML.js?v=c8b8a71d:3674
+invokeGuardedCallbackDev @ chunk-PJEEZAML.js?v=c8b8a71d:3699
+invokeGuardedCallback @ chunk-PJEEZAML.js?v=c8b8a71d:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-PJEEZAML.js?v=c8b8a71d:3736
+executeDispatch @ chunk-PJEEZAML.js?v=c8b8a71d:7014
+processDispatchQueueItemsInOrder @ chunk-PJEEZAML.js?v=c8b8a71d:7034
+processDispatchQueue @ chunk-PJEEZAML.js?v=c8b8a71d:7043
+dispatchEventsForPlugins @ chunk-PJEEZAML.js?v=c8b8a71d:7051
+(anonymous) @ chunk-PJEEZAML.js?v=c8b8a71d:7174
+batchedUpdates$1 @ chunk-PJEEZAML.js?v=c8b8a71d:18913
+batchedUpdates @ chunk-PJEEZAML.js?v=c8b8a71d:3579
+dispatchEventForPluginEventSystem @ chunk-PJEEZAML.js?v=c8b8a71d:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-PJEEZAML.js?v=c8b8a71d:5478
+dispatchEvent @ chunk-PJEEZAML.js?v=c8b8a71d:5472
+dispatchDiscreteEvent @ chunk-PJEEZAML.js?v=c8b8a71d:5449Understand this error
+PythonBridge.tsx:323 🔍 Function result: null
+PythonBridge.tsx:314 🔍 Parsing function call: spawn_npc with args: "fairy_guide", x=0, y=0, z=5
+PythonBridge.tsx:319 🔍 Parsed arguments: (4) ['fairy_guide', 0, 0, 5]
+PythonBridge.tsx:320 🔍 Calling function: spawn_npc with: (4) ['fairy_guide', 0, 0, 5]
+PythonBridge.tsx:274 🤖 Python calling spawn_npc: fairy_guide (3) [0, 0, 5]
+CreativeEngine.ts:145 ❌ NPC "fairy_guide" not found. Use define_npc() first.
+console.error @ chunk-T6SUJGNB.js?v=c8b8a71d:18167
+spawnCustomNPC @ CreativeEngine.ts:145
+spawn_npc @ PythonBridge.tsx:278
+executePythonCode @ PythonBridge.tsx:322
+handlePythonExecute @ App.tsx:194
+handleRunScript @ PythonEditor.tsx:100
+callCallback2 @ chunk-PJEEZAML.js?v=c8b8a71d:3674
+invokeGuardedCallbackDev @ chunk-PJEEZAML.js?v=c8b8a71d:3699
+invokeGuardedCallback @ chunk-PJEEZAML.js?v=c8b8a71d:3733
+invokeGuardedCallbackAndCatchFirstError @ chunk-PJEEZAML.js?v=c8b8a71d:3736
+executeDispatch @ chunk-PJEEZAML.js?v=c8b8a71d:7014
+processDispatchQueueItemsInOrder @ chunk-PJEEZAML.js?v=c8b8a71d:7034
+processDispatchQueue @ chunk-PJEEZAML.js?v=c8b8a71d:7043
+dispatchEventsForPlugins @ chunk-PJEEZAML.js?v=c8b8a71d:7051
+(anonymous) @ chunk-PJEEZAML.js?v=c8b8a71d:7174
+batchedUpdates$1 @ chunk-PJEEZAML.js?v=c8b8a71d:18913
+batchedUpdates @ chunk-PJEEZAML.js?v=c8b8a71d:3579
+dispatchEventForPluginEventSystem @ chunk-PJEEZAML.js?v=c8b8a71d:7173
+dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ chunk-PJEEZAML.js?v=c8b8a71d:5478
+dispatchEvent @ chunk-PJEEZAML.js?v=c8b8a71d:5472
+dispatchDiscreteEvent @ chunk-PJEEZAML.js?v=c8b8a71d:5449Understand this error
+PythonBridge.tsx:323 🔍 Function result: null
+PythonBridge.tsx:314 🔍 Parsing function call: list_blueprints with args: 
+PythonBridge.tsx:329 ❌ Function not found: list_blueprints
+PythonBridge.tsx:330 Available functions: (15) ['spawn_box', 'spawn_sphere', 'set_background', 'set_lighting', 'create_building', 'clear_scene', 'set_theme', 'set_weather', 'move_object', 'add_avatar_animation', 'print', 'define_shape', 'spawn_custom', 'define_npc', 'spawn_npc']
+PythonBridge.tsx:314 🔍 Parsing function call: set_theme with args: "grassland"
+PythonBridge.tsx:319 🔍 Parsed arguments: ['grassland']
+PythonBridge.tsx:320 🔍 Calling function: set_theme with: ['grassland']
+useEnvironment.tsx:337 Environment settings saved
+useEnvironment.tsx:274 Environment theme changed to: grassland
+PythonBridge.tsx:323 🔍 Function result: undefined
+PythonBridge.tsx:314 🔍 Parsing function call: spawn_box with args: x=2, y=2, z=2, color="red"
+PythonBridge.tsx:319 🔍 Parsed arguments: (4) [2, 2, 2, 'red']
+PythonBridge.tsx:320 🔍 Calling function: spawn_box with: (4) [2, 2, 2, 'red']
+PythonBridge.tsx:323 🔍 Function result: python_box_1750348087250
+PythonBridge.tsx:314 🔍 Parsing function call: spawn_sphere with args: x=-2, y=2, z=2, color="blue"
+PythonBridge.tsx:319 🔍 Parsed arguments: (4) [-2, 2, 2, 'blue']
+PythonBridge.tsx:320 🔍 Calling function: spawn_sphere with: (4) [-2, 2, 2, 'blue']
+PythonBridge.tsx:323 🔍 Function result: python_sphere_1750348087250
+PythonBridge.tsx:150 🐍 Python: 🎨 Your creative world is ready!
+PythonBridge.tsx:150 🐍 Python: Try creating more shapes and NPCs!
+Terrain.tsx:14 🌍 Terrain size: 100 units
+7Terrain.tsx:14 🌍 Terrain size: 100 units
+useWorldObjects.tsx:79 Saved objects to storage: [{…}]
+849Terrain.tsx:14 🌍 Terrain size: 100 units
+Terrain.tsx:14 🌍 Terrain size: 100 units
+456Terrain.tsx:14 🌍 Terrain size: 100 units
+PrefabObjects.tsx:103 Removed object with ID: house-1750348087250-fzcp6q4gp
+Terrain.tsx:14 🌍 Terrain size: 100 units
+Terrain.tsx:14 🌍 Terrain size: 100 units
+useWorldObjects.tsx:79 Saved objects to storage: []
+1976Terrain.tsx:14 🌍 Terrain size: 100 units

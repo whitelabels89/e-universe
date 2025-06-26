@@ -31,9 +31,13 @@ import { Minimap } from "./components/UI/Minimap";
 import { MinimapLegend } from "./components/UI/MinimapLegend";
 import { ProfileMenu } from "./components/UI/ProfileMenu";
 import { MobileControls } from "./components/UI/MobileControls";
+import { LearningHints } from "./components/UI/LearningHints";
+import { ResponsiveUI } from "./components/UI/ResponsiveUI";
+import { MobilePerformanceOptimizer } from "./components/UI/MobilePerformanceOptimizer";
 import { TopNavbar } from "./components/UI/TopNavbar";
 import { CampusBuildings } from "./components/CampusBuildings";
 import { InteriorEnvironment } from "./components/InteriorEnvironment";
+import { CreativePanel } from "./components/UI/CreativePanel";
 import { EnvironmentRenderer } from "./components/EnvironmentRenderer";
 import { BuildModeCamera } from "./components/BuildModeCamera";
 import { BuildPreviewGhost } from "./components/BuildPreviewGhost";
@@ -191,6 +195,8 @@ function App() {
   const handlePythonExecute = (code: string) => {
     if (pythonExecutor) {
       pythonExecutor(code);
+      // Trigger learning hint
+      window.dispatchEvent(new CustomEvent('python_executed'));
     }
   };
 
@@ -275,7 +281,7 @@ function App() {
           {/* Build Mode Camera Controller */}
           <BuildModeCamera />
 
-          {/* Python Bridge for 3D World Control */}
+          {/* Python Bridge for 3D World Control & Creative Engine */}
           <PythonBridge
             onCodeExecute={(executor) => setPythonExecutor(() => executor)}
           />
@@ -286,6 +292,9 @@ function App() {
             targetRotation={avatarRotation}
             moving={avatarMoving}
           />
+          
+          {/* Mobile Performance Optimization */}
+          <MobilePerformanceOptimizer />
         </Canvas>
 
         {/* Top Navigation Bar */}
@@ -305,7 +314,13 @@ function App() {
           terrainSize={100}
         />
         <GameUI />
-        <MobileControls />
+        
+        {/* Mobile Enhancements */}
+        <ResponsiveUI>
+          <MobileControls />
+        </ResponsiveUI>
+        
+        <CreativePanel />
 
         {/* Python Editor Panel */}
         <PythonEditor
