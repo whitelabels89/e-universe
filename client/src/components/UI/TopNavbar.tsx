@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Button } from "./button";
 import { Separator } from "./separator";
+import { motion, AnimatePresence } from "framer-motion";
 import { useCampus } from "../../lib/stores/useCampus";
 import { useEducation } from "../../lib/stores/useEducation";
 import { useBuildMode } from "../../lib/stores/useBuildMode";
@@ -11,7 +12,7 @@ import { useUniverseSettings } from "../../lib/stores/useUniverseSettings";
 import { 
   User, Building2, Settings, Gamepad2, Home, BookOpen, Trophy, Coins, 
   Menu, ChevronDown, ChevronUp, MoreHorizontal, Palette, School,
-  Hammer, Square, Circle, Triangle, Star, Target, Mountain
+  Hammer, Square, Circle, Triangle, Star, Target, Mountain, ArrowLeft
 } from "lucide-react";
 import { PREFAB_TYPES } from "../../types/education";
 
@@ -27,6 +28,7 @@ export function TopNavbar({ onPythonToggle }: TopNavbarProps = {}) {
   const [showProfileMenu, setShowProfileMenu] = useState<boolean>(false);
   const [showSettingsMenu, setShowSettingsMenu] = useState<boolean>(false);
   const [showEnvironmentMenu, setShowEnvironmentMenu] = useState<boolean>(false);
+  const [showHomeConfirmDialog, setShowHomeConfirmDialog] = useState<boolean>(false);
   
   const { 
     currentInterior, 
@@ -137,6 +139,12 @@ export function TopNavbar({ onPythonToggle }: TopNavbarProps = {}) {
   ];
 
   const handleTabClick = (tabId: string) => {
+    // Handle home button specifically
+    if (tabId === "home") {
+      setShowHomeConfirmDialog(true);
+      return;
+    }
+    
     setActiveTab(tabId);
     
     // Close all menus first
@@ -159,6 +167,14 @@ export function TopNavbar({ onPythonToggle }: TopNavbarProps = {}) {
     } else if (isBuildMode && tabId !== "building") {
       toggleBuildMode();
     }
+  };
+
+  const handleHomeConfirm = () => {
+    window.location.href = 'https://queensacademy.id/elearn/modul.html';
+  };
+
+  const handleHomeCancel = () => {
+    setShowHomeConfirmDialog(false);
   };
 
   const handlePrefabSelect = (prefabId: string) => {
@@ -630,6 +646,61 @@ export function TopNavbar({ onPythonToggle }: TopNavbarProps = {}) {
           </div>
         </div>
       )}
+
+      {/* Home Confirmation Dialog */}
+      <AnimatePresence>
+        {showHomeConfirmDialog && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-60 p-4"
+            onClick={handleHomeCancel}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-lg p-6 max-w-md w-full shadow-xl"
+              onClick={e => e.stopPropagation()}
+            >
+              {/* Dialog Header */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className="bg-blue-100 p-2 rounded-full">
+                  <ArrowLeft className="w-6 h-6 text-blue-600" />
+                </div>
+                <h2 className="text-xl font-bold text-gray-800">
+                  Kembali ke Dashboard?
+                </h2>
+              </div>
+
+              {/* Dialog Content */}
+              <p className="text-gray-600 mb-6">
+                Apakah Anda yakin ingin kembali ke dashboard Queens Academy? 
+                Progress yang belum disimpan akan hilang.
+              </p>
+
+              {/* Action Buttons */}
+              <div className="flex gap-3">
+                <motion.button
+                  onClick={handleHomeConfirm}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors"
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Ya, Kembali
+                </motion.button>
+                <motion.button
+                  onClick={handleHomeCancel}
+                  className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-lg font-medium transition-colors"
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Batal
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
